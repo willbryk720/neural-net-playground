@@ -246,10 +246,10 @@ class TfStuff extends Component {
           </div>
         </section>
 
-        <section>
+        {/* <section>
           <p>Inference Examples</p>
           <div id="images" />
-        </section>
+        </section> */}
       </div>
     );
   }
