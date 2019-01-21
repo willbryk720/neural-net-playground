@@ -34,6 +34,11 @@ class NetworkScene extends Component {
     this.camera.position.set(-2, -50, 2);
     this.camera.up.set(0, 0, 1);
 
+    this.mouse = new THREE.Vector2();
+    this.INTERSECTED = null;
+    this.raycaster = new THREE.Raycaster();
+    this.updateDocumentOrigin();
+
     // controls
 
     this.controls = new OrbitControls(this.camera, this.renderer.domElement);
@@ -60,6 +65,7 @@ class NetworkScene extends Component {
     this.scene.add(light);
 
     window.addEventListener("resize", this.onWindowResize, false);
+    window.addEventListener("mousemove", this.onDocumentMouseMove, false);
 
     this.start();
   }
@@ -94,7 +100,7 @@ class NetworkScene extends Component {
     return itemPositions;
   };
 
-  drawLine = ({ center, numNodes, geometry, material }) => {
+  drawLine = ({ center, numNodes, geometry }) => {
     const nodePositions = this.getPositionsOfLineOfItems(
       SQUARE_NEURON_SPACING,
       NEURON_WIDTH,
@@ -103,14 +109,16 @@ class NetworkScene extends Component {
     );
 
     nodePositions.forEach(nodePosition => {
+      const material = new THREE.MeshBasicMaterial({ color: 0x000000 });
       let mesh = new THREE.Mesh(geometry, material);
       mesh.position.x = nodePosition[0];
       mesh.position.y = nodePosition[1];
       mesh.position.z = nodePosition[2];
+      mesh.addEventListener("resize", this.onWindowResize, false);
       this.scene.add(mesh);
     });
   };
-  drawSquare = ({ center, numNodesWide, geometry, material }) => {
+  drawSquare = ({ center, numNodesWide, geometry }) => {
     const height = center[2];
     const centerX = center[0];
 
@@ -138,6 +146,7 @@ class NetworkScene extends Component {
     // draw the nodes from the positions
     nodePositions.forEach(row => {
       row.forEach(pos => {
+        const material = new THREE.MeshBasicMaterial({ color: 0x000000 });
         let mesh = new THREE.Mesh(geometry, material);
         mesh.position.x = pos[0] + centerX;
         mesh.position.y = pos[1];
@@ -271,7 +280,7 @@ class NetworkScene extends Component {
       NEURON_WIDTH,
       NEURON_WIDTH
     );
-    var material = new THREE.MeshBasicMaterial({ color: 0x000000 });
+    // var material = new THREE.MeshBasicMaterial({ color: 0x000000 });
 
     let layerHeight = 0;
     let previousSquareCenters;
@@ -288,15 +297,13 @@ class NetworkScene extends Component {
           this.drawSquare({
             center: [0, 0, layerHeight],
             numNodesWide: dimensions[0],
-            geometry,
-            material
+            geometry
           });
         } else {
           this.drawLine({
             center: [0, 0, layerHeight],
             numNodes: dimensions[0],
-            geometry,
-            material
+            geometry
           });
         }
       } else {
@@ -315,8 +322,7 @@ class NetworkScene extends Component {
             this.drawSquare({
               center: squareCenter,
               numNodesWide: dimensions[0],
-              geometry,
-              material
+              geometry
             });
           });
           previousSquareCenters = squareCenters;
@@ -324,8 +330,7 @@ class NetworkScene extends Component {
           this.drawLine({
             center: [0, 0, layerHeight],
             numNodes: dimensions[0],
-            geometry,
-            material
+            geometry
           });
         }
       }
@@ -474,6 +479,22 @@ class NetworkScene extends Component {
     // }
   };
   renderScene = () => {
+    // console.log("rendering scene");
+    this.raycaster.setFromCamera(this.mouse, this.camera);
+    const intersects = this.raycaster.intersectObjects(this.scene.children);
+    if (intersects.length > 0) {
+      if (this.INTERSECTED != intersects[0].object) {
+        if (this.INTERSECTED)
+          this.INTERSECTED.material.color.set(this.INTERSECTED.currentHex);
+        this.INTERSECTED = intersects[0].object;
+        this.INTERSECTED.currentHex = this.INTERSECTED.material.color;
+        this.INTERSECTED.material.color.set(0xff0000);
+      }
+    } else {
+      if (this.INTERSECTED)
+        this.INTERSECTED.material.color.set(this.INTERSECTED.currentHex);
+      this.INTERSECTED = null;
+    }
     this.renderer.render(this.scene, this.camera);
   };
   markLastChange = () => {
@@ -482,7 +503,12 @@ class NetworkScene extends Component {
       this.animate();
     }
   };
+
+  updateDocumentOrigin = () => {
+    this.documentOrigin = [window.innerWidth * this.props.windowRatio, 0];
+  };
   onWindowResize = () => {
+    this.updateDocumentOrigin();
     this.camera.aspect = window.innerWidth / window.innerHeight;
     this.camera.updateProjectionMatrix();
 
@@ -490,6 +516,18 @@ class NetworkScene extends Component {
       window.innerWidth * this.props.windowRatio,
       window.innerHeight * this.props.windowRatio
     );
+  };
+
+  onDocumentMouseMove = event => {
+    event.preventDefault();
+    const xOffset = event.clientX - this.documentOrigin[0];
+    const yOffset = event.clientY - this.documentOrigin[1];
+    const windowWidth = window.innerWidth * this.props.windowRatio;
+    const windowHeight = window.innerHeight * this.props.windowRatio;
+
+    // Dont know why the docs said to multiply by 2 and subtract 1
+    this.mouse.x = (xOffset / windowWidth) * 2 - 1;
+    this.mouse.y = -(yOffset / windowHeight) * 2 + 1;
   };
 
   render() {
