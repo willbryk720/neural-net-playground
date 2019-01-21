@@ -42,7 +42,7 @@ class NetworkScene extends Component {
     this.controls.dampingFactor = 0.1;
     this.controls.screenSpacePanning = false;
     this.controls.minDistance = 10;
-    this.controls.maxDistance = 400;
+    this.controls.maxDistance = 500;
     this.controls.keyPanSpeed = 1.5;
     this.controls.panSpeed = 0.6;
     this.controls.rotateSpeed = 0.05;
@@ -311,7 +311,6 @@ class NetworkScene extends Component {
             squareCenters = this.getSquareCenters(dimensions, layerHeight);
           }
 
-          console.log("SQUARECENTERS", squareCenters);
           squareCenters.forEach(squareCenter => {
             this.drawSquare({
               center: squareCenter,

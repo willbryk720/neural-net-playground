@@ -37,7 +37,7 @@ class App extends Component {
           </div>
         </div>
         <div style={{ display: "inline-block", width: "50%" }}>
-          {/* <NetworkScene windowRatio={0.5} layers={this.state.layers} /> */}
+          <NetworkScene windowRatio={0.5} layers={this.state.layers} />
           <TfStuff
             layers={this.state.layers}
             numEpochs={this.state.numEpochs}

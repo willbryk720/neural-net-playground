@@ -8,6 +8,7 @@ import {
 
 import { Button, Icon, Segment, Input } from "semantic-ui-react";
 import Layer from "./Layer";
+import AddStarterNetworks from "./AddStarterNetworks";
 
 const SortableContainer = sortableContainer(({ children }) => {
   return <ul>{children}</ul>;
@@ -56,10 +57,18 @@ class SortableLayers extends Component {
       ]
     });
   };
+
+  loadStarterNetwork = layers => {
+    this.setState({
+      layers: layers
+    });
+    this.props.updateLayers(layers);
+  };
   render() {
     return (
       <div>
         <h1>Create Neural Network</h1>
+        <AddStarterNetworks loadStarterNetwork={this.loadStarterNetwork} />
 
         <Button
           color="blue"
