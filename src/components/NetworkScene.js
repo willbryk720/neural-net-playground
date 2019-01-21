@@ -35,7 +35,7 @@ class NetworkScene extends Component {
     this.camera.up.set(0, 0, 1);
 
     this.mouse = new THREE.Vector2();
-    this.INTERSECTED = null;
+    this.hoverIntersectObject = null;
     this.raycaster = new THREE.Raycaster();
     this.updateDocumentOrigin();
 
@@ -66,6 +66,7 @@ class NetworkScene extends Component {
 
     window.addEventListener("resize", this.onWindowResize, false);
     window.addEventListener("mousemove", this.onDocumentMouseMove, false);
+    window.addEventListener("mousedown", this.onDocumentMouseDown, false);
 
     this.start();
   }
@@ -338,37 +339,6 @@ class NetworkScene extends Component {
       layerHeight += LAYER_VERTICAL_SPACING;
     });
 
-    // const NUM_LAYERS = newLayers.length;
-    // let NUM_NODES_PER_LAYER = 100;
-    // const LAYER_SPACING = 10;
-    // let layers = [];
-    // let layerSizes = [];
-    // for (var l = 0; l < NUM_LAYERS; l++) {
-    //   const layerData = this.getLayerDataFromLayer(newLayers[l]);
-    //   let layer = [];
-    //   NUM_NODES_PER_LAYER = layerData.numNeurons;
-    //   layerSizes.push(NUM_NODES_PER_LAYER);
-    //   const sqrt_num_nodes = Math.round(Math.sqrt(NUM_NODES_PER_LAYER));
-
-    //   for (var i = 0; i < NUM_NODES_PER_LAYER; i++) {
-    //     var mesh = new THREE.Mesh(geometry, material);
-    //     const pos = [
-    //       LAYER_SPACING * (l - NUM_LAYERS / 2),
-    //       1 * (i % sqrt_num_nodes) + (i % sqrt_num_nodes),
-    //       1 * Math.floor(i / sqrt_num_nodes) + Math.floor(i / sqrt_num_nodes)
-    //     ];
-    //     mesh.position.x = pos[0];
-    //     mesh.position.y = pos[1];
-    //     mesh.position.z = pos[2];
-    //     mesh.updateMatrix();
-    //     mesh.matrixAutoUpdate = false;
-    //     this.scene.add(mesh);
-
-    //     layer.push(pos);
-    //   }
-    //   layers.push(layer);
-    // }
-
     // DRAW EDGES
 
     // for (var l = 0; l < NUM_LAYERS - 1; l++) {
@@ -452,7 +422,6 @@ class NetworkScene extends Component {
     if (!this.frameId) {
       this.frameId = requestAnimationFrame(this.animate);
 
-      this.lastTimeControlsChanged = new Date();
       this.countSincelastControlsChange = 0;
 
       // this saves computer processing, because nothing updates after a few seconds
@@ -470,6 +439,7 @@ class NetworkScene extends Component {
     if (this.countSincelastControlsChange < 100) {
       this.frameId = window.requestAnimationFrame(this.animate);
     }
+    console.log("rendering again", this.countSincelastControlsChange);
 
     this.controls.update();
 
@@ -479,21 +449,24 @@ class NetworkScene extends Component {
     // }
   };
   renderScene = () => {
-    // console.log("rendering scene");
     this.raycaster.setFromCamera(this.mouse, this.camera);
     const intersects = this.raycaster.intersectObjects(this.scene.children);
     if (intersects.length > 0) {
-      if (this.INTERSECTED != intersects[0].object) {
-        if (this.INTERSECTED)
-          this.INTERSECTED.material.color.set(this.INTERSECTED.currentHex);
-        this.INTERSECTED = intersects[0].object;
-        this.INTERSECTED.currentHex = this.INTERSECTED.material.color;
-        this.INTERSECTED.material.color.set(0xff0000);
+      if (this.hoverIntersectObject != intersects[0].object) {
+        if (this.hoverIntersectObject)
+          this.hoverIntersectObject.material.color.set(
+            this.hoverIntersectObject.currentHex
+          );
+        this.hoverIntersectObject = intersects[0].object;
+        this.hoverIntersectObject.currentHex = this.hoverIntersectObject.material.color;
+        this.hoverIntersectObject.material.color.set(0xff0000);
       }
     } else {
-      if (this.INTERSECTED)
-        this.INTERSECTED.material.color.set(this.INTERSECTED.currentHex);
-      this.INTERSECTED = null;
+      if (this.hoverIntersectObject)
+        this.hoverIntersectObject.material.color.set(
+          this.hoverIntersectObject.currentHex
+        );
+      this.hoverIntersectObject = null;
     }
     this.renderer.render(this.scene, this.camera);
   };
@@ -519,15 +492,50 @@ class NetworkScene extends Component {
   };
 
   onDocumentMouseMove = event => {
-    event.preventDefault();
     const xOffset = event.clientX - this.documentOrigin[0];
     const yOffset = event.clientY - this.documentOrigin[1];
     const windowWidth = window.innerWidth * this.props.windowRatio;
     const windowHeight = window.innerHeight * this.props.windowRatio;
+    if (
+      xOffset >= 0 &&
+      event.clientX <= this.documentOrigin[0] + windowWidth &&
+      yOffset >= 0 &&
+      event.clientY <= this.documentOrigin[1] + windowHeight
+    ) {
+      event.preventDefault();
+      this.markLastChange();
+    }
 
     // Dont know why the docs said to multiply by 2 and subtract 1
     this.mouse.x = (xOffset / windowWidth) * 2 - 1;
     this.mouse.y = -(yOffset / windowHeight) * 2 + 1;
+  };
+
+  onDocumentMouseDown = event => {
+    const xOffset = event.clientX - this.documentOrigin[0];
+    const yOffset = event.clientY - this.documentOrigin[1];
+    const windowWidth = window.innerWidth * this.props.windowRatio;
+    const windowHeight = window.innerHeight * this.props.windowRatio;
+    if (
+      xOffset >= 0 &&
+      event.clientX <= this.documentOrigin[0] + windowWidth &&
+      yOffset >= 0 &&
+      event.clientY <= this.documentOrigin[1] + windowHeight
+    ) {
+      event.preventDefault();
+      this.markLastChange();
+
+      // update mouse
+      this.mouse.x = (xOffset / windowWidth) * 2 - 1;
+      this.mouse.y = -(yOffset / windowHeight) * 2 + 1;
+
+      this.raycaster.setFromCamera(this.mouse, this.camera);
+      const intersects = this.raycaster.intersectObjects(this.scene.children);
+      if (intersects.length > 0) {
+        const intersectObject = intersects[0].object;
+        intersectObject.material.color.set(0x0000ff);
+      }
+    }
   };
 
   render() {
