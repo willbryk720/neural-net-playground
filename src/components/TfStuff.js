@@ -26,16 +26,44 @@ class TfStuff extends Component {
     // model.add(tf.layers.dense({ units: 42, activation: "relu" }));
     // model.add(tf.layers.dense({ units: 10, activation: "softmax" }));
     // return model;
-    console.log(this.props.layers);
     const model = tf.sequential();
-    model.add(tf.layers.flatten({ inputShape: [IMAGE_H, IMAGE_W, 1] }));
+
+    // model.add(tf.layers.flatten({ inputShape: [IMAGE_H, IMAGE_W, 1] }));
     this.props.layers.forEach(layer => {
-      const layerData = getLayerDataFromString(layer);
-      model.add(
-        tf.layers.dense({ units: layerData.numNeurons, activation: "relu" })
-      );
+      const { layerType, options } = layer;
+      const optionsObj = JSON.parse(options);
+      model.add(tf.layers[layerType](optionsObj));
+      // const layerOptions = getLayerDataFromString(layer);
+      // model.add(
+      //   tf.layers.dense({ units: layerData.numNeurons, activation: "relu" })
+      // );
     });
+    // model.add(tf.layers.dense({ units: 10, activation: "softmax" }));
+    return model;
+  }
+
+  createConvModel() {
+    const model = tf.sequential();
+    model.add(
+      tf.layers.conv2d({
+        inputShape: [IMAGE_H, IMAGE_W, 1],
+        kernelSize: 3,
+        filters: 16,
+        activation: "relu"
+      })
+    );
+    model.add(tf.layers.maxPooling2d({ poolSize: 2, strides: 2 }));
+    model.add(
+      tf.layers.conv2d({ kernelSize: 3, filters: 32, activation: "relu" })
+    );
+    model.add(tf.layers.maxPooling2d({ poolSize: 2, strides: 2 }));
+    model.add(
+      tf.layers.conv2d({ kernelSize: 3, filters: 32, activation: "relu" })
+    );
+    model.add(tf.layers.flatten({}));
+    model.add(tf.layers.dense({ units: 64, activation: "relu" }));
     model.add(tf.layers.dense({ units: 10, activation: "softmax" }));
+
     return model;
   }
 
@@ -181,7 +209,7 @@ class TfStuff extends Component {
 
     this.logStatus("Creating model...");
     // const model = createModel();
-    const model = this.createDenseModel();
+    const model = this.createConvModel();
     model.summary();
 
     this.logStatus("Starting model training...");

@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 // import "./App.css";
-import ThreeScene from "./components/ThreeScene";
+import NetworkScene from "./components/NetworkScene";
 import Left from "./components/Left";
 
 import TfStuff from "./components/TfStuff";
@@ -14,7 +14,7 @@ class App extends Component {
   }
 
   updateLayers = newLayers => {
-    console.log(newLayers);
+    console.log("NEWLAYERS", newLayers);
     this.setState({ layers: newLayers });
   };
 
@@ -37,7 +37,7 @@ class App extends Component {
           </div>
         </div>
         <div style={{ display: "inline-block", width: "50%" }}>
-          <ThreeScene windowRatio={0.5} layers={this.state.layers} />
+          {/* <NetworkScene windowRatio={0.5} layers={this.state.layers} /> */}
           <TfStuff
             layers={this.state.layers}
             numEpochs={this.state.numEpochs}
