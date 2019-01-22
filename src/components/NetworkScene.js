@@ -39,6 +39,9 @@ class NetworkScene extends Component {
     this.raycaster = new THREE.Raycaster();
     this.updateDocumentOrigin();
 
+    // initialize neuron edges
+    this.neuronEdges = [];
+
     // controls
 
     this.controls = new OrbitControls(this.camera, this.renderer.domElement);
@@ -324,22 +327,14 @@ class NetworkScene extends Component {
     return allNeuronPositions;
   };
 
-  updateNetworkSetup(newLayers) {
-    const layersMetadata = this.getLayersMetadataFromLayers(newLayers);
-    console.log("LAYERSMETADATA", layersMetadata);
-
+  drawAllNeuronPositions = allNeuronPositions => {
     // VISUALIZE
     var geometry = new THREE.BoxGeometry(
       NEURON_WIDTH,
       NEURON_WIDTH,
       NEURON_WIDTH
     );
-    // var material = new THREE.MeshBasicMaterial({ color: 0x000000 });
 
-    const allNeuronPositions = this.getAllNeuronPositions(layersMetadata);
-    console.log("ALL", allNeuronPositions);
-
-    // // draw the nodes from the positions
     allNeuronPositions.forEach(layerOfPositions => {
       const { isSquare, neuronPositions } = layerOfPositions;
       neuronPositions.forEach(neuronGrouping => {
@@ -361,86 +356,74 @@ class NetworkScene extends Component {
             mesh.position.x = pos[0];
             mesh.position.y = pos[1];
             mesh.position.z = pos[2];
+            mesh.layerShape = "line";
             this.scene.add(mesh);
           });
         }
       });
     });
+  };
 
-    // DRAW EDGES
+  // drawAxes = () => {
+  //   // Axes
+  //   var axisGeometry = new THREE.Geometry();
+  //   axisGeometry.vertices.push(
+  //     new THREE.Vector3(0, 0, 0),
+  //     new THREE.Vector3(100, 0, 0)
+  //   );
 
-    // for (var l = 0; l < NUM_LAYERS - 1; l++) {
-    //   for (var i = 0; i < layerSizes[l]; i++) {
-    //     const pos1 = layers[l][i];
+  //   this.scene.add(
+  //     new THREE.Line(
+  //       axisGeometry,
+  //       new THREE.LineBasicMaterial({
+  //         color: 0xffffff,
+  //         linewidth: 50
+  //       })
+  //     )
+  //   );
 
-    //     for (var j = 0; j < layerSizes[l + 1]; j++) {
-    //       const pos2 = layers[l + 1][j];
-    //       // if (Math.random() < 0.5) {
-    //       var axisGeometry = new THREE.Geometry();
-    //       axisGeometry.vertices.push(
-    //         new THREE.Vector3(...pos1),
-    //         new THREE.Vector3(...pos2)
-    //       );
+  //   axisGeometry = new THREE.Geometry();
+  //   axisGeometry.vertices.push(
+  //     new THREE.Vector3(0, 0, 0),
+  //     new THREE.Vector3(0, 100, 0)
+  //   );
 
-    //       this.scene.add(
-    //         new THREE.Line(
-    //           axisGeometry,
-    //           new THREE.LineBasicMaterial({
-    //             color: 0xff0000
-    //           })
-    //         )
-    //       );
-    //     }
-    //   }
-    // }
+  //   this.scene.add(
+  //     new THREE.Line(
+  //       axisGeometry,
+  //       new THREE.LineBasicMaterial({
+  //         color: 0x00ff00,
+  //         linewidth: 50
+  //       })
+  //     )
+  //   );
 
-    // Axes
-    var axisGeometry = new THREE.Geometry();
-    axisGeometry.vertices.push(
-      new THREE.Vector3(0, 0, 0),
-      new THREE.Vector3(100, 0, 0)
-    );
+  //   axisGeometry = new THREE.Geometry();
+  //   axisGeometry.vertices.push(
+  //     new THREE.Vector3(0, 0, 0),
+  //     new THREE.Vector3(0, 0, 100)
+  //   );
 
-    this.scene.add(
-      new THREE.Line(
-        axisGeometry,
-        new THREE.LineBasicMaterial({
-          color: 0xffffff,
-          linewidth: 50
-        })
-      )
-    );
+  //   this.scene.add(
+  //     new THREE.Line(
+  //       axisGeometry,
+  //       new THREE.LineBasicMaterial({
+  //         color: 0x0000ff
+  //       })
+  //     )
+  //   );
+  // };
 
-    axisGeometry = new THREE.Geometry();
-    axisGeometry.vertices.push(
-      new THREE.Vector3(0, 0, 0),
-      new THREE.Vector3(0, 100, 0)
-    );
+  updateNetworkSetup(newLayers) {
+    const layersMetadata = this.getLayersMetadataFromLayers(newLayers);
+    console.log("LAYERSMETADATA", layersMetadata);
 
-    this.scene.add(
-      new THREE.Line(
-        axisGeometry,
-        new THREE.LineBasicMaterial({
-          color: 0x00ff00,
-          linewidth: 50
-        })
-      )
-    );
+    this.allNeuronPositions = this.getAllNeuronPositions(layersMetadata);
 
-    axisGeometry = new THREE.Geometry();
-    axisGeometry.vertices.push(
-      new THREE.Vector3(0, 0, 0),
-      new THREE.Vector3(0, 0, 100)
-    );
+    // draw the nodes from the positions
+    this.drawAllNeuronPositions(this.allNeuronPositions);
 
-    this.scene.add(
-      new THREE.Line(
-        axisGeometry,
-        new THREE.LineBasicMaterial({
-          color: 0x0000ff
-        })
-      )
-    );
+    // this.drawAxes();
   }
   componentWillUnmount() {
     this.stop();
@@ -476,6 +459,71 @@ class NetworkScene extends Component {
     //   this.camera.position.set(600, cameraPos[1], cameraPos[2]);
     // }
   };
+
+  drawEdges = neuron => {
+    // remove previous edges
+    this.neuronEdges.forEach(edge => {
+      this.scene.remove(edge);
+    });
+
+    let neuronEdges = [];
+    if (neuron.layerShape === "line") {
+      const previousLayerIndex =
+        Math.round(neuron.position.z / LAYER_VERTICAL_SPACING) - 1;
+      const { isSquare, neuronPositions } = this.allNeuronPositions[
+        previousLayerIndex
+      ];
+      const secondPos = [
+        neuron.position.x,
+        neuron.position.y,
+        neuron.position.z - NEURON_WIDTH / 2
+      ];
+
+      neuronPositions.forEach(neuronGrouping => {
+        if (isSquare) {
+          neuronGrouping.forEach(row => {
+            row.forEach(pos => {
+              let axisGeometry = new THREE.Geometry();
+              axisGeometry.vertices.push(
+                new THREE.Vector3(...secondPos),
+                new THREE.Vector3(...pos)
+              );
+              neuronEdges.push(
+                new THREE.Line(
+                  axisGeometry,
+                  new THREE.LineBasicMaterial({
+                    color: 0xff0000
+                  })
+                )
+              );
+            });
+          });
+        } else {
+          neuronGrouping.forEach(pos => {
+            let axisGeometry = new THREE.Geometry();
+            axisGeometry.vertices.push(
+              new THREE.Vector3(...secondPos),
+              new THREE.Vector3(...pos)
+            );
+            neuronEdges.push(
+              new THREE.Line(
+                axisGeometry,
+                new THREE.LineBasicMaterial({
+                  color: 0xff0000
+                })
+              )
+            );
+          });
+        }
+      });
+
+      this.neuronEdges = neuronEdges;
+      this.neuronEdges.forEach(edge => {
+        this.scene.add(edge);
+      });
+    }
+  };
+
   renderScene = () => {
     this.raycaster.setFromCamera(this.mouse, this.camera);
     const intersects = this.raycaster.intersectObjects(this.scene.children);
@@ -491,7 +539,7 @@ class NetworkScene extends Component {
         this.hoverIntersectObject = intersects[0].object;
         this.hoverIntersectObject.formerColorHex = this.hoverIntersectObject.material.color.getHex();
         this.hoverIntersectObject.material.color.set(0xff0000);
-        console.log(this.hoverIntersectObject);
+        // this.drawEdges(this.hoverIntersectObject);
       }
     } else {
       if (this.hoverIntersectObject) {
@@ -505,6 +553,7 @@ class NetworkScene extends Component {
     }
     this.renderer.render(this.scene, this.camera);
   };
+
   markLastChange = () => {
     if (this.countSincelastControlsChange >= 100) {
       this.countSincelastControlsChange = 0;
@@ -515,6 +564,7 @@ class NetworkScene extends Component {
   updateDocumentOrigin = () => {
     this.documentOrigin = [window.innerWidth * this.props.windowRatio, 0];
   };
+
   onWindowResize = () => {
     this.updateDocumentOrigin();
     this.camera.aspect = window.innerWidth / window.innerHeight;
@@ -568,7 +618,11 @@ class NetworkScene extends Component {
       const intersects = this.raycaster.intersectObjects(this.scene.children);
       if (intersects.length > 0) {
         const intersectObject = intersects[0].object;
-        intersectObject.material.color.set(0x0000ff);
+        if (intersectObject.type === "Mesh") {
+          // dont want this to trigger for a Line
+          intersectObject.material.color.set(0x0000ff);
+          this.drawEdges(this.hoverIntersectObject);
+        }
       }
     }
   };

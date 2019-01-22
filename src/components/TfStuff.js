@@ -20,50 +20,46 @@ class TfStuff extends Component {
     this.setState({ status: s });
   }
 
-  createDenseModel() {
-    // const model = tf.sequential();
-    // model.add(tf.layers.flatten({ inputShape: [IMAGE_H, IMAGE_W, 1] }));
-    // model.add(tf.layers.dense({ units: 42, activation: "relu" }));
-    // model.add(tf.layers.dense({ units: 10, activation: "softmax" }));
-    // return model;
-    const model = tf.sequential();
+  // createDenseModel() {
+  //   const model = tf.sequential();
+  //   model.add(tf.layers.flatten({ inputShape: [IMAGE_H, IMAGE_W, 1] }));
+  //   model.add(tf.layers.dense({ units: 42, activation: "relu" }));
+  //   model.add(tf.layers.dense({ units: 10, activation: "softmax" }));
+  //   return model;
+  // }
 
-    // model.add(tf.layers.flatten({ inputShape: [IMAGE_H, IMAGE_W, 1] }));
+  // createConvModel() {
+  //   const model = tf.sequential();
+  //   model.add(
+  //     tf.layers.conv2d({
+  //       inputShape: [IMAGE_H, IMAGE_W, 1],
+  //       kernelSize: 3,
+  //       filters: 16,
+  //       activation: "relu"
+  //     })
+  //   );
+  //   model.add(tf.layers.maxPooling2d({ poolSize: 2, strides: 2 }));
+  //   model.add(
+  //     tf.layers.conv2d({ kernelSize: 3, filters: 32, activation: "relu" })
+  //   );
+  //   model.add(tf.layers.maxPooling2d({ poolSize: 2, strides: 2 }));
+  //   model.add(
+  //     tf.layers.conv2d({ kernelSize: 3, filters: 32, activation: "relu" })
+  //   );
+  //   model.add(tf.layers.flatten({}));
+  //   model.add(tf.layers.dense({ units: 64, activation: "relu" }));
+  //   model.add(tf.layers.dense({ units: 10, activation: "softmax" }));
+
+  //   return model;
+  // }
+
+  createModel() {
+    const model = tf.sequential();
     this.props.layers.forEach(layer => {
       const { layerType, options } = layer;
       const optionsObj = JSON.parse(options);
       model.add(tf.layers[layerType](optionsObj));
-      // const layerOptions = getLayerDataFromString(layer);
-      // model.add(
-      //   tf.layers.dense({ units: layerData.numNeurons, activation: "relu" })
-      // );
     });
-    // model.add(tf.layers.dense({ units: 10, activation: "softmax" }));
-    return model;
-  }
-
-  createConvModel() {
-    const model = tf.sequential();
-    model.add(
-      tf.layers.conv2d({
-        inputShape: [IMAGE_H, IMAGE_W, 1],
-        kernelSize: 3,
-        filters: 16,
-        activation: "relu"
-      })
-    );
-    model.add(tf.layers.maxPooling2d({ poolSize: 2, strides: 2 }));
-    model.add(
-      tf.layers.conv2d({ kernelSize: 3, filters: 32, activation: "relu" })
-    );
-    model.add(tf.layers.maxPooling2d({ poolSize: 2, strides: 2 }));
-    model.add(
-      tf.layers.conv2d({ kernelSize: 3, filters: 32, activation: "relu" })
-    );
-    model.add(tf.layers.flatten({}));
-    model.add(tf.layers.dense({ units: 64, activation: "relu" }));
-    model.add(tf.layers.dense({ units: 10, activation: "softmax" }));
-
     return model;
   }
 
@@ -201,6 +197,14 @@ class TfStuff extends Component {
     return data;
   }
 
+  async printStuff(model) {
+    console.log("layres", model.layers);
+    const weights = model.layers[1].getWeights();
+    console.log(weights);
+    console.log(await weights[0].as1D().data());
+    return weights;
+  }
+
   async runTF() {
     // This is the main function. It loads the MNIST data, trains the model, and
     // then shows what the model predicted on unseen test data.
@@ -208,9 +212,14 @@ class TfStuff extends Component {
     const data = await this.load();
 
     this.logStatus("Creating model...");
-    // const model = createModel();
-    const model = this.createConvModel();
+    const model = this.createModel();
+
+    // const model = this.createConvModel();
     model.summary();
+
+    const layer0 = this.printStuff(model);
+    console.log(layer0);
+    // console.log(layer0[0].print());
 
     this.logStatus("Starting model training...");
     await this.train(model, () => this.showPredictions(model, data), data);
