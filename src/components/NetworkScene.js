@@ -101,25 +101,17 @@ class NetworkScene extends Component {
     return itemPositions;
   };
 
-  drawLine = ({ center, numNodes, geometry }) => {
+  getNeuronsInLine = ({ center, numNodes }) => {
     const nodePositions = this.getPositionsOfLineOfItems(
       SQUARE_NEURON_SPACING,
       NEURON_WIDTH,
       numNodes,
       center[2]
     );
-
-    nodePositions.forEach(nodePosition => {
-      const material = new THREE.MeshBasicMaterial({ color: 0x000000 });
-      let mesh = new THREE.Mesh(geometry, material);
-      mesh.position.x = nodePosition[0];
-      mesh.position.y = nodePosition[1];
-      mesh.position.z = nodePosition[2];
-      mesh.addEventListener("resize", this.onWindowResize, false);
-      this.scene.add(mesh);
-    });
+    return nodePositions;
   };
-  drawSquare = ({ center, numNodesWide, geometry }) => {
+
+  getNeuronsInSquare = ({ center, numNodesWide }) => {
     const height = center[2];
     const centerX = center[0];
 
@@ -140,22 +132,13 @@ class NetworkScene extends Component {
         height
       );
       // modify y values
-      newRow = newRow.map(pos => [pos[0], newY, height]);
+      newRow = newRow.map(pos => [pos[0] + centerX, newY, height]);
       nodePositions.push(newRow);
     }
 
-    // draw the nodes from the positions
-    nodePositions.forEach(row => {
-      row.forEach(pos => {
-        const material = new THREE.MeshBasicMaterial({ color: 0x000000 });
-        let mesh = new THREE.Mesh(geometry, material);
-        mesh.position.x = pos[0] + centerX;
-        mesh.position.y = pos[1];
-        mesh.position.z = pos[2];
-        this.scene.add(mesh);
-      });
-    });
+    return nodePositions;
   };
+
   getSquareCenters = (dimensions, layerHeight) => {
     let numSquares = dimensions[2];
     const numNodesPerSide = dimensions[0];
@@ -271,17 +254,8 @@ class NetworkScene extends Component {
     return layersMetadata;
   };
 
-  updateNetworkSetup(newLayers) {
-    const layersMetadata = this.getLayersMetadataFromLayers(newLayers);
-    console.log("LAYERSMETADATA", layersMetadata);
-
-    // VISUALIZE
-    var geometry = new THREE.BoxGeometry(
-      NEURON_WIDTH,
-      NEURON_WIDTH,
-      NEURON_WIDTH
-    );
-    // var material = new THREE.MeshBasicMaterial({ color: 0x000000 });
+  getAllNeuronPositions = layersMetadata => {
+    let allNeuronPositions = [];
 
     let layerHeight = 0;
     let previousSquareCenters;
@@ -293,19 +267,23 @@ class NetworkScene extends Component {
         directlyAbovePrevious,
         layerType
       } = layerMetadata;
+
+      let neuronPositions = [];
       if (index == 0) {
         if (isSquare) {
-          this.drawSquare({
-            center: [0, 0, layerHeight],
-            numNodesWide: dimensions[0],
-            geometry
-          });
+          neuronPositions.push(
+            this.getNeuronsInSquare({
+              center: [0, 0, layerHeight],
+              numNodesWide: dimensions[0]
+            })
+          );
         } else {
-          this.drawLine({
-            center: [0, 0, layerHeight],
-            numNodes: dimensions[0],
-            geometry
-          });
+          neuronPositions.push(
+            this.getNeuronsInLine({
+              center: [0, 0, layerHeight],
+              numNodes: dimensions[0]
+            })
+          );
         }
       } else {
         if (layerMetadata.isSquare) {
@@ -320,23 +298,73 @@ class NetworkScene extends Component {
           }
 
           squareCenters.forEach(squareCenter => {
-            this.drawSquare({
-              center: squareCenter,
-              numNodesWide: dimensions[0],
-              geometry
-            });
+            neuronPositions.push(
+              this.getNeuronsInSquare({
+                center: squareCenter,
+                numNodesWide: dimensions[0]
+              })
+            );
           });
           previousSquareCenters = squareCenters;
         } else {
-          this.drawLine({
-            center: [0, 0, layerHeight],
-            numNodes: dimensions[0],
-            geometry
-          });
+          neuronPositions.push(
+            this.getNeuronsInLine({
+              center: [0, 0, layerHeight],
+              numNodes: dimensions[0]
+            })
+          );
         }
       }
 
+      // array that includes neuronPositions which are all the positions
+      allNeuronPositions.push({ isSquare, dimensions, neuronPositions });
       layerHeight += LAYER_VERTICAL_SPACING;
+    });
+
+    return allNeuronPositions;
+  };
+
+  updateNetworkSetup(newLayers) {
+    const layersMetadata = this.getLayersMetadataFromLayers(newLayers);
+    console.log("LAYERSMETADATA", layersMetadata);
+
+    // VISUALIZE
+    var geometry = new THREE.BoxGeometry(
+      NEURON_WIDTH,
+      NEURON_WIDTH,
+      NEURON_WIDTH
+    );
+    // var material = new THREE.MeshBasicMaterial({ color: 0x000000 });
+
+    const allNeuronPositions = this.getAllNeuronPositions(layersMetadata);
+    console.log("ALL", allNeuronPositions);
+
+    // // draw the nodes from the positions
+    allNeuronPositions.forEach(layerOfPositions => {
+      const { isSquare, neuronPositions } = layerOfPositions;
+      neuronPositions.forEach(neuronGrouping => {
+        if (isSquare) {
+          neuronGrouping.forEach(row => {
+            row.forEach(pos => {
+              const material = new THREE.MeshBasicMaterial({ color: 0x000000 });
+              let mesh = new THREE.Mesh(geometry, material);
+              mesh.position.x = pos[0];
+              mesh.position.y = pos[1];
+              mesh.position.z = pos[2];
+              this.scene.add(mesh);
+            });
+          });
+        } else {
+          neuronGrouping.forEach(pos => {
+            const material = new THREE.MeshBasicMaterial({ color: 0x000000 });
+            let mesh = new THREE.Mesh(geometry, material);
+            mesh.position.x = pos[0];
+            mesh.position.y = pos[1];
+            mesh.position.z = pos[2];
+            this.scene.add(mesh);
+          });
+        }
+      });
     });
 
     // DRAW EDGES
