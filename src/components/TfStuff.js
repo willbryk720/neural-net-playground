@@ -5,53 +5,26 @@ import * as ui from "../utils/ui";
 import { IMAGE_H, IMAGE_W, MnistData } from "../utils/data";
 import { Button, Input } from "semantic-ui-react";
 
-function getLayerDataFromString(newLayer) {
-  const numNeurons = parseInt(newLayer.split("neurons")[0]);
-  return { numNeurons: numNeurons };
-}
+import { Chart } from "react-google-charts";
+import LineChart from "react-linechart";
+
+import "../../node_modules/react-linechart/dist/styles.css";
+
+let accuracyValues = [[], []];
 
 class TfStuff extends Component {
   constructor(props) {
     super(props);
-    this.state = { status: "", currentlyTraining: false };
+    this.state = {
+      status: "",
+      currentlyTraining: false,
+      trainingAccuracyValues: []
+    };
   }
 
   logStatus(s) {
     this.setState({ status: s });
   }
-
-  // createDenseModel() {
-  //   const model = tf.sequential();
-  //   model.add(tf.layers.flatten({ inputShape: [IMAGE_H, IMAGE_W, 1] }));
-  //   model.add(tf.layers.dense({ units: 42, activation: "relu" }));
-  //   model.add(tf.layers.dense({ units: 10, activation: "softmax" }));
-  //   return model;
-  // }
-
-  // createConvModel() {
-  //   const model = tf.sequential();
-  //   model.add(
-  //     tf.layers.conv2d({
-  //       inputShape: [IMAGE_H, IMAGE_W, 1],
-  //       kernelSize: 3,
-  //       filters: 16,
-  //       activation: "relu"
-  //     })
-  //   );
-  //   model.add(tf.layers.maxPooling2d({ poolSize: 2, strides: 2 }));
-  //   model.add(
-  //     tf.layers.conv2d({ kernelSize: 3, filters: 32, activation: "relu" })
-  //   );
-  //   model.add(tf.layers.maxPooling2d({ poolSize: 2, strides: 2 }));
-  //   model.add(
-  //     tf.layers.conv2d({ kernelSize: 3, filters: 32, activation: "relu" })
-  //   );
-  //   model.add(tf.layers.flatten({}));
-  //   model.add(tf.layers.dense({ units: 64, activation: "relu" }));
-  //   model.add(tf.layers.dense({ units: 10, activation: "softmax" }));
-
-  //   return model;
-  // }
 
   createModel() {
     const model = tf.sequential();
@@ -63,7 +36,36 @@ class TfStuff extends Component {
     return model;
   }
 
+  plotAccuracy(batch, accuracy, set) {
+    // const accuracyContainer = document.getElementById("accuracy-canvas");
+    // const series = set === "train" ? 0 : 1;
+    accuracyValues[0].push({ x: batch, y: accuracy });
+
+    this.setState({
+      trainingAccuracyValues: [
+        ...this.state.trainingAccuracyValues,
+        { x: batch, y: accuracy }
+      ]
+    });
+    console.log(accuracyValues);
+    // tfvis.render.linechart(
+    //   { values: accuracyValues, series: ["train", "validation"] },
+    //   accuracyContainer,
+    //   {
+    //     xLabel: "Batch #",
+    //     yLabel: "Loss",
+    //     width: 400,
+    //     height: 300
+    //   }
+    // );
+    // accuracyLabelElement.innerText = `last accuracy: ${(accuracy * 100).toFixed(
+    //   1
+    // )}%`;
+  }
+
   async train(model, onIteration, data) {
+    accuracyValues = [[], []];
+
     this.logStatus("Training model...");
     const LEARNING_RATE = 0.01;
     const optimizer = "rmsprop";
@@ -93,14 +95,19 @@ class TfStuff extends Component {
       callbacks: {
         onBatchEnd: async (batch, logs) => {
           trainBatchCount++;
-          this.logStatus(
-            `Training... (` +
-              `${((trainBatchCount / totalNumBatches) * 100).toFixed(1)}%` +
-              ` complete). To stop training, refresh or close page.`
-          );
+          if (batch % 10 === 0) {
+            this.logStatus(
+              `Training... (` +
+                `${((trainBatchCount / totalNumBatches) * 100).toFixed(1)}%` +
+                ` complete). To stop training, refresh or close page.`
+            );
+          }
 
           // ui.plotLoss(trainBatchCount, logs.loss, "train");
-          // ui.plotAccuracy(trainBatchCount, logs.acc, "train");
+          if (batch % 10 === 0) {
+            this.plotAccuracy(trainBatchCount, logs.acc, "train");
+          }
+
           // if (onIteration && batch % 10 === 0) {
           //   onIteration("onBatchEnd", batch, logs);
           // }
@@ -109,7 +116,7 @@ class TfStuff extends Component {
         onEpochEnd: async (epoch, logs) => {
           valAcc = logs.val_acc;
           // ui.plotLoss(trainBatchCount, logs.val_loss, "validation");
-          // ui.plotAccuracy(trainBatchCount, logs.val_acc, "validation");
+          this.plotAccuracy(trainBatchCount, logs.val_acc, "validation");
           // if (onIteration) {
           //   onIteration("onEpochEnd", epoch, logs);
           // }
@@ -198,10 +205,10 @@ class TfStuff extends Component {
   }
 
   async printStuff(model) {
-    console.log("layres", model.layers);
+    console.log("layers", model.layers);
     const weights = model.layers[1].getWeights();
     console.log(weights);
-    console.log(await weights[0].as1D().data());
+    // console.log(await weights[0].as1D().data());
     return weights;
   }
 
@@ -214,12 +221,10 @@ class TfStuff extends Component {
     this.logStatus("Creating model...");
     const model = this.createModel();
 
-    // const model = this.createConvModel();
     model.summary();
 
     const layer0 = this.printStuff(model);
     console.log(layer0);
-    // console.log(layer0[0].print());
 
     this.logStatus("Starting model training...");
     await this.train(model, () => this.showPredictions(model, data), data);
@@ -227,24 +232,23 @@ class TfStuff extends Component {
     this.setState({ currentlyTraining: false });
   }
 
-  // componentDidMount() {
-
-  // }
-
   render() {
+    const data = [
+      {
+        color: "steelblue",
+        points: this.state.trainingAccuracyValues
+      }
+    ];
+    // const chartData = [
+    //   {
+    //     color: "steelblue",
+    //     points: this.state.trainingAccuracyValues
+    //   }
+    // ];
     return (
       <div className="tfjs-example-container">
-        <h3>
-          Train a model to recognize handwritten digits from the MNIST database
-          using the tf.layers api.
-        </h3>
-
+        <h3>Recognize handwritten digits from the MNIST database</h3>
         <section>
-          <div>
-            <label>Model Type: DenseNet</label>
-          </div>
-          <br />
-
           <div>
             <label># of training epochs:</label>
             <Input
@@ -266,7 +270,6 @@ class TfStuff extends Component {
             Load Data and Train Model{" "}
           </Button>
         </section>
-
         <section>
           <p>{this.state.status} </p>
           <p id="message" />
@@ -282,11 +285,40 @@ class TfStuff extends Component {
             </div>
           </div>
         </section>
-
-        {/* <section>
-          <p>Inference Examples</p>
-          <div id="images" />
-        </section> */}
+        {/* <Chart
+          chartType="ScatterChart"
+          data={[["Age", "Weight"], [4, 5.5], [6, 5.5], [8, 12]]}
+          width="100%"
+          height="400px"
+          legendToggle
+        /> */}
+        {/* <Chart
+          width={"600px"}
+          height={"400px"}
+          chartType="LineChart"
+          loader={<div>Loading Chart</div>}
+          data={this.state.trainingAccuracyValues}
+          options={{
+            hAxis: {
+              title: "Batch"
+            },
+            vAxis: {
+              title: "Accuracy"
+            }
+          }}
+          rootProps={{ "data-testid": "1" }}
+        /> */}
+        <LineChart
+          width={600}
+          height={400}
+          data={data}
+          xLabel={"Batch"}
+          yLabel={"Accuracy"}
+          pointRadius={2}
+          yMax={1}
+        />{" "}
+        <br />
+        <br />
       </div>
     );
   }
