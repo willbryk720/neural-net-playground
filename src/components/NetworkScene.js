@@ -439,7 +439,7 @@ class NetworkScene extends Component {
     if (this.countSincelastControlsChange < 100) {
       this.frameId = window.requestAnimationFrame(this.animate);
     }
-    console.log("rendering again", this.countSincelastControlsChange);
+    // console.log("rendering again", this.countSincelastControlsChange);
 
     this.controls.update();
 
@@ -453,19 +453,26 @@ class NetworkScene extends Component {
     const intersects = this.raycaster.intersectObjects(this.scene.children);
     if (intersects.length > 0) {
       if (this.hoverIntersectObject != intersects[0].object) {
-        if (this.hoverIntersectObject)
+        if (this.hoverIntersectObject) {
+          // set back to former color
           this.hoverIntersectObject.material.color.set(
-            this.hoverIntersectObject.currentHex
+            this.hoverIntersectObject.formerColorHex
           );
+        }
+
         this.hoverIntersectObject = intersects[0].object;
-        this.hoverIntersectObject.currentHex = this.hoverIntersectObject.material.color;
+        this.hoverIntersectObject.formerColorHex = this.hoverIntersectObject.material.color.getHex();
         this.hoverIntersectObject.material.color.set(0xff0000);
+        console.log(this.hoverIntersectObject);
       }
     } else {
-      if (this.hoverIntersectObject)
+      if (this.hoverIntersectObject) {
+        // set back to former color
         this.hoverIntersectObject.material.color.set(
-          this.hoverIntersectObject.currentHex
+          this.hoverIntersectObject.formerColorHex
         );
+      }
+
       this.hoverIntersectObject = null;
     }
     this.renderer.render(this.scene, this.camera);
