@@ -51,10 +51,7 @@ class SortableLayers extends Component {
   };
   onClickAdd = () => {
     this.setState({
-      layers: [
-        ...this.state.layers,
-        { layerType: "Dense", options: "X neurons" }
-      ]
+      layers: [...this.state.layers, { layerType: "dense", options: "" }]
     });
   };
 

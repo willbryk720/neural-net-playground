@@ -26,22 +26,27 @@ const persistedReducer = persistReducer(persistConfig, rootReducer);
 const initialState = {};
 const middleware = [thunk];
 
-const store =
-  process.env.NODE_ENV !== "development"
-    ? createStore(
-        persistedReducer,
-        initialState,
-        compose(applyMiddleware(...middleware))
-      )
-    : createStore(
-        persistedReducer,
-        initialState,
-        compose(
-          applyMiddleware(...middleware),
-          window.__REDUX_DEVTOOLS_EXTENSION__ &&
-            window.__REDUX_DEVTOOLS_EXTENSION__()
-        )
-      );
+// const store =
+//   process.env.NODE_ENV !== "development"
+//     ? createStore(
+//         persistedReducer,
+//         initialState,
+//         compose(applyMiddleware(...middleware))
+//       )
+//     : createStore(
+//         persistedReducer,
+//         initialState,
+//         compose(
+//           applyMiddleware(...middleware),
+//           window.__REDUX_DEVTOOLS_EXTENSION__ &&
+//             window.__REDUX_DEVTOOLS_EXTENSION__()
+//         )
+//       );
+const store = createStore(
+  persistedReducer,
+  initialState,
+  compose(applyMiddleware(...middleware))
+);
 
 let persistor = persistStore(store);
 
