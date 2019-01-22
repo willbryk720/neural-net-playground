@@ -526,7 +526,10 @@ class NetworkScene extends Component {
 
   renderScene = () => {
     this.raycaster.setFromCamera(this.mouse, this.camera);
-    const intersects = this.raycaster.intersectObjects(this.scene.children);
+    const intersects = this.raycaster
+      .intersectObjects(this.scene.children)
+      .filter(o => o.object.type === "Mesh");
+
     if (intersects.length > 0) {
       if (this.hoverIntersectObject != intersects[0].object) {
         if (this.hoverIntersectObject) {
@@ -538,8 +541,7 @@ class NetworkScene extends Component {
 
         this.hoverIntersectObject = intersects[0].object;
         this.hoverIntersectObject.formerColorHex = this.hoverIntersectObject.material.color.getHex();
-        this.hoverIntersectObject.material.color.set(0xff0000);
-        // this.drawEdges(this.hoverIntersectObject);
+        this.hoverIntersectObject.material.color.set(0x00ff00);
       }
     } else {
       if (this.hoverIntersectObject) {
@@ -548,7 +550,6 @@ class NetworkScene extends Component {
           this.hoverIntersectObject.formerColorHex
         );
       }
-
       this.hoverIntersectObject = null;
     }
     this.renderer.render(this.scene, this.camera);
@@ -615,14 +616,14 @@ class NetworkScene extends Component {
       this.mouse.y = -(yOffset / windowHeight) * 2 + 1;
 
       this.raycaster.setFromCamera(this.mouse, this.camera);
-      const intersects = this.raycaster.intersectObjects(this.scene.children);
+      const intersects = this.raycaster
+        .intersectObjects(this.scene.children)
+        .filter(o => o.object.type === "Mesh");
       if (intersects.length > 0) {
         const intersectObject = intersects[0].object;
-        if (intersectObject.type === "Mesh") {
-          // dont want this to trigger for a Line
-          intersectObject.material.color.set(0x0000ff);
-          this.drawEdges(this.hoverIntersectObject);
-        }
+        // dont want this to trigger for a Line
+        intersectObject.material.color.set(0x0000ff);
+        this.drawEdges(this.hoverIntersectObject);
       }
     }
   };
