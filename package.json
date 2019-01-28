@@ -7,6 +7,7 @@
     "@tensorflow/tfjs-vis": "^0.4.2",
     "axios": "^0.18.0",
     "react": "^16.7.0",
+    "react-canvas-draw": "^1.0.0",
     "react-dom": "^16.7.0",
     "react-google-charts": "^3.0.10",
     "react-linechart": "^1.1.12",

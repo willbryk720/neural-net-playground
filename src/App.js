@@ -4,13 +4,14 @@ import NetworkScene from "./components/NetworkScene";
 import Left from "./components/Left";
 
 import TfStuff from "./components/TfStuff";
+import Draw from "./components/Draw";
 
 import { Input } from "semantic-ui-react";
 
 class App extends Component {
   constructor(props) {
     super(props);
-    this.state = { layers: [], numEpochs: 3 };
+    this.state = { layers: [], numEpochs: 2, drawing: [] };
   }
 
   updateLayers = newLayers => {
@@ -20,6 +21,11 @@ class App extends Component {
 
   onChangeNumEpochs = newNumEpochs => {
     this.setState({ numEpochs: newNumEpochs });
+  };
+
+  onUpdateDrawing = drawing => {
+    this.setState({ drawing });
+    console.log(drawing);
   };
 
   render() {
@@ -37,12 +43,17 @@ class App extends Component {
           </div>
         </div>
         <div style={{ display: "inline-block", width: "50%" }}>
-          <NetworkScene windowRatio={0.5} layers={this.state.layers} />
+          <NetworkScene
+            windowRatio={0.5}
+            layers={this.state.layers}
+            drawingImage={this.state.drawing}
+          />
           <TfStuff
             layers={this.state.layers}
             numEpochs={this.state.numEpochs}
             onChangeNumEpochs={this.onChangeNumEpochs}
           />
+          <Draw onUpdateDrawing={this.onUpdateDrawing} />
         </div>
       </div>
     );

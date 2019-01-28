@@ -27,12 +27,16 @@ class TfStuff extends Component {
   }
 
   createModel() {
+    console.log("CREATING MODEL");
     const model = tf.sequential();
     this.props.layers.forEach(layer => {
       const { layerType, options } = layer;
       const optionsObj = JSON.parse(options);
       model.add(tf.layers[layerType](optionsObj));
     });
+
+    const layer0 = this.printStuff(model);
+
     return model;
   }
 
@@ -47,20 +51,6 @@ class TfStuff extends Component {
         { x: batch, y: accuracy }
       ]
     });
-    console.log(accuracyValues);
-    // tfvis.render.linechart(
-    //   { values: accuracyValues, series: ["train", "validation"] },
-    //   accuracyContainer,
-    //   {
-    //     xLabel: "Batch #",
-    //     yLabel: "Loss",
-    //     width: 400,
-    //     height: 300
-    //   }
-    // );
-    // accuracyLabelElement.innerText = `last accuracy: ${(accuracy * 100).toFixed(
-    //   1
-    // )}%`;
   }
 
   async train(model, onIteration, data) {
@@ -206,9 +196,34 @@ class TfStuff extends Component {
 
   async printStuff(model) {
     console.log("layers", model.layers);
-    const weights = model.layers[1].getWeights();
-    console.log(weights);
-    // console.log(await weights[0].as1D().data());
+
+    for (let i = 0; i < model.layers.length; i++) {
+      console.log("-------LAYER_" + i + "-------");
+      const weightsAndBiases = model.layers[i].getWeights();
+      console.log("WEIGHTS_AND_BIASES", weightsAndBiases);
+      // weightsAndBiases has length 2, the first is for weights, the second is for biases
+      if (weightsAndBiases.length != 2) {
+        continue;
+      }
+      // const biases = await weightsAndBiases[1].as1D().data();
+      const biases = weightsAndBiases[1].dataSync();
+
+      const weightsObj = weightsAndBiases[0];
+      let weightsArr;
+      // if (weightsObj.rank === 1) {
+      //   weightsArr = await weightsObj.as1D().data();
+      // } else if (weightsObj.rank === 2) {
+      //   weightsArr = await weightsObj.as2D().data();
+      // }
+      weightsArr = weightsObj.dataSync();
+      console.log(biases);
+      console.log(weightsArr);
+
+      // weightsObj.print()
+    }
+
+    let weights = model.layers[0].getWeights();
+
     return weights;
   }
 
@@ -221,13 +236,37 @@ class TfStuff extends Component {
     this.logStatus("Creating model...");
     const model = this.createModel();
 
-    model.summary();
-
-    const layer0 = this.printStuff(model);
-    console.log(layer0);
+    // model.summary();
 
     this.logStatus("Starting model training...");
     await this.train(model, () => this.showPredictions(model, data), data);
+
+    console.log("PRINT WEIGHTS AFTER TRAINING");
+    this.printStuff(model);
+    // const x = model.predict(tf.ones([1, 28, 28, 1]));
+    // x.print();
+
+    // console.log("SHAPES");
+    // console.log(data.xs.slice([0, 0], [1, 28, 28, 1]).shape());
+    // console.log(trainData.labels.slice([0, 0], [1, 10]).shape());
+    const { xs, labels } = data.getTestData(4);
+    let input = xs.slice([3, 0], [1, 28, 28, 1]);
+    const d = input.dataSync();
+    let a = [];
+    d.forEach(d => {
+      a.push(d);
+    });
+    console.log("SYNC", JSON.stringify(a));
+
+    const layers = model.layers;
+    for (var i = 0; i < layers.length; i++) {
+      var layer = layers[i];
+      var output = await layer.apply(input);
+      input = output;
+      console.log("OUTPUT BRO");
+      console.log(output.dataSync());
+    }
+    console.log("labels: ", labels.dataSync());
 
     this.setState({ currentlyTraining: false });
   }
@@ -239,12 +278,6 @@ class TfStuff extends Component {
         points: this.state.trainingAccuracyValues
       }
     ];
-    // const chartData = [
-    //   {
-    //     color: "steelblue",
-    //     points: this.state.trainingAccuracyValues
-    //   }
-    // ];
     return (
       <div className="tfjs-example-container">
         <h3>Recognize handwritten digits from the MNIST database</h3>
@@ -285,29 +318,6 @@ class TfStuff extends Component {
             </div>
           </div>
         </section>
-        {/* <Chart
-          chartType="ScatterChart"
-          data={[["Age", "Weight"], [4, 5.5], [6, 5.5], [8, 12]]}
-          width="100%"
-          height="400px"
-          legendToggle
-        /> */}
-        {/* <Chart
-          width={"600px"}
-          height={"400px"}
-          chartType="LineChart"
-          loader={<div>Loading Chart</div>}
-          data={this.state.trainingAccuracyValues}
-          options={{
-            hAxis: {
-              title: "Batch"
-            },
-            vAxis: {
-              title: "Accuracy"
-            }
-          }}
-          rootProps={{ "data-testid": "1" }}
-        /> */}
         <LineChart
           width={600}
           height={400}

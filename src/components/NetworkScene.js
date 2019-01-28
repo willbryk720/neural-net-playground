@@ -4,6 +4,8 @@ import React, { Component } from "react";
 import * as THREE from "three";
 import * as OrbitControls from "three-orbitcontrols";
 
+import { MnistData } from "../utils/data";
+
 const LAYER_VERTICAL_SPACING = 10;
 const DENSE_NEURON_SPACING = 0.5;
 const SQUARE_NEURON_SPACING = 0.5;
@@ -74,6 +76,12 @@ class NetworkScene extends Component {
     this.start();
   }
 
+  async loadMnist() {
+    let data = new MnistData();
+    await data.load();
+    return data;
+  }
+
   componentWillReceiveProps(nextProps) {
     // if (nextProps.layers !== this.props.numLayers) {
     //   //Perform some operation here
@@ -84,23 +92,26 @@ class NetworkScene extends Component {
     this.animate();
   }
 
+  // Returns 1d array of positions of neurons spaced evenly with the line center at [0,0,height]
   getPositionsOfLineOfItems = (itemSpacing, itemWidth, numItems, height) => {
     const itemPositions = [];
-    if (numItems % 2 == 1) {
-      itemPositions.push([0, 0, height]);
-      numItems -= 1;
-      for (let i = 0; i < numItems / 2; i++) {
-        const distance = itemWidth / 2 + (itemSpacing + itemWidth) * (i + 0.5);
-        itemPositions.push([distance, 0, height]);
-        itemPositions.push([-distance, 0, height]);
-      }
-    } else {
-      for (let i = 0; i < numItems / 2; i++) {
-        const distance = (itemSpacing + itemWidth) * (i + 0.5);
-        itemPositions.push([distance, 0, height]);
-        itemPositions.push([-distance, 0, height]);
-      }
+
+    const spacingAndWidth = itemSpacing + itemWidth;
+    const halfNumItems = Math.floor(numItems / 2);
+    const oddNumNeurons = numItems % 2 == 1;
+
+    for (let i = halfNumItems - 1; i >= 0; i--) {
+      const distance =
+        spacingAndWidth * (i + 0.5) + (oddNumNeurons ? spacingAndWidth / 2 : 0);
+      itemPositions.push([-distance, 0, height]);
     }
+    if (oddNumNeurons) itemPositions.push([0, 0, height]);
+    for (let i = 0; i < halfNumItems; i++) {
+      const distance =
+        spacingAndWidth * (i + 0.5) + (oddNumNeurons ? spacingAndWidth / 2 : 0);
+      itemPositions.push([distance, 0, height]);
+    }
+
     return itemPositions;
   };
 
@@ -114,6 +125,8 @@ class NetworkScene extends Component {
     return nodePositions;
   };
 
+  // Returns 2d array of neuron positions (starting from farleft going right then down)
+  // Takes as input the center position of the square of neurons and the number of nodes per side
   getNeuronsInSquare = ({ center, numNodesWide }) => {
     const height = center[2];
     const centerX = center[0];
@@ -324,10 +337,11 @@ class NetworkScene extends Component {
       layerHeight += LAYER_VERTICAL_SPACING;
     });
 
+    console.log("ALL", allNeuronPositions);
     return allNeuronPositions;
   };
 
-  drawAllNeuronPositions = allNeuronPositions => {
+  drawAllNeuronPositionsBlack = allNeuronPositions => {
     // VISUALIZE
     var geometry = new THREE.BoxGeometry(
       NEURON_WIDTH,
@@ -364,66 +378,74 @@ class NetworkScene extends Component {
     });
   };
 
-  // drawAxes = () => {
-  //   // Axes
-  //   var axisGeometry = new THREE.Geometry();
-  //   axisGeometry.vertices.push(
-  //     new THREE.Vector3(0, 0, 0),
-  //     new THREE.Vector3(100, 0, 0)
-  //   );
+  drawAllNeuronPositionsWithInputColored = (
+    allNeuronPositions,
+    inputNeuronValues
+  ) => {
+    // VISUALIZE
+    var geometry = new THREE.BoxGeometry(
+      NEURON_WIDTH,
+      NEURON_WIDTH,
+      NEURON_WIDTH
+    );
 
-  //   this.scene.add(
-  //     new THREE.Line(
-  //       axisGeometry,
-  //       new THREE.LineBasicMaterial({
-  //         color: 0xffffff,
-  //         linewidth: 50
-  //       })
-  //     )
-  //   );
+    allNeuronPositions.forEach((layerOfPositions, index) => {
+      const { isSquare, neuronPositions } = layerOfPositions;
+      neuronPositions.forEach(neuronGrouping => {
+        if (isSquare) {
+          let color = 0x000000;
 
-  //   axisGeometry = new THREE.Geometry();
-  //   axisGeometry.vertices.push(
-  //     new THREE.Vector3(0, 0, 0),
-  //     new THREE.Vector3(0, 100, 0)
-  //   );
+          neuronGrouping.forEach((row, r) => {
+            row.forEach((pos, c) => {
+              if (index === 0) {
+                color = inputNeuronValues[r * 28 + c] * 0xffffff;
+              }
+              const material = new THREE.MeshBasicMaterial({ color: color });
+              let mesh = new THREE.Mesh(geometry, material);
+              mesh.position.x = pos[0];
+              mesh.position.y = pos[1];
+              mesh.position.z = pos[2];
+              this.scene.add(mesh);
+            });
+          });
+          color = 0x000000;
+        } else {
+          neuronGrouping.forEach(pos => {
+            const material = new THREE.MeshBasicMaterial({ color: 0x000000 });
+            let mesh = new THREE.Mesh(geometry, material);
+            mesh.position.x = pos[0];
+            mesh.position.y = pos[1];
+            mesh.position.z = pos[2];
+            mesh.layerShape = "line";
+            this.scene.add(mesh);
+          });
+        }
+      });
+    });
+  };
 
-  //   this.scene.add(
-  //     new THREE.Line(
-  //       axisGeometry,
-  //       new THREE.LineBasicMaterial({
-  //         color: 0x00ff00,
-  //         linewidth: 50
-  //       })
-  //     )
-  //   );
-
-  //   axisGeometry = new THREE.Geometry();
-  //   axisGeometry.vertices.push(
-  //     new THREE.Vector3(0, 0, 0),
-  //     new THREE.Vector3(0, 0, 100)
-  //   );
-
-  //   this.scene.add(
-  //     new THREE.Line(
-  //       axisGeometry,
-  //       new THREE.LineBasicMaterial({
-  //         color: 0x0000ff
-  //       })
-  //     )
-  //   );
-  // };
-
-  updateNetworkSetup(newLayers) {
+  async updateNetworkSetup(newLayers) {
     const layersMetadata = this.getLayersMetadataFromLayers(newLayers);
     console.log("LAYERSMETADATA", layersMetadata);
 
     this.allNeuronPositions = this.getAllNeuronPositions(layersMetadata);
 
-    // draw the nodes from the positions
-    this.drawAllNeuronPositions(this.allNeuronPositions);
+    const data = await this.loadMnist();
+    const q = 1;
+    const { xs, labels } = data.getTestData(q);
+    let input = xs.slice([q - 1, 0], [1, 28, 28, 1]);
+    const d = input.dataSync();
+    let image2 = [];
+    d.forEach(d => {
+      image2.push(d);
+    });
 
-    // this.drawAxes();
+    // draw the nodes from the positions
+    // this.drawAllNeuronPositionsBlack(this.allNeuronPositions);
+    this.drawAllNeuronPositionsWithInputColored(
+      this.allNeuronPositions,
+      image2
+    );
   }
   componentWillUnmount() {
     this.stop();
