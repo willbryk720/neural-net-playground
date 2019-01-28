@@ -6,11 +6,12 @@ import * as OrbitControls from "three-orbitcontrols";
 
 import { MnistData } from "../utils/data";
 
-const LAYER_VERTICAL_SPACING = 10;
-const DENSE_NEURON_SPACING = 0.5;
-const SQUARE_NEURON_SPACING = 0.5;
-const CONV_FILTERS_SPACING = 20;
-const NEURON_WIDTH = 1;
+import {
+  getAllNeuronPositions,
+  getLayersMetadataFromLayers
+} from "../utils/scene";
+
+import { NEURON_WIDTH, LAYER_VERTICAL_SPACING } from "../utils/constants";
 
 class NetworkScene extends Component {
   componentDidMount() {
@@ -57,7 +58,7 @@ class NetworkScene extends Component {
     this.controls.panSpeed = 0.6;
     this.controls.rotateSpeed = 0.05;
 
-    this.updateNetworkSetup(this.props.layers);
+    this.updateNetworkSetup(this.props.layers, this.props.drawing);
 
     // lights
     var light = new THREE.DirectionalLight(0xffffff);
@@ -88,258 +89,11 @@ class NetworkScene extends Component {
 
     // Clear all objects (check that this doesnt have memory leaks TODO)
     this.scene.remove.apply(this.scene, this.scene.children);
-    this.updateNetworkSetup(nextProps.layers);
-    this.animate();
+    this.updateNetworkSetup(nextProps.layers, nextProps.drawing);
+    console.log("BUDDY", nextProps.layers);
+    // this.animate();
+    this.markLastChange(); // should it be this or markLastChange TODO
   }
-
-  // Returns 1d array of positions of neurons spaced evenly with the line center at [0,0,height]
-  getPositionsOfLineOfItems = (itemSpacing, itemWidth, numItems, height) => {
-    const itemPositions = [];
-
-    const spacingAndWidth = itemSpacing + itemWidth;
-    const halfNumItems = Math.floor(numItems / 2);
-    const oddNumNeurons = numItems % 2 == 1;
-
-    for (let i = halfNumItems - 1; i >= 0; i--) {
-      const distance =
-        spacingAndWidth * (i + 0.5) + (oddNumNeurons ? spacingAndWidth / 2 : 0);
-      itemPositions.push([-distance, 0, height]);
-    }
-    if (oddNumNeurons) itemPositions.push([0, 0, height]);
-    for (let i = 0; i < halfNumItems; i++) {
-      const distance =
-        spacingAndWidth * (i + 0.5) + (oddNumNeurons ? spacingAndWidth / 2 : 0);
-      itemPositions.push([distance, 0, height]);
-    }
-
-    return itemPositions;
-  };
-
-  getNeuronsInLine = ({ center, numNodes }) => {
-    const nodePositions = this.getPositionsOfLineOfItems(
-      SQUARE_NEURON_SPACING,
-      NEURON_WIDTH,
-      numNodes,
-      center[2]
-    );
-    return nodePositions;
-  };
-
-  // Returns 2d array of neuron positions (starting from farleft going right then down)
-  // Takes as input the center position of the square of neurons and the number of nodes per side
-  getNeuronsInSquare = ({ center, numNodesWide }) => {
-    const height = center[2];
-    const centerX = center[0];
-
-    let nodePositions = []; // array of arrays
-    const linePositions = this.getPositionsOfLineOfItems(
-      SQUARE_NEURON_SPACING,
-      NEURON_WIDTH,
-      numNodesWide,
-      height
-    );
-
-    for (let i = 0; i < numNodesWide; i++) {
-      const newY = linePositions[i][0]; // hacky way to get a new y position in square
-      let newRow = this.getPositionsOfLineOfItems(
-        SQUARE_NEURON_SPACING,
-        NEURON_WIDTH,
-        numNodesWide,
-        height
-      );
-      // modify y values
-      newRow = newRow.map(pos => [pos[0] + centerX, newY, height]);
-      nodePositions.push(newRow);
-    }
-
-    return nodePositions;
-  };
-
-  getSquareCenters = (dimensions, layerHeight) => {
-    let numSquares = dimensions[2];
-    const numNodesPerSide = dimensions[0];
-
-    const squareWidth =
-      numNodesPerSide * (NEURON_WIDTH + SQUARE_NEURON_SPACING) -
-      SQUARE_NEURON_SPACING;
-
-    const squareCenters = this.getPositionsOfLineOfItems(
-      CONV_FILTERS_SPACING,
-      squareWidth,
-      numSquares,
-      layerHeight
-    );
-
-    return squareCenters;
-  };
-
-  getLayersMetadataFromLayers = newLayers => {
-    const layers = newLayers.map(l => {
-      const newL = Object.assign({}, l);
-      newL.options = JSON.parse(newL.options);
-      return newL;
-    });
-    if (layers.length == 0) return [];
-    const firstLayer = layers[0];
-    const inputDim = firstLayer.options.inputShape;
-
-    let layersMetadata = [];
-    let previousLayerMetadata = {
-      dimensions: inputDim,
-      isSquare: inputDim.length > 1,
-      directlyAbovePrevious: false,
-      layerType: "input"
-    };
-    layersMetadata.push(previousLayerMetadata);
-
-    layers.forEach(layer => {
-      const { layerType, options } = layer;
-      switch (layerType) {
-        case "dense": {
-          const { units, activation } = options;
-          previousLayerMetadata = {
-            dimensions: [units],
-            isSquare: false,
-            directlyAbovePrevious: false,
-            layerType
-          };
-          layersMetadata.push(previousLayerMetadata);
-          break;
-        }
-        case "conv2d": {
-          const { kernelSize, filters, activation, strides } = options;
-          const numSquares = filters; // TODO might eventually be this multiplied by depth of previous layer
-
-          // TODO: Calculate this for variable kernelSize and strides
-          const prevDims = previousLayerMetadata.dimensions;
-          let dimensions;
-          if (!Array.isArray(kernelSize) && !Array.isArray(strides)) {
-            dimensions = [
-              prevDims[0] - kernelSize + 1,
-              prevDims[1] - kernelSize + 1,
-              numSquares
-            ];
-          } else {
-            throw "Havent implemented array kernelSize or array strides";
-          }
-
-          previousLayerMetadata = {
-            dimensions: dimensions,
-            isSquare: true,
-            directlyAbovePrevious: false,
-            layerType
-          };
-          layersMetadata.push(previousLayerMetadata);
-          break;
-        }
-        case "maxPooling2d": {
-          const { poolSize, strides } = options;
-          const numSquares = previousLayerMetadata.dimensions[2];
-
-          // TODO: Calculate this for variable kernelSize and strides
-          const prevDims = previousLayerMetadata.dimensions;
-          let dimensions;
-          if (!Array.isArray(poolSize) && !Array.isArray(strides)) {
-            dimensions = [
-              Math.floor(prevDims[0] / strides),
-              Math.floor(prevDims[1] / strides),
-              numSquares
-            ];
-          } else {
-            throw "Havent implemented array poolsize or array strides";
-          }
-
-          previousLayerMetadata = {
-            dimensions: dimensions,
-            isSquare: true,
-            directlyAbovePrevious: true,
-            layerType
-          };
-          layersMetadata.push(previousLayerMetadata);
-          break;
-        }
-        case "flatten": {
-          // skip adding it to layersMetadata
-          break;
-        }
-        default:
-          alert("haven't seen that layer type before! :(");
-      }
-    });
-
-    return layersMetadata;
-  };
-
-  getAllNeuronPositions = layersMetadata => {
-    let allNeuronPositions = [];
-
-    let layerHeight = 0;
-    let previousSquareCenters;
-
-    layersMetadata.forEach((layerMetadata, index) => {
-      const {
-        dimensions,
-        isSquare,
-        directlyAbovePrevious,
-        layerType
-      } = layerMetadata;
-
-      let neuronPositions = [];
-      if (index == 0) {
-        if (isSquare) {
-          neuronPositions.push(
-            this.getNeuronsInSquare({
-              center: [0, 0, layerHeight],
-              numNodesWide: dimensions[0]
-            })
-          );
-        } else {
-          neuronPositions.push(
-            this.getNeuronsInLine({
-              center: [0, 0, layerHeight],
-              numNodes: dimensions[0]
-            })
-          );
-        }
-      } else {
-        if (layerMetadata.isSquare) {
-          let squareCenters;
-          if (directlyAbovePrevious) {
-            squareCenters = previousSquareCenters.map(psc => {
-              psc[2] = layerHeight; // change height of previous centers
-              return psc;
-            });
-          } else {
-            squareCenters = this.getSquareCenters(dimensions, layerHeight);
-          }
-
-          squareCenters.forEach(squareCenter => {
-            neuronPositions.push(
-              this.getNeuronsInSquare({
-                center: squareCenter,
-                numNodesWide: dimensions[0]
-              })
-            );
-          });
-          previousSquareCenters = squareCenters;
-        } else {
-          neuronPositions.push(
-            this.getNeuronsInLine({
-              center: [0, 0, layerHeight],
-              numNodes: dimensions[0]
-            })
-          );
-        }
-      }
-
-      // array that includes neuronPositions which are all the positions
-      allNeuronPositions.push({ isSquare, dimensions, neuronPositions });
-      layerHeight += LAYER_VERTICAL_SPACING;
-    });
-
-    console.log("ALL", allNeuronPositions);
-    return allNeuronPositions;
-  };
 
   drawAllNeuronPositionsBlack = allNeuronPositions => {
     // VISUALIZE
@@ -398,7 +152,7 @@ class NetworkScene extends Component {
           neuronGrouping.forEach((row, r) => {
             row.forEach((pos, c) => {
               if (index === 0) {
-                color = inputNeuronValues[r * 28 + c] * 0xffffff;
+                color = inputNeuronValues[r][c] * 0xffffff;
               }
               const material = new THREE.MeshBasicMaterial({ color: color });
               let mesh = new THREE.Mesh(geometry, material);
@@ -424,28 +178,33 @@ class NetworkScene extends Component {
     });
   };
 
-  async updateNetworkSetup(newLayers) {
-    const layersMetadata = this.getLayersMetadataFromLayers(newLayers);
+  async updateNetworkSetup(newLayers, drawing) {
+    const layersMetadata = getLayersMetadataFromLayers(newLayers);
     console.log("LAYERSMETADATA", layersMetadata);
 
-    this.allNeuronPositions = this.getAllNeuronPositions(layersMetadata);
+    this.allNeuronPositions = getAllNeuronPositions(layersMetadata);
 
-    const data = await this.loadMnist();
-    const q = 1;
-    const { xs, labels } = data.getTestData(q);
-    let input = xs.slice([q - 1, 0], [1, 28, 28, 1]);
-    const d = input.dataSync();
-    let image2 = [];
-    d.forEach(d => {
-      image2.push(d);
-    });
+    // const data = await this.loadMnist();
+    // const q = 1;
+    // const { xs, labels } = data.getTestData(q);
+    // let input = xs.slice([q - 1, 0], [1, 28, 28, 1]);
+    // const d = input.dataSync();
+    // let image2 = [];
+    // d.forEach(d => {
+    //   image2.push(d);
+    // });
 
-    // draw the nodes from the positions
-    // this.drawAllNeuronPositionsBlack(this.allNeuronPositions);
-    this.drawAllNeuronPositionsWithInputColored(
-      this.allNeuronPositions,
-      image2
-    );
+    console.log("DRAWING", drawing);
+    if (drawing.length === 0) {
+      this.drawAllNeuronPositionsBlack(this.allNeuronPositions);
+    } else {
+      console.log("drawing2", drawing);
+      // draw the nodes from the positions
+      this.drawAllNeuronPositionsWithInputColored(
+        this.allNeuronPositions,
+        drawing
+      );
+    }
   }
   componentWillUnmount() {
     this.stop();

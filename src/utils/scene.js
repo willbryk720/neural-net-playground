@@ -1,8 +1,10 @@
-const LAYER_VERTICAL_SPACING = 10;
-const DENSE_NEURON_SPACING = 0.5;
-const SQUARE_NEURON_SPACING = 0.5;
-const CONV_FILTERS_SPACING = 20;
-const NEURON_WIDTH = 1;
+import {
+  LAYER_VERTICAL_SPACING,
+  DENSE_NEURON_SPACING,
+  SQUARE_NEURON_SPACING,
+  CONV_FILTERS_SPACING,
+  NEURON_WIDTH
+} from "./constants";
 
 // Returns 1d array of positions of neurons spaced evenly with the line center at [0,0,height]
 export const getPositionsOfLineOfItems = (
@@ -57,7 +59,7 @@ export const getNeuronsInSquare = ({ center, numNodesWide }) => {
   );
 
   for (let i = 0; i < numNodesWide; i++) {
-    const newY = linePositions[i][0]; // hacky way to get a new y position in square
+    const newY = linePositions[numNodesWide - i - 1][0]; // hacky way to get a new y position in square
     let newRow = getPositionsOfLineOfItems(
       SQUARE_NEURON_SPACING,
       NEURON_WIDTH,

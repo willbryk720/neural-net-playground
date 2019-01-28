@@ -46,7 +46,7 @@ class App extends Component {
           <NetworkScene
             windowRatio={0.5}
             layers={this.state.layers}
-            drawingImage={this.state.drawing}
+            drawing={this.state.drawing}
           />
           <TfStuff
             layers={this.state.layers}
