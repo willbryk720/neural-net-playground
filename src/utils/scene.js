@@ -59,7 +59,7 @@ export const getNeuronsInSquare = ({ center, numNodesWide }) => {
   );
 
   for (let i = 0; i < numNodesWide; i++) {
-    const newY = linePositions[numNodesWide - i - 1][0]; // hacky way to get a new y position in square
+    const newY = linePositions[numNodesWide - i - 1][0]; // hacky way to get y position of row in square
     let newRow = getPositionsOfLineOfItems(
       SQUARE_NEURON_SPACING,
       NEURON_WIDTH,
@@ -178,7 +178,7 @@ export const getLayersMetadataFromLayers = newLayers => {
         break;
       }
       case "flatten": {
-        // skip adding it to layersMetadata
+        layersMetadata.push({ layerType }); // add only layerType
         break;
       }
       default:
@@ -202,6 +202,8 @@ export const getAllNeuronPositions = layersMetadata => {
       directlyAbovePrevious,
       layerType
     } = layerMetadata;
+
+    if (layerType === "flatten") return; // skip flatten layers
 
     let neuronPositions = [];
     if (index == 0) {
@@ -252,10 +254,14 @@ export const getAllNeuronPositions = layersMetadata => {
     }
 
     // array that includes neuronPositions which are all the positions
-    allNeuronPositions.push({ isSquare, dimensions, neuronPositions });
+    allNeuronPositions.push({
+      isSquare,
+      dimensions,
+      layerType,
+      neuronPositions
+    });
     layerHeight += LAYER_VERTICAL_SPACING;
   });
 
-  console.log("ALL", allNeuronPositions);
   return allNeuronPositions;
 };

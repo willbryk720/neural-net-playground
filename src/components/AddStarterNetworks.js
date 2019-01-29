@@ -36,16 +36,38 @@ let networks = [
         layerType: "conv2d",
         options: { kernelSize: 3, filters: 32, activation: "relu" }
       },
-      { layerType: "maxPooling2d", options: { poolSize: 2, strides: 2 } },
-      {
-        layerType: "conv2d",
-        options: { kernelSize: 3, filters: 32, activation: "relu" }
-      },
       { layerType: "flatten", options: {} },
       { layerType: "dense", options: { units: 64, activation: "relu" } },
       { layerType: "dense", options: { units: 10, activation: "softmax" } }
     ]
   }
+  // {
+  //   name: "Conv",
+  //   layers: [
+  //     {
+  //       layerType: "conv2d",
+  //       options: {
+  //         inputShape: [28, 28, 1],
+  //         kernelSize: 3,
+  //         filters: 16,
+  //         activation: "relu"
+  //       }
+  //     },
+  //     { layerType: "maxPooling2d", options: { poolSize: 2, strides: 2 } },
+  //     {
+  //       layerType: "conv2d",
+  //       options: { kernelSize: 3, filters: 32, activation: "relu" }
+  //     },
+  //     { layerType: "maxPooling2d", options: { poolSize: 2, strides: 2 } },
+  //     {
+  //       layerType: "conv2d",
+  //       options: { kernelSize: 3, filters: 32, activation: "relu" }
+  //     },
+  //     { layerType: "flatten", options: {} },
+  //     { layerType: "dense", options: { units: 64, activation: "relu" } },
+  //     { layerType: "dense", options: { units: 10, activation: "softmax" } }
+  //   ]
+  // }
 ];
 networks.forEach(network => {
   network.layers.forEach(layer => {

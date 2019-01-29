@@ -239,7 +239,10 @@ class TfStuff extends Component {
     // model.summary();
 
     this.logStatus("Starting model training...");
+    this.props.onStartTrainingModel();
     await this.train(model, () => this.showPredictions(model, data), data);
+
+    this.props.onFinishedTrainingModel(model);
 
     console.log("PRINT WEIGHTS AFTER TRAINING");
     this.printStuff(model);
@@ -249,24 +252,30 @@ class TfStuff extends Component {
     // console.log("SHAPES");
     // console.log(data.xs.slice([0, 0], [1, 28, 28, 1]).shape());
     // console.log(trainData.labels.slice([0, 0], [1, 10]).shape());
-    const { xs, labels } = data.getTestData(4);
-    let input = xs.slice([3, 0], [1, 28, 28, 1]);
-    const d = input.dataSync();
-    let a = [];
-    d.forEach(d => {
-      a.push(d);
-    });
-    console.log("SYNC", JSON.stringify(a));
 
-    const layers = model.layers;
-    for (var i = 0; i < layers.length; i++) {
-      var layer = layers[i];
-      var output = await layer.apply(input);
-      input = output;
-      console.log("OUTPUT BRO");
-      console.log(output.dataSync());
-    }
-    console.log("labels: ", labels.dataSync());
+    // const { xs, labels } = data.getTestData(4);
+    // let input = xs.slice([3, 0], [1, 28, 28, 1]);
+    // console.log(input, input.dataSync());
+    // console.log(JSON.stringify(input.dataSync()));
+
+    // const d = input.dataSync();
+    // let a = [];
+    // d.forEach(d => {
+    //   a.push(d);
+    // });
+    // console.log("SYNC", JSON.stringify(a));
+
+    // let input = tf.tensor(this.props.drawing).reshape([1, 28, 28, 1]);
+    // console.log(input, input.dataSync());
+    // const layers = model.layers;
+    // for (var i = 0; i < layers.length; i++) {
+    //   var layer = layers[i];
+    //   var output = await layer.apply(input);
+    //   input = output;
+    //   console.log("OUTPUT BRO");
+    //   console.log(output, output.dataSync());
+    // }
+    // console.log("labels: ", labels.dataSync());
 
     this.setState({ currentlyTraining: false });
   }

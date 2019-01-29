@@ -11,21 +11,38 @@ import { Input } from "semantic-ui-react";
 class App extends Component {
   constructor(props) {
     super(props);
-    this.state = { layers: [], numEpochs: 2, drawing: [] };
+    this.state = {
+      layers: [],
+      layerOutputs: [],
+      numEpochs: 2,
+      drawing: [],
+      trainedModel: {},
+      isCurrentlyTraining: false
+    };
   }
 
   updateLayers = newLayers => {
-    console.log("NEWLAYERS", newLayers);
-    this.setState({ layers: newLayers });
+    this.setState({ layers: newLayers, layerOutputs: [], trainedModel: [] });
   };
 
   onChangeNumEpochs = newNumEpochs => {
     this.setState({ numEpochs: newNumEpochs });
   };
 
-  onUpdateDrawing = drawing => {
-    this.setState({ drawing });
-    console.log(drawing);
+  onMakePrediction = (layerOutputs, drawing) => {
+    this.setState({ drawing, layerOutputs });
+  };
+
+  onFinishedTrainingModel = model => {
+    this.setState({ trainedModel: model, isCurrentlyTraining: false });
+    console.log("NEWMODEL", model);
+  };
+
+  onStartTrainingModel = () => {
+    this.setState({
+      isCurrentlyTraining: true,
+      trainedModel: {}
+    });
   };
 
   render() {
@@ -39,6 +56,10 @@ class App extends Component {
           }}
         >
           <div style={{ marginLeft: "2%", marginRight: "2%" }}>
+            <Draw
+              onMakePrediction={this.onMakePrediction}
+              trainedModel={this.state.trainedModel}
+            />
             <Left updateLayers={this.updateLayers} />
           </div>
         </div>
@@ -47,13 +68,16 @@ class App extends Component {
             windowRatio={0.5}
             layers={this.state.layers}
             drawing={this.state.drawing}
+            layerOutputs={this.state.layerOutputs}
           />
           <TfStuff
             layers={this.state.layers}
             numEpochs={this.state.numEpochs}
             onChangeNumEpochs={this.onChangeNumEpochs}
+            onFinishedTrainingModel={this.onFinishedTrainingModel}
+            onStartTrainingModel={this.onStartTrainingModel}
+            drawing={this.state.drawing}
           />
-          <Draw onUpdateDrawing={this.onUpdateDrawing} />
         </div>
       </div>
     );

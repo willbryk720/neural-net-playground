@@ -99,55 +99,6 @@ export class MnistData {
 
     this.datasetLabels = new Uint8Array(await labelsResponse.arrayBuffer());
 
-    const start = new Date();
-
-    // FLIP EACH IMAGE (BC EACH IS BACKWARDS)
-    // let datasetImages = this.datasetImages;
-    // let index = 0;
-    // let index2 = 0;
-    // for (let i = 0; i < NUM_DATASET_ELEMENTS; i++) {
-    //   let image = [];
-    //   for (let r = 0; r < IMAGE_H; r++) {
-    //     let row = [];
-    //     for (let c = 0; c < IMAGE_W; c++) {
-    //       row.push(datasetImages[index]);
-    //       index += 1;
-    //     }
-    //     image.push(row);
-    //   }
-    //   image.reverse(); // flip image upside down
-    //   // update datasetImages
-    //   for (let r = 0; r < IMAGE_H; r++) {
-    //     for (let c = 0; c < IMAGE_W; c++) {
-    //       datasetImages[index2] = image[r][c];
-    //       index2 += 1;
-    //     }
-    //   }
-    // }
-    // this.datasetImages = datasetImages;
-
-    // const datasetImages = this.datasetImages;
-    // let test = 0;
-    // for (let i = 0; i < NUM_DATASET_ELEMENTS; i++) {
-    //     const imageIndex = i * IMAGE_SIZE;
-    //     const halfH = Math.floor(IMAGE_H / 2);
-    //     for (let j = 0; j < halfH; j++) {
-    //       const rowIndex = j * IMAGE_W;
-    //       const rowIndex2 = (IMAGE_H - j - 1) * IMAGE_W;
-    //       for (let k = 0; k < IMAGE_W; k++) {
-    //         const i1 = imageIndex + rowIndex + k;
-    //         const i2 = imageIndex + rowIndex2 + k;
-    //         const save = datasetImages[i1];
-    //         datasetImages[i1] = datasetImages[i2];
-    //         datasetImages[i2] = save;
-    //       }
-    //     }
-    // }
-    // this.datasetImages = datasetImages;
-
-    const end = new Date();
-    console.log(end - start);
-
     // Slice the the images and labels into train and test sets.
     this.trainImages = this.datasetImages.slice(
       0,

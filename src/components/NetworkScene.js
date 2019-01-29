@@ -4,14 +4,40 @@ import React, { Component } from "react";
 import * as THREE from "three";
 import * as OrbitControls from "three-orbitcontrols";
 
-import { MnistData } from "../utils/data";
-
 import {
   getAllNeuronPositions,
   getLayersMetadataFromLayers
 } from "../utils/scene";
 
 import { NEURON_WIDTH, LAYER_VERTICAL_SPACING } from "../utils/constants";
+
+function reshapeArrayTo2D(arr, numRows, numCols) {
+  let newArr = [];
+  for (let i = 0; i < numRows; i++) {
+    let row = [];
+    for (let j = 0; j < numCols; j++) {
+      row.push(arr[i * numRows + j]);
+    }
+    newArr.push(row);
+  }
+  return newArr;
+}
+
+function reshapeArrayTo3D(arr, numA, numB, numC) {
+  const sizeSquares = numA * numB;
+
+  let newArr = [];
+  for (let c = 0; c < numC; c++) {
+    const slicedArray = arr.slice(sizeSquares * c, sizeSquares * (c + 1));
+    const squareArray = reshapeArrayTo2D(slicedArray, numA, numB);
+    newArr.push(squareArray);
+  }
+  return newArr;
+}
+
+function fracToHex(frac) {
+  return Math.round(frac * 255) * 65793;
+}
 
 class NetworkScene extends Component {
   componentDidMount() {
@@ -58,7 +84,7 @@ class NetworkScene extends Component {
     this.controls.panSpeed = 0.6;
     this.controls.rotateSpeed = 0.05;
 
-    this.updateNetworkSetup(this.props.layers, this.props.drawing);
+    this.updateNetworkSetup(this.props);
 
     // lights
     var light = new THREE.DirectionalLight(0xffffff);
@@ -77,20 +103,14 @@ class NetworkScene extends Component {
     this.start();
   }
 
-  async loadMnist() {
-    let data = new MnistData();
-    await data.load();
-    return data;
-  }
-
   componentWillReceiveProps(nextProps) {
     // if (nextProps.layers !== this.props.numLayers) {
     //   //Perform some operation here
 
     // Clear all objects (check that this doesnt have memory leaks TODO)
     this.scene.remove.apply(this.scene, this.scene.children);
-    this.updateNetworkSetup(nextProps.layers, nextProps.drawing);
-    console.log("BUDDY", nextProps.layers);
+    this.updateNetworkSetup(nextProps);
+
     // this.animate();
     this.markLastChange(); // should it be this or markLastChange TODO
   }
@@ -118,6 +138,7 @@ class NetworkScene extends Component {
             });
           });
         } else {
+          // draw line
           neuronGrouping.forEach(pos => {
             const material = new THREE.MeshBasicMaterial({ color: 0x000000 });
             let mesh = new THREE.Mesh(geometry, material);
@@ -132,28 +153,64 @@ class NetworkScene extends Component {
     });
   };
 
-  drawAllNeuronPositionsWithInputColored = (
+  drawAllNeuronPositionsWithOutputs = (
     allNeuronPositions,
-    inputNeuronValues
+    layerOutputs,
+    layersMetadata,
+    input2DArray
   ) => {
     // VISUALIZE
-    var geometry = new THREE.BoxGeometry(
+    const geometry = new THREE.BoxGeometry(
       NEURON_WIDTH,
       NEURON_WIDTH,
       NEURON_WIDTH
     );
 
+    let allLayerOutputColors = [];
+    allLayerOutputColors.push([input2DArray]); // push input as 3d array
+
+    // going to be skipping flatten layersMetadata but dont want layerOutputs index to increment too
+    // so layerOutputs needs its own index
+    //loop starts at 1 bc skips input metadata layer
+    let outputIndex = 0;
+    for (let i = 1; i < layersMetadata.length; i++) {
+      const layerMetadata = layersMetadata[i];
+      const { isSquare, dimensions, layerType } = layerMetadata;
+
+      if (layerType === "flatten") {
+        outputIndex += 1;
+        continue;
+      }
+
+      const lO = layerOutputs[outputIndex];
+      const values = lO.dataSync();
+      const colors = values.map(v => fracToHex(v));
+      if (isSquare) {
+        // return [reshapeArrayTo2D(values, 28, 28)]; //TODO BAD BAD
+        allLayerOutputColors.push(reshapeArrayTo3D(colors, ...dimensions));
+      } else {
+        // console.log("VALUES", values.map(v => v * 65793 * 255));
+        allLayerOutputColors.push(colors);
+      }
+      outputIndex += 1;
+    }
+    console.log("allLayerOutputColors", allLayerOutputColors);
+
+    // const inputs = layerOutputs[0].dataSync();
+    // const drawing = reshapeArrayTo2D(inputs, 28, 28);
+
     allNeuronPositions.forEach((layerOfPositions, index) => {
       const { isSquare, neuronPositions } = layerOfPositions;
-      neuronPositions.forEach(neuronGrouping => {
-        if (isSquare) {
-          let color = 0x000000;
+      const outputColors = allLayerOutputColors[index];
+      console.log(outputColors);
 
+      neuronPositions.forEach((neuronGrouping, g) => {
+        if (isSquare) {
+          // let color = 0x000000;
           neuronGrouping.forEach((row, r) => {
             row.forEach((pos, c) => {
-              if (index === 0) {
-                color = inputNeuronValues[r][c] * 0xffffff;
-              }
+              const color = fracToHex(outputColors[g][r][c]);
+
               const material = new THREE.MeshBasicMaterial({ color: color });
               let mesh = new THREE.Mesh(geometry, material);
               mesh.position.x = pos[0];
@@ -162,10 +219,12 @@ class NetworkScene extends Component {
               this.scene.add(mesh);
             });
           });
-          color = 0x000000;
         } else {
-          neuronGrouping.forEach(pos => {
-            const material = new THREE.MeshBasicMaterial({ color: 0x000000 });
+          // draw line
+          neuronGrouping.forEach((pos, i) => {
+            const material = new THREE.MeshBasicMaterial({
+              color: outputColors[i]
+            });
             let mesh = new THREE.Mesh(geometry, material);
             mesh.position.x = pos[0];
             mesh.position.y = pos[1];
@@ -178,34 +237,32 @@ class NetworkScene extends Component {
     });
   };
 
-  async updateNetworkSetup(newLayers, drawing) {
-    const layersMetadata = getLayersMetadataFromLayers(newLayers);
-    console.log("LAYERSMETADATA", layersMetadata);
+  async updateNetworkSetup(nextProps) {
+    const { layers, drawing, layerOutputs } = nextProps;
+
+    const layersMetadata = getLayersMetadataFromLayers(layers);
+    console.log(
+      "IMPORTANT: drawing, layers, layerOutputs, layersMetadata ",
+      drawing,
+      layers,
+      layerOutputs,
+      layersMetadata
+    );
 
     this.allNeuronPositions = getAllNeuronPositions(layersMetadata);
 
-    // const data = await this.loadMnist();
-    // const q = 1;
-    // const { xs, labels } = data.getTestData(q);
-    // let input = xs.slice([q - 1, 0], [1, 28, 28, 1]);
-    // const d = input.dataSync();
-    // let image2 = [];
-    // d.forEach(d => {
-    //   image2.push(d);
-    // });
-
-    console.log("DRAWING", drawing);
-    if (drawing.length === 0) {
+    if (layerOutputs.length === 0) {
       this.drawAllNeuronPositionsBlack(this.allNeuronPositions);
     } else {
-      console.log("drawing2", drawing);
-      // draw the nodes from the positions
-      this.drawAllNeuronPositionsWithInputColored(
+      this.drawAllNeuronPositionsWithOutputs(
         this.allNeuronPositions,
+        layerOutputs,
+        layersMetadata,
         drawing
       );
     }
   }
+
   componentWillUnmount() {
     this.stop();
     this.mount.removeChild(this.renderer.domElement);
