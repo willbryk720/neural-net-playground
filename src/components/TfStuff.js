@@ -228,6 +228,12 @@ class TfStuff extends Component {
   }
 
   async runTF() {
+    // const x = await tf.loadModel(
+    //   "file:///Users/williambryk/Desktop/my-model-1.json"
+    // );
+    const x = await tf.loadModel("http://localhost:3000/my-model-1.json");
+    console.log("YOOO", x);
+
     // This is the main function. It loads the MNIST data, trains the model, and
     // then shows what the model predicted on unseen test data.
     this.logStatus("Loading MNIST data...");
@@ -243,6 +249,8 @@ class TfStuff extends Component {
     await this.train(model, () => this.showPredictions(model, data), data);
 
     this.props.onFinishedTrainingModel(model);
+
+    // await model.save("downloads:///Users/williambryk/Desktop/my-model-3");
 
     console.log("PRINT WEIGHTS AFTER TRAINING");
     this.printStuff(model);
@@ -309,7 +317,7 @@ class TfStuff extends Component {
               this.runTF();
             }}
           >
-            Load Data and Train Model{" "}
+            Load Data and Train New Model
           </Button>
         </section>
         <section>

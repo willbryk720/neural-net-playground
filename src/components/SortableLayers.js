@@ -64,7 +64,7 @@ class SortableLayers extends Component {
   render() {
     return (
       <div>
-        <h1>Create Neural Network</h1>
+        <h1>Layers</h1>
         <AddStarterNetworks loadStarterNetwork={this.loadStarterNetwork} />
 
         <Button

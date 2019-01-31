@@ -6,6 +6,8 @@ import Left from "./components/Left";
 import TfStuff from "./components/TfStuff";
 import Draw from "./components/Draw";
 
+import AddPreTrainedModel from "./components/AddPreTrainedModel";
+
 import { Input } from "semantic-ui-react";
 
 class App extends Component {
@@ -48,6 +50,7 @@ class App extends Component {
   render() {
     return (
       <div className="App">
+        <AddPreTrainedModel loadPreTrainedModel={() => "hi"} />
         <div
           style={{
             display: "inline-block",
