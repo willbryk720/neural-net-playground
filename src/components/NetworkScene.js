@@ -414,8 +414,8 @@ class NetworkScene extends Component {
   onWindowResize = () => {
     this.updateDocumentOrigin();
     this.camera.aspect =
-      ((window.innerWidth * this.props.windowWidthRatio) / window.innerHeight) *
-      this.props.windowHeightRatio;
+      (window.innerWidth * this.props.windowWidthRatio) /
+      (window.innerHeight * this.props.windowHeightRatio);
     this.camera.updateProjectionMatrix();
 
     this.renderer.setSize(
