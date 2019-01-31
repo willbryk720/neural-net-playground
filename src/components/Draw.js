@@ -62,17 +62,17 @@ class Draw extends Component {
     const { trainedModel } = this.props;
     let layerOutputs = [];
 
-    // console.log("INPUT", inputTensor, inputTensor.dataSync());
+    console.log("INPUT", inputTensor, inputTensor.dataSync());
     const layers = trainedModel.layers;
     for (var i = 0; i < layers.length; i++) {
       var layer = layers[i];
       var output = await layer.apply(inputTensor);
       inputTensor = output;
-      // console.log("OUTPUT BRO");
-      // console.log(output, output.dataSync());
+      console.log("OUTPUT BRO");
+      console.log(output, output.dataSync());
       layerOutputs.push(output);
     }
-    // console.log("----------------------------------");
+    console.log("----------------------------------");
 
     return layerOutputs;
   };

@@ -34,6 +34,23 @@ function reshapeArrayTo3D(arr, numA, numB, numC) {
   }
   return newArr;
 }
+// function reshapeArrayTo3D(arr, numA, numB, numC) {
+//   const sizeSquares = numA * numB;
+
+//   let newArr = [];
+//   for (let c = 0; c < numC; c++) {
+//     let oneFilterArr = [];
+//     for (let i = 0; i < sizeSquares; i++) {
+//       oneFilterArr.push(arr[i + i * numC]);
+//     }
+//     // const slicedArray = arr.slice(sizeSquares * c, sizeSquares * (c + 1));
+//     // const squareArray = reshapeArrayTo2D(slicedArray, numA, numB);
+//     // newArr.push(squareArray);
+//     newArr.push(reshapeArrayTo2D(oneFilterArr, 28, 28));
+//   }
+//   console.log("NEWARR", newArr);
+//   return newArr;
+// }
 
 function fracToHex(frac) {
   return Math.round(frac * 255) * 65793;
@@ -171,7 +188,15 @@ class NetworkScene extends Component {
     );
 
     let allLayerOutputColors = [];
-    allLayerOutputColors.push([input2DArray]); // push input as 3d array
+
+    // change input colors to hex
+    let input2DArrayColors = [];
+    input2DArray.forEach(r => {
+      let rArr = [];
+      r.forEach(c => rArr.push(fracToHex(c)));
+      input2DArrayColors.push(rArr);
+    });
+    allLayerOutputColors.push([input2DArrayColors]); // push input as 3d array
 
     // going to be skipping flatten layersMetadata but dont want layerOutputs index to increment too
     // so layerOutputs needs its own index
@@ -187,7 +212,9 @@ class NetworkScene extends Component {
       }
 
       const lO = layerOutputs[outputIndex];
-      const values = lO.dataSync();
+      let values = lO.dataSync();
+
+      // const colors = values.map(v => fracToHex(v));
       const colors = values.map(v => fracToHex(v));
       if (isSquare) {
         // return [reshapeArrayTo2D(values, 28, 28)]; //TODO BAD BAD
@@ -213,8 +240,7 @@ class NetworkScene extends Component {
           // let color = 0x000000;
           neuronGrouping.forEach((row, r) => {
             row.forEach((pos, c) => {
-              const color = fracToHex(outputColors[g][r][c]);
-
+              const color = outputColors[g][r][c];
               const material = new THREE.MeshBasicMaterial({ color: color });
               let mesh = new THREE.Mesh(geometry, material);
               mesh.position.x = pos[0];
