@@ -65,7 +65,11 @@ class NetworkScene extends Component {
     this.camera.up.set(0, 0, 1);
 
     this.mouse = new THREE.Vector2();
+
+    // for saving object that is currently being hovered over, or was clicked on
     this.hoverIntersectObject = null;
+    this.clickIntersectObject = null;
+
     this.raycaster = new THREE.Raycaster();
     this.updateDocumentOrigin();
 
@@ -73,7 +77,6 @@ class NetworkScene extends Component {
     this.neuronEdges = [];
 
     // controls
-
     this.controls = new OrbitControls(this.camera, this.renderer.domElement);
     //controls.addEventListener( 'change', render ); // call this only in static scenes (i.e., if there is no animation loop)
     this.controls.enableDamping = true; // an animation loop is required when either damping or auto-rotation are enabled
@@ -467,7 +470,10 @@ class NetworkScene extends Component {
         const intersectObject = intersects[0].object;
         // dont want this to trigger for a Line
         intersectObject.material.color.set(0x0000ff);
-        this.drawEdges(this.hoverIntersectObject);
+        // TODO use this.clickIntersectObject
+        // intersectObject.formerColorHex = 0x0000ff;
+
+        this.drawEdges(intersectObject);
       }
     }
   };
