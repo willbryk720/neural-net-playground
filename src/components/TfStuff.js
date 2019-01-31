@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 
 import * as tf from "@tensorflow/tfjs";
-import * as ui from "../utils/ui";
+// import * as ui from "../utils/ui";
 import { IMAGE_H, IMAGE_W, MnistData } from "../utils/data";
 import { Button, Input } from "semantic-ui-react";
 
@@ -244,7 +244,7 @@ class TfStuff extends Component {
 
     this.props.onFinishedTrainingModel(model);
 
-    // await model.save("downloads:///dense-3epochs");
+    await model.save("downloads:///conv-1epoch");
 
     console.log("PRINT WEIGHTS AFTER TRAINING");
     this.printStuff(model);

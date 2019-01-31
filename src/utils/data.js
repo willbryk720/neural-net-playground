@@ -166,4 +166,26 @@ export class MnistData {
     }
     return { xs, labels };
   }
+
+  getTestImage() {
+    let xs = tf.tensor4d(this.testImages, [
+      this.testImages.length / IMAGE_SIZE,
+      IMAGE_H,
+      IMAGE_W,
+      1
+    ]);
+    let labels = tf.tensor2d(this.testLabels, [
+      this.testLabels.length / NUM_CLASSES,
+      NUM_CLASSES
+    ]);
+
+    const totalNumberExamples = this.testImages.length / IMAGE_SIZE;
+    const randIndex = Math.floor(Math.random() * totalNumberExamples);
+
+    console.log(totalNumberExamples, randIndex);
+    xs = xs.slice([randIndex, 0, 0, 0], [1, IMAGE_H, IMAGE_W, 1]);
+    labels = labels.slice([randIndex, 0], [1, NUM_CLASSES]);
+
+    return { xs, labels };
+  }
 }

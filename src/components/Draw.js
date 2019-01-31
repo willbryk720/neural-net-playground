@@ -8,6 +8,18 @@ import * as tf from "@tensorflow/tfjs";
 const CANVAS_WIDTH = 200;
 const CANVAS_HEIGHT = 200;
 
+function reshapeArrayTo2D(arr, numRows, numCols) {
+  let newArr = [];
+  for (let i = 0; i < numRows; i++) {
+    let row = [];
+    for (let j = 0; j < numCols; j++) {
+      row.push(arr[i * numRows + j]);
+    }
+    newArr.push(row);
+  }
+  return newArr;
+}
+
 class Draw extends Component {
   constructor(props) {
     super(props);
@@ -46,27 +58,59 @@ class Draw extends Component {
     return drawing;
   };
 
-  makePrediction = async () => {
-    const drawing = this.getDrawing();
+  getLayerOutputs = async inputTensor => {
     const { trainedModel } = this.props;
-
     let layerOutputs = [];
 
-    let input = tf.tensor(drawing).reshape([1, 28, 28, 1]);
-
-    console.log("INPUT", input, input.dataSync());
+    // console.log("INPUT", inputTensor, inputTensor.dataSync());
     const layers = trainedModel.layers;
     for (var i = 0; i < layers.length; i++) {
       var layer = layers[i];
-      var output = await layer.apply(input);
-      input = output;
-      console.log("OUTPUT BRO");
-      console.log(output, output.dataSync());
+      var output = await layer.apply(inputTensor);
+      inputTensor = output;
+      // console.log("OUTPUT BRO");
+      // console.log(output, output.dataSync());
       layerOutputs.push(output);
     }
-    console.log("----------------------------------");
+    // console.log("----------------------------------");
 
+    return layerOutputs;
+  };
+
+  makePrediction = async (image, imageTensor) => {
+    // const drawing = this.getDrawing();
+    // let input = tf.tensor(drawing).reshape([1, 28, 28, 1]);
+
+    // console.log("DRAWING PRINT AND DRAWING ARRAY");
+    // input.print(true);
+    // const inputVector = await input.dataSync();
+    // console.log(inputVector);
+    // console.log(reshapeArrayTo2D(inputVector, 28, 28));
+    // console.log(drawing);
+
+    const layerOutputs = await this.getLayerOutputs(image);
+    this.props.onMakePrediction(layerOutputs, image);
+
+    console.log(layerOutputs);
+  };
+
+  makeDrawingPrediction = async () => {
+    const drawing = this.getDrawing();
+    const imageTensor = tf.tensor(drawing).reshape([1, 28, 28, 1]);
+    // this.makePrediction(drawing, imageTensor);
+    const layerOutputs = await this.getLayerOutputs(imageTensor);
     this.props.onMakePrediction(layerOutputs, drawing);
+  };
+
+  makeTestImagePrediction = async () => {
+    const { xs, labels } = this.props.getRandomTestImage();
+    const imageTensor = xs;
+    console.log(imageTensor);
+    const imageVector = await imageTensor.dataSync();
+    const image = reshapeArrayTo2D(imageVector, 28, 28);
+    // await this.makePrediction(image, imageTensor);
+    const layerOutputs = await this.getLayerOutputs(imageTensor);
+    this.props.onMakePrediction(layerOutputs, image);
   };
 
   render() {
@@ -89,10 +133,18 @@ class Draw extends Component {
         <Button
           size="mini"
           color="blue"
-          onClick={this.makePrediction}
+          onClick={this.makeDrawingPrediction}
           disabled={Object.keys(trainedModel).length === 0}
         >
-          Predict
+          Predict Drawing
+        </Button>
+        <Button
+          size="mini"
+          color="blue"
+          onClick={this.makeTestImagePrediction}
+          disabled={!this.props.datasetName}
+        >
+          Predict Test Image
         </Button>
       </div>
     );

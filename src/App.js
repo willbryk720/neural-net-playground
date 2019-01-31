@@ -7,6 +7,7 @@ import TfStuff from "./components/TfStuff";
 import Draw from "./components/Draw";
 
 import AddPreTrainedModel from "./components/AddPreTrainedModel";
+import LoadData from "./components/LoadData";
 
 import { Input } from "semantic-ui-react";
 
@@ -19,8 +20,10 @@ class App extends Component {
       numEpochs: 2,
       drawing: [],
       trainedModel: {},
-      isCurrentlyTraining: false
+      isCurrentlyTraining: false,
+      datasetName: null
     };
+    this.dataRef = React.createRef();
   }
 
   updateLayers = newLayers => {
@@ -54,6 +57,16 @@ class App extends Component {
     });
   };
 
+  getRandomTestImage = () => {
+    const randomTestImage = this.dataRef.current.getRandomTestImage();
+    console.log(randomTestImage);
+    return randomTestImage;
+  };
+
+  onLoadedDataset = datasetName => {
+    this.setState({ datasetName });
+  };
+
   render() {
     return (
       <div className="App">
@@ -68,6 +81,8 @@ class App extends Component {
             <Draw
               onMakePrediction={this.onMakePrediction}
               trainedModel={this.state.trainedModel}
+              getRandomTestImage={this.getRandomTestImage}
+              datasetName={this.state.datasetName}
             />
             <AddPreTrainedModel
               onLoadPreTrainedModel={this.onLoadPreTrainedModel}
@@ -84,6 +99,7 @@ class App extends Component {
             drawing={this.state.drawing}
             layerOutputs={this.state.layerOutputs}
           />
+          <LoadData ref={this.dataRef} onLoadedDataset={this.onLoadedDataset} />
           <TfStuff
             layers={this.state.layers}
             numEpochs={this.state.numEpochs}
