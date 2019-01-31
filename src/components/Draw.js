@@ -77,27 +77,9 @@ class Draw extends Component {
     return layerOutputs;
   };
 
-  makePrediction = async (image, imageTensor) => {
-    // const drawing = this.getDrawing();
-    // let input = tf.tensor(drawing).reshape([1, 28, 28, 1]);
-
-    // console.log("DRAWING PRINT AND DRAWING ARRAY");
-    // input.print(true);
-    // const inputVector = await input.dataSync();
-    // console.log(inputVector);
-    // console.log(reshapeArrayTo2D(inputVector, 28, 28));
-    // console.log(drawing);
-
-    const layerOutputs = await this.getLayerOutputs(image);
-    this.props.onMakePrediction(layerOutputs, image);
-
-    console.log(layerOutputs);
-  };
-
   makeDrawingPrediction = async () => {
     const drawing = this.getDrawing();
     const imageTensor = tf.tensor(drawing).reshape([1, 28, 28, 1]);
-    // this.makePrediction(drawing, imageTensor);
     const layerOutputs = await this.getLayerOutputs(imageTensor);
     this.props.onMakePrediction(layerOutputs, drawing);
   };
@@ -105,10 +87,8 @@ class Draw extends Component {
   makeTestImagePrediction = async () => {
     const { xs, labels } = this.props.getRandomTestImage();
     const imageTensor = xs;
-    console.log(imageTensor);
     const imageVector = await imageTensor.dataSync();
     const image = reshapeArrayTo2D(imageVector, 28, 28);
-    // await this.makePrediction(image, imageTensor);
     const layerOutputs = await this.getLayerOutputs(imageTensor);
     this.props.onMakePrediction(layerOutputs, image);
   };
