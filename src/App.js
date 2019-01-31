@@ -21,13 +21,19 @@ class App extends Component {
       drawing: [],
       trainedModel: {},
       isCurrentlyTraining: false,
-      datasetName: null
+      datasetName: null,
+      starterNetworkName: null
     };
     this.dataRef = React.createRef();
   }
 
-  updateLayers = newLayers => {
-    this.setState({ layers: newLayers, layerOutputs: [], trainedModel: {} });
+  updateLayers = (newLayers, starterNetworkName) => {
+    this.setState({
+      layers: newLayers,
+      layerOutputs: [],
+      trainedModel: {},
+      starterNetworkName
+    });
   };
 
   onChangeNumEpochs = newNumEpochs => {
@@ -63,6 +69,14 @@ class App extends Component {
     return randomTestImage;
   };
 
+  getTrainData = () => {
+    console.log(this.dataRef.current.getTrainData());
+    return this.dataRef.current.getTrainData();
+  };
+  getTestData = () => {
+    return this.dataRef.current.getTestData();
+  };
+
   onLoadedDataset = datasetName => {
     this.setState({ datasetName });
   };
@@ -86,6 +100,7 @@ class App extends Component {
             />
             <AddPreTrainedModel
               onLoadPreTrainedModel={this.onLoadPreTrainedModel}
+              starterNetworkName={this.state.starterNetworkName}
             />
             <Left updateLayers={this.updateLayers} />
           </div>
@@ -107,6 +122,9 @@ class App extends Component {
             onFinishedTrainingModel={this.onFinishedTrainingModel}
             onStartTrainingModel={this.onStartTrainingModel}
             drawing={this.state.drawing}
+            datasetName={this.state.datasetName}
+            getTrainData={this.getTrainData}
+            getTestData={this.getTestData}
           />
         </div>
       </div>

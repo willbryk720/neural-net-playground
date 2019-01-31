@@ -67,7 +67,7 @@
   },
   "weightsManifest": [
     {
-      "paths": ["./dense-3epochs.weights.bin"],
+      "paths": ["./Dense-3epochs.weights.bin"],
       "weights": [
         {
           "name": "dense_Dense1/kernel",

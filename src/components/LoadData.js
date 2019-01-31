@@ -26,6 +26,13 @@ class LoadData extends Component {
     return this.state.data.getTestImage();
   };
 
+  getTrainData = () => {
+    return this.state.data.getTrainData();
+  };
+  getTestData = () => {
+    return this.state.data.getTestData();
+  };
+
   async getData() {
     const data = await this.load();
     this.setState({ currentlyGettingData: false });

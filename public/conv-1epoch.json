@@ -135,7 +135,7 @@
   },
   "weightsManifest": [
     {
-      "paths": ["./conv-1epoch.weights.bin"],
+      "paths": ["./Conv-1epoch.weights.bin"],
       "weights": [
         {
           "name": "conv2d_Conv2D1/kernel",

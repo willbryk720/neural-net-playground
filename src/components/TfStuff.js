@@ -53,7 +53,7 @@ class TfStuff extends Component {
     });
   }
 
-  async train(model, onIteration, data) {
+  async train(model, onIteration) {
     accuracyValues = [[], []];
 
     this.logStatus("Training model...");
@@ -70,8 +70,10 @@ class TfStuff extends Component {
     const trainEpochs = this.props.numEpochs;
     let trainBatchCount = 0;
 
-    const trainData = data.getTrainData();
-    const testData = data.getTestData();
+    const trainData = this.props.getTrainData();
+    const testData = this.props.getTestData();
+    // const trainData = data.getTrainData();
+    // const testData = data.getTestData();
 
     const totalNumBatches =
       Math.ceil((trainData.xs.shape[0] * (1 - validationSplit)) / batchSize) *
@@ -170,9 +172,9 @@ class TfStuff extends Component {
   //   }
   // }
 
-  async showPredictions(model, data) {
+  async showPredictions(model) {
     const testExamples = 100;
-    const examples = data.getTestData(testExamples);
+    const examples = this.props.getTestData(testExamples);
 
     // Code wrapped in a tf.tidy() function callback will have their tensors freed
     // from GPU memory after execution without having to call dispose().
@@ -188,11 +190,11 @@ class TfStuff extends Component {
     });
   }
 
-  async load() {
-    let data = new MnistData();
-    await data.load();
-    return data;
-  }
+  // async load() {
+  //   let data = new MnistData();
+  //   await data.load();
+  //   return data;
+  // }
 
   async printStuff(model) {
     console.log("layers", model.layers);
@@ -228,10 +230,8 @@ class TfStuff extends Component {
   }
 
   async runTF() {
-    // This is the main function. It loads the MNIST data, trains the model, and
-    // then shows what the model predicted on unseen test data.
-    this.logStatus("Loading MNIST data...");
-    const data = await this.load();
+    // this.logStatus("Loading MNIST data...");
+    // const data = await this.load();
 
     this.logStatus("Creating model...");
     const model = this.createModel();
@@ -240,11 +240,11 @@ class TfStuff extends Component {
 
     this.logStatus("Starting model training...");
     this.props.onStartTrainingModel();
-    await this.train(model, () => this.showPredictions(model, data), data);
+    await this.train(model, () => this.showPredictions(model));
 
     this.props.onFinishedTrainingModel(model);
 
-    await model.save("downloads:///conv-1epoch");
+    // await model.save("downloads:///conv-1epoch");
 
     console.log("PRINT WEIGHTS AFTER TRAINING");
     this.printStuff(model);
@@ -303,7 +303,11 @@ class TfStuff extends Component {
           <br />
 
           <Button
-            disabled={this.state.currentlyTraining}
+            disabled={
+              this.state.currentlyTraining ||
+              !this.props.datasetName ||
+              this.props.layers.length === 0
+            }
             loading={this.state.currentlyTraining}
             color="blue"
             onClick={() => {
@@ -311,7 +315,7 @@ class TfStuff extends Component {
               this.runTF();
             }}
           >
-            Load Data and Train New Model
+            Train New Model
           </Button>
         </section>
         <section>

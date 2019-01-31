@@ -89,7 +89,7 @@ class AddStarterNetworks extends Component {
           return (
             <Button
               key={network.name}
-              onClick={() => loadStarterNetwork(network.layers)}
+              onClick={() => loadStarterNetwork(network.layers, network.name)}
             >
               {network.name}
             </Button>

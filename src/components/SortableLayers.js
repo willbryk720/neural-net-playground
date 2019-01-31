@@ -55,11 +55,11 @@ class SortableLayers extends Component {
     });
   };
 
-  loadStarterNetwork = layers => {
+  loadStarterNetwork = (layers, starterNetworkName) => {
     this.setState({
       layers: layers
     });
-    this.props.updateLayers(layers);
+    this.props.updateLayers(layers, starterNetworkName);
   };
   render() {
     return (
@@ -71,7 +71,7 @@ class SortableLayers extends Component {
           color="blue"
           size="large"
           onClick={() => {
-            this.props.updateLayers(this.state.layers);
+            this.props.updateLayers(this.state.layers, null);
           }}
         >
           Update

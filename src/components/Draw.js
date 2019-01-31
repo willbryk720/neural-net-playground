@@ -122,7 +122,7 @@ class Draw extends Component {
           size="mini"
           color="blue"
           onClick={this.makeTestImagePrediction}
-          disabled={!this.props.datasetName}
+          disabled={Object.keys(trainedModel).length === 0}
         >
           Predict Test Image
         </Button>
