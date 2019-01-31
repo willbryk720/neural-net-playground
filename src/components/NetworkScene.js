@@ -49,14 +49,15 @@ class NetworkScene extends Component {
     this.renderer = new THREE.WebGLRenderer({ antialias: true });
     this.renderer.setPixelRatio(window.devicePixelRatio);
     this.renderer.setSize(
-      window.innerWidth * this.props.windowRatio,
-      window.innerHeight * this.props.windowRatio
+      window.innerWidth * this.props.windowWidthRatio,
+      window.innerHeight * this.props.windowHeightRatio
     );
     this.mount.appendChild(this.renderer.domElement);
 
     this.camera = new THREE.PerspectiveCamera(
       60,
-      window.innerWidth / window.innerHeight,
+      (window.innerWidth * this.props.windowWidthRatio) /
+        (window.innerHeight * this.props.windowHeightRatio),
       1,
       1600
     );
@@ -401,25 +402,30 @@ class NetworkScene extends Component {
   };
 
   updateDocumentOrigin = () => {
-    this.documentOrigin = [window.innerWidth * this.props.windowRatio, 0];
+    this.documentOrigin = [
+      window.innerWidth - window.innerWidth * this.props.windowWidthRatio,
+      0
+    ];
   };
 
   onWindowResize = () => {
     this.updateDocumentOrigin();
-    this.camera.aspect = window.innerWidth / window.innerHeight;
+    this.camera.aspect =
+      ((window.innerWidth * this.props.windowWidthRatio) / window.innerHeight) *
+      this.props.windowHeightRatio;
     this.camera.updateProjectionMatrix();
 
     this.renderer.setSize(
-      window.innerWidth * this.props.windowRatio,
-      window.innerHeight * this.props.windowRatio
+      window.innerWidth * this.props.windowWidthRatio,
+      window.innerHeight * this.props.windowHeightRatio
     );
   };
 
   onDocumentMouseMove = event => {
     const xOffset = event.clientX - this.documentOrigin[0];
     const yOffset = event.clientY - this.documentOrigin[1];
-    const windowWidth = window.innerWidth * this.props.windowRatio;
-    const windowHeight = window.innerHeight * this.props.windowRatio;
+    const windowWidth = window.innerWidth * this.props.windowWidthRatio;
+    const windowHeight = window.innerHeight * this.props.windowHeightRatio;
     if (
       xOffset >= 0 &&
       event.clientX <= this.documentOrigin[0] + windowWidth &&
@@ -438,8 +444,8 @@ class NetworkScene extends Component {
   onDocumentMouseDown = event => {
     const xOffset = event.clientX - this.documentOrigin[0];
     const yOffset = event.clientY - this.documentOrigin[1];
-    const windowWidth = window.innerWidth * this.props.windowRatio;
-    const windowHeight = window.innerHeight * this.props.windowRatio;
+    const windowWidth = window.innerWidth * this.props.windowWidthRatio;
+    const windowHeight = window.innerHeight * this.props.windowHeightRatio;
     if (
       xOffset >= 0 &&
       event.clientX <= this.documentOrigin[0] + windowWidth &&

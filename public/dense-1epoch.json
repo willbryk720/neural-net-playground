@@ -67,7 +67,7 @@
   },
   "weightsManifest": [
     {
-      "paths": ["./my-model-1.weights.bin"],
+      "paths": ["./dense-1epoch.weights.bin"],
       "weights": [
         {
           "name": "dense_Dense1/kernel",

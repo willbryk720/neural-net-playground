@@ -24,7 +24,7 @@ class App extends Component {
   }
 
   updateLayers = newLayers => {
-    this.setState({ layers: newLayers, layerOutputs: [], trainedModel: [] });
+    this.setState({ layers: newLayers, layerOutputs: [], trainedModel: {} });
   };
 
   onChangeNumEpochs = newNumEpochs => {
@@ -47,10 +47,16 @@ class App extends Component {
     });
   };
 
+  onLoadPreTrainedModel = preTrainedModel => {
+    // isLoadingPreTrainedModel
+    this.setState({
+      trainedModel: preTrainedModel
+    });
+  };
+
   render() {
     return (
       <div className="App">
-        <AddPreTrainedModel loadPreTrainedModel={() => "hi"} />
         <div
           style={{
             display: "inline-block",
@@ -63,12 +69,17 @@ class App extends Component {
               onMakePrediction={this.onMakePrediction}
               trainedModel={this.state.trainedModel}
             />
+            <AddPreTrainedModel
+              onLoadPreTrainedModel={this.onLoadPreTrainedModel}
+            />
             <Left updateLayers={this.updateLayers} />
           </div>
         </div>
+
         <div style={{ display: "inline-block", width: "50%" }}>
           <NetworkScene
-            windowRatio={0.5}
+            windowHeightRatio={0.5}
+            windowWidthRatio={0.5}
             layers={this.state.layers}
             drawing={this.state.drawing}
             layerOutputs={this.state.layerOutputs}
