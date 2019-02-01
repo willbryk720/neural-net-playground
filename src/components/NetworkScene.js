@@ -444,42 +444,56 @@ class NetworkScene extends Component {
   };
 
   onDocumentMouseMove = event => {
-    const xOffset = event.clientX - this.documentOrigin[0];
-    const yOffset = event.clientY - this.documentOrigin[1];
-    const windowWidth = window.innerWidth * this.props.windowWidthRatio;
-    const windowHeight = window.innerHeight * this.props.windowHeightRatio;
+    const canvasBounds = this.renderer.context.canvas.getBoundingClientRect();
     if (
-      xOffset >= 0 &&
-      event.clientX <= this.documentOrigin[0] + windowWidth &&
-      yOffset >= 0 &&
-      event.clientY <= this.documentOrigin[1] + windowHeight
+      event.clientX >= canvasBounds.left &&
+      event.clientX <= canvasBounds.right &&
+      event.clientY >= canvasBounds.top &&
+      event.clientY <= canvasBounds.bottom
     ) {
       event.preventDefault();
       this.markLastChange();
     }
 
-    // Dont know why the docs said to multiply by 2 and subtract 1
-    this.mouse.x = (xOffset / windowWidth) * 2 - 1;
-    this.mouse.y = -(yOffset / windowHeight) * 2 + 1;
+    // update mouse x and y for raycaster
+    this.mouse.x =
+      ((event.clientX - canvasBounds.left) /
+        (canvasBounds.right - canvasBounds.left)) *
+        2 -
+      1;
+    this.mouse.y =
+      -(
+        (event.clientY - canvasBounds.top) /
+        (canvasBounds.bottom - canvasBounds.top)
+      ) *
+        2 +
+      1;
   };
 
   onDocumentMouseDown = event => {
-    const xOffset = event.clientX - this.documentOrigin[0];
-    const yOffset = event.clientY - this.documentOrigin[1];
-    const windowWidth = window.innerWidth * this.props.windowWidthRatio;
-    const windowHeight = window.innerHeight * this.props.windowHeightRatio;
+    const canvasBounds = this.renderer.context.canvas.getBoundingClientRect();
     if (
-      xOffset >= 0 &&
-      event.clientX <= this.documentOrigin[0] + windowWidth &&
-      yOffset >= 0 &&
-      event.clientY <= this.documentOrigin[1] + windowHeight
+      event.clientX >= canvasBounds.left &&
+      event.clientX <= canvasBounds.right &&
+      event.clientY >= canvasBounds.top &&
+      event.clientY <= canvasBounds.bottom
     ) {
       event.preventDefault();
       this.markLastChange();
 
       // update mouse
-      this.mouse.x = (xOffset / windowWidth) * 2 - 1;
-      this.mouse.y = -(yOffset / windowHeight) * 2 + 1;
+      this.mouse.x =
+        ((event.clientX - canvasBounds.left) /
+          (canvasBounds.right - canvasBounds.left)) *
+          2 -
+        1;
+      this.mouse.y =
+        -(
+          (event.clientY - canvasBounds.top) /
+          (canvasBounds.bottom - canvasBounds.top)
+        ) *
+          2 +
+        1;
 
       this.raycaster.setFromCamera(this.mouse, this.camera);
       const intersects = this.raycaster
