@@ -9,7 +9,10 @@ import Draw from "./components/Draw";
 import AddPreTrainedModel from "./components/AddPreTrainedModel";
 import LoadData from "./components/LoadData";
 
-import { Input } from "semantic-ui-react";
+import ShowLoading from "./components/ShowLoading";
+import Info from "./components/Info";
+
+import { Input, Button } from "semantic-ui-react";
 
 class App extends Component {
   constructor(props) {
@@ -22,7 +25,11 @@ class App extends Component {
       trainedModel: {},
       isCurrentlyTraining: false,
       datasetName: null,
-      starterNetworkName: null
+      starterNetworkName: null,
+      networkSceneWindowRatios: {
+        windowHeightRatio: 0.5,
+        windowWidthRatio: 0.5
+      }
     };
     this.dataRef = React.createRef();
   }
@@ -90,6 +97,12 @@ class App extends Component {
           }}
         >
           <div style={{ marginLeft: "2%", marginRight: "2%" }}>
+            <Info
+              datasetName={this.state.datasetName}
+              starterNetworkName={this.state.starterNetworkName}
+              trainedModel={this.state.trainedModel}
+            />
+            <ShowLoading isCurrentlyTraining={this.state.isCurrentlyTraining} />
             <Draw
               onMakePrediction={this.onMakePrediction}
               trainedModel={this.state.trainedModel}
@@ -106,12 +119,40 @@ class App extends Component {
 
         <div style={{ display: "inline-block", width: "50%" }}>
           <NetworkScene
-            windowHeightRatio={0.5}
-            windowWidthRatio={0.5}
+            windowHeightRatio={
+              this.state.networkSceneWindowRatios.windowHeightRatio
+            }
+            windowWidthRatio={
+              this.state.networkSceneWindowRatios.windowWidthRatio
+            }
             layers={this.state.layers}
             drawing={this.state.drawing}
             layerOutputs={this.state.layerOutputs}
           />
+          <Button
+            onClick={() => {
+              const isHalfScreen =
+                this.state.networkSceneWindowRatios.windowHeightRatio === 0.5;
+              console.log(this.state.networkSceneWindowRatios);
+              let networkSceneWindowRatios;
+              if (isHalfScreen) {
+                networkSceneWindowRatios = {
+                  windowHeightRatio: 0.9,
+                  windowWidthRatio: 1.0
+                };
+              } else {
+                networkSceneWindowRatios = {
+                  windowHeightRatio: 0.5,
+                  windowWidthRatio: 0.5
+                };
+              }
+              this.setState({
+                networkSceneWindowRatios
+              });
+            }}
+          >
+            FullScreen
+          </Button>
           <LoadData ref={this.dataRef} onLoadedDataset={this.onLoadedDataset} />
           <TfStuff
             layers={this.state.layers}

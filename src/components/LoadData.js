@@ -16,7 +16,6 @@ class LoadData extends Component {
   async load() {
     let data = new MnistData();
     await data.load();
-    console.log(data);
     this.setState({ data });
     this.props.onLoadedDataset("MNIST");
     return data;

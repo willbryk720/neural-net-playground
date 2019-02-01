@@ -44,9 +44,6 @@ function reshapeArrayTo3D(arr, numA, numB, numC) {
     for (let i = 0; i < sizeSquares; i++) {
       oneFilterArr.push(arr[c + i * numC]);
     }
-    // const slicedArray = arr.slice(sizeSquares * c, sizeSquares * (c + 1));
-    // const squareArray = reshapeArrayTo2D(slicedArray, numA, numB);
-    // newArr.push(squareArray);
     newArr.push(reshapeArrayTo2D(oneFilterArr, numA, numB));
   }
   console.log("NEWARR", newArr);
@@ -126,6 +123,7 @@ class NetworkScene extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
+    console.log(nextProps);
     // if (nextProps.layers !== this.props.numLayers) {
     //   //Perform some operation here
 
@@ -226,9 +224,6 @@ class NetworkScene extends Component {
     }
     console.log("allLayerOutputColors", allLayerOutputColors);
 
-    // const inputs = layerOutputs[0].dataSync();
-    // const drawing = reshapeArrayTo2D(inputs, 28, 28);
-
     allNeuronPositions.forEach((layerOfPositions, index) => {
       const { isSquare, neuronPositions } = layerOfPositions;
       const outputColors = allLayerOutputColors[index];
@@ -236,7 +231,6 @@ class NetworkScene extends Component {
 
       neuronPositions.forEach((neuronGrouping, g) => {
         if (isSquare) {
-          // let color = 0x000000;
           neuronGrouping.forEach((row, r) => {
             row.forEach((pos, c) => {
               const color = outputColors[g][r][c];

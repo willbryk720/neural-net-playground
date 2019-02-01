@@ -126,52 +126,6 @@ class TfStuff extends Component {
     );
   }
 
-  // draw(image, canvas) {
-  //   const [width, height] = [28, 28];
-  //   canvas.width = width;
-  //   canvas.height = height;
-  //   const ctx = canvas.getContext("2d");
-  //   const imageData = new ImageData(width, height);
-  //   const data = image.dataSync();
-  //   for (let i = 0; i < height * width; ++i) {
-  //     const j = i * 4;
-  //     imageData.data[j + 0] = data[i] * 255;
-  //     imageData.data[j + 1] = data[i] * 255;
-  //     imageData.data[j + 2] = data[i] * 255;
-  //     imageData.data[j + 3] = 255;
-  //   }
-  //   ctx.putImageData(imageData, 0, 0);
-  // }
-
-  // showTestResults(batch, predictions, labels) {
-  //   const testExamples = batch.xs.shape[0];
-  //   // imagesElement.innerHTML = "";
-  //   for (let i = 0; i < testExamples; i++) {
-  //     const image = batch.xs.slice([i, 0], [1, batch.xs.shape[1]]);
-
-  //     const div = document.createElement("div");
-  //     div.className = "pred-container";
-
-  //     const canvas = document.createElement("canvas");
-  //     canvas.className = "prediction-canvas";
-  //     draw(image.flatten(), canvas);
-
-  //     const pred = document.createElement("div");
-
-  //     const prediction = predictions[i];
-  //     const label = labels[i];
-  //     const correct = prediction === label;
-
-  //     pred.className = `pred ${correct ? "pred-correct" : "pred-incorrect"}`;
-  //     pred.innerText = `pred: ${prediction}`;
-
-  //     div.appendChild(pred);
-  //     div.appendChild(canvas);
-
-  //     // imagesElement.appendChild(div);
-  //   }
-  // }
-
   async showPredictions(model) {
     const testExamples = 100;
     const examples = this.props.getTestData(testExamples);
@@ -185,16 +139,8 @@ class TfStuff extends Component {
       const axis = 1;
       const labels = Array.from(examples.labels.argMax(axis).dataSync());
       const predictions = Array.from(output.argMax(axis).dataSync());
-
-      // this.showTestResults(examples, predictions, labels);
     });
   }
-
-  // async load() {
-  //   let data = new MnistData();
-  //   await data.load();
-  //   return data;
-  // }
 
   async printStuff(model) {
     console.log("layers", model.layers);
@@ -230,9 +176,6 @@ class TfStuff extends Component {
   }
 
   async runTF() {
-    // this.logStatus("Loading MNIST data...");
-    // const data = await this.load();
-
     this.logStatus("Creating model...");
     const model = this.createModel();
 
@@ -248,8 +191,6 @@ class TfStuff extends Component {
 
     console.log("PRINT WEIGHTS AFTER TRAINING");
     this.printStuff(model);
-    // const x = model.predict(tf.ones([1, 28, 28, 1]));
-    // x.print();
 
     // console.log("SHAPES");
     // console.log(data.xs.slice([0, 0], [1, 28, 28, 1]).shape());
@@ -259,25 +200,6 @@ class TfStuff extends Component {
     // let input = xs.slice([3, 0], [1, 28, 28, 1]);
     // console.log(input, input.dataSync());
     // console.log(JSON.stringify(input.dataSync()));
-
-    // const d = input.dataSync();
-    // let a = [];
-    // d.forEach(d => {
-    //   a.push(d);
-    // });
-    // console.log("SYNC", JSON.stringify(a));
-
-    // let input = tf.tensor(this.props.drawing).reshape([1, 28, 28, 1]);
-    // console.log(input, input.dataSync());
-    // const layers = model.layers;
-    // for (var i = 0; i < layers.length; i++) {
-    //   var layer = layers[i];
-    //   var output = await layer.apply(input);
-    //   input = output;
-    //   console.log("OUTPUT BRO");
-    //   console.log(output, output.dataSync());
-    // }
-    // console.log("labels: ", labels.dataSync());
 
     this.setState({ currentlyTraining: false });
   }
@@ -318,21 +240,7 @@ class TfStuff extends Component {
             Train New Model
           </Button>
         </section>
-        <section>
-          <p>{this.state.status} </p>
-          <p id="message" />
-
-          <div id="stats">
-            <div className="canvases">
-              <label id="loss-label" />
-              <div id="loss-canvas" />
-            </div>
-            <div className="canvases">
-              <label id="accuracy-label" />
-              <div id="accuracy-canvas" />
-            </div>
-          </div>
-        </section>
+        <p>{this.state.status} </p>
         <LineChart
           width={600}
           height={400}

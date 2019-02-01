@@ -20,6 +20,7 @@ class AddPreTrainedModel extends Component {
     const preTrainedModel = await tf.loadModel(
       `http://localhost:3000/${modelName}.json`
     );
+    preTrainedModel.preTrainedModelName = modelName;
     console.log(modelName, preTrainedModel);
     this.props.onLoadPreTrainedModel(preTrainedModel);
   }
