@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Button, Icon, Segment, Input, Dropdown } from "semantic-ui-react";
+import { Button, Icon } from "semantic-ui-react";
 
 import * as tf from "@tensorflow/tfjs";
 
@@ -42,6 +42,11 @@ class AddPreTrainedModel extends Component {
             {pTM.name}
           </Button>
         ))}
+        {this.props.preTrainedModelName && (
+          <span>
+            {this.props.preTrainedModelName} <Icon name="check" color="green" />
+          </span>
+        )}
       </div>
     );
   }

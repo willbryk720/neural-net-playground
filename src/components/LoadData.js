@@ -1,8 +1,7 @@
 import React, { Component } from "react";
 
-import * as tf from "@tensorflow/tfjs";
-import { IMAGE_H, IMAGE_W, MnistData } from "../utils/data";
-import { Button, Input } from "semantic-ui-react";
+import { MnistData } from "../utils/data";
+import { Button, Icon } from "semantic-ui-react";
 
 class LoadData extends Component {
   constructor(props) {
@@ -35,9 +34,6 @@ class LoadData extends Component {
   async getData() {
     const data = await this.load();
     this.setState({ currentlyGettingData: false });
-
-    // const trainData = data.getTrainData();
-    // const testData = data.getTestData();
   }
 
   render() {
@@ -54,6 +50,12 @@ class LoadData extends Component {
         >
           Load Data
         </Button>
+        {this.props.datasetName && (
+          <span>
+            <b>{this.props.datasetName}</b>
+            <Icon name="check" color="green" />
+          </span>
+        )}
       </div>
     );
   }

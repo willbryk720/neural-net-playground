@@ -54,6 +54,25 @@ function fracToHex(frac) {
   return Math.round(frac * 255) * 65793;
 }
 
+function isObjectsEquivalent(a, b) {
+  // Create arrays of property names
+  const aProps = Object.getOwnPropertyNames(a);
+  const bProps = Object.getOwnPropertyNames(b);
+
+  if (aProps.length != bProps.length) {
+    return false;
+  }
+
+  for (let i = 0; i < aProps.length; i++) {
+    const propName = aProps[i];
+    if (a[propName] !== b[propName]) {
+      return false;
+    }
+  }
+
+  return true;
+}
+
 class NetworkScene extends Component {
   componentDidMount() {
     // if (!Detector.webgl) Detector.addGetWebGLMessage();
@@ -86,7 +105,6 @@ class NetworkScene extends Component {
     this.clickIntersectObject = null;
 
     this.raycaster = new THREE.Raycaster();
-    this.updateDocumentOrigin();
 
     // initialize neuron edges
     this.neuronEdges = [];
@@ -127,12 +145,13 @@ class NetworkScene extends Component {
     // if (nextProps.layers !== this.props.numLayers) {
     //   //Perform some operation here
 
-    // Clear all objects (check that this doesnt have memory leaks TODO)
-    this.scene.remove.apply(this.scene, this.scene.children);
-    this.updateNetworkSetup(nextProps);
-
-    // this.animate();
-    this.markLastChange(); // should it be this or markLastChange TODO
+    if (!isObjectsEquivalent(this.props, nextProps)) {
+      // Clear all objects (check that this doesnt have memory leaks TODO)
+      this.scene.remove.apply(this.scene, this.scene.children);
+      this.updateNetworkSetup(nextProps);
+      this.markLastChange(); // should it be this or markLastChange TODO
+      // this.animate();
+    }
   }
 
   drawAllNeuronPositionsBlack = allNeuronPositions => {
@@ -261,6 +280,9 @@ class NetworkScene extends Component {
   };
 
   async updateNetworkSetup(nextProps) {
+    // this.props.onBeginUpdateNetwork();
+    console.log("STARTING");
+
     const { layers, drawing, layerOutputs } = nextProps;
 
     const layersMetadata = getLayersMetadataFromLayers(layers);
@@ -284,6 +306,9 @@ class NetworkScene extends Component {
         drawing
       );
     }
+
+    console.log("ENDING");
+    // this.props.onEndUpdateNetwork();
   }
 
   componentWillUnmount() {
@@ -423,15 +448,7 @@ class NetworkScene extends Component {
     }
   };
 
-  updateDocumentOrigin = () => {
-    this.documentOrigin = [
-      window.innerWidth - window.innerWidth * this.props.windowWidthRatio,
-      0
-    ];
-  };
-
   onWindowResize = () => {
-    this.updateDocumentOrigin();
     this.camera.aspect =
       (window.innerWidth * this.props.windowWidthRatio) /
       (window.innerHeight * this.props.windowHeightRatio);

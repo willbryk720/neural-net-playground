@@ -12,6 +12,8 @@ import LoadData from "./components/LoadData";
 import ShowLoading from "./components/ShowLoading";
 import Info from "./components/Info";
 
+import CircularLoading from "./components/common/CircularLoading";
+
 import { Input, Button } from "semantic-ui-react";
 
 const preTrainedModelOptions = [
@@ -93,6 +95,11 @@ class App extends Component {
     this.setState({ datasetName });
   };
 
+  // onBeginUpdateNetwork = () => {
+  //   this.setState({ networkLoading: true });
+  // };
+  // onEndUpdateNetwork = () => this.setState({ networkLoading: false });
+
   render() {
     return (
       <div
@@ -122,6 +129,7 @@ class App extends Component {
             <LoadData
               ref={this.dataRef}
               onLoadedDataset={this.onLoadedDataset}
+              datasetName={this.state.datasetName}
             />
             <h1>2. Create Layers</h1>
             <Left updateLayers={this.updateLayers} />
@@ -131,6 +139,7 @@ class App extends Component {
               onLoadPreTrainedModel={this.onLoadPreTrainedModel}
               starterNetworkName={this.state.starterNetworkName}
               preTrainedModelOptions={preTrainedModelOptions}
+              preTrainedModelName={this.state.trainedModel.preTrainedModelName}
             />
             {preTrainedModelOptions.find(
               pTM => pTM.name.split("-")[0] === this.state.starterNetworkName
@@ -164,6 +173,8 @@ class App extends Component {
             layers={this.state.layers}
             drawing={this.state.drawing}
             layerOutputs={this.state.layerOutputs}
+            onBeginUpdateNetwork={this.onBeginUpdateNetwork}
+            onEndUpdateNetwork={this.onEndUpdateNetwork}
           />
           {/* <Button
             onClick={() => {

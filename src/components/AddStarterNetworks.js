@@ -88,6 +88,7 @@ class AddStarterNetworks extends Component {
         {networks.map(network => {
           return (
             <Button
+              color="green"
               key={network.name}
               onClick={() => loadStarterNetwork(network.layers, network.name)}
             >
