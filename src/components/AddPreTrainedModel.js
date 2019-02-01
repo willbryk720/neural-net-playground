@@ -10,6 +10,7 @@ class AddPreTrainedModel extends Component {
   }
 
   async downloadPreTrainedModel(modelName) {
+    console.log(`${process.env.PUBLIC_URL}/${modelName}.json`);
     const preTrainedModel = await tf.loadModel(
       `${process.env.PUBLIC_URL}/${modelName}.json`
     );
