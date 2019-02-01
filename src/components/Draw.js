@@ -94,7 +94,7 @@ class Draw extends Component {
   };
 
   render() {
-    const { trainedModel } = this.props;
+    const { trainedModel, datasetName } = this.props;
     return (
       <div>
         <h3>Predict</h3>
@@ -114,7 +114,7 @@ class Draw extends Component {
           size="mini"
           color="blue"
           onClick={this.makeDrawingPrediction}
-          disabled={Object.keys(trainedModel).length === 0}
+          disabled={Object.keys(trainedModel).length === 0 || !datasetName}
         >
           Predict Drawing
         </Button>
@@ -122,7 +122,7 @@ class Draw extends Component {
           size="mini"
           color="blue"
           onClick={this.makeTestImagePrediction}
-          disabled={Object.keys(trainedModel).length === 0}
+          disabled={Object.keys(trainedModel).length === 0 || !datasetName}
         >
           Predict Test Image
         </Button>

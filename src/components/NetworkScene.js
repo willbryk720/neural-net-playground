@@ -502,7 +502,7 @@ class NetworkScene extends Component {
       if (intersects.length > 0) {
         const intersectObject = intersects[0].object;
         // dont want this to trigger for a Line
-        intersectObject.material.color.set(0x0000ff);
+        // intersectObject.material.color.set(0x00ffff);
         // TODO use this.clickIntersectObject
         // intersectObject.formerColorHex = 0x0000ff;
 
