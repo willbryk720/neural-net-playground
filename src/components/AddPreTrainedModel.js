@@ -15,9 +15,14 @@ class AddPreTrainedModel extends Component {
     // );
     console.log(process.env.NODE_ENV);
     console.log(`${process.env.PUBLIC_URL}/${modelName}.json`);
-    const preTrainedModel = await tf.loadModel(
-      `https://calm-thicket-77808.herokuapp.com/${modelName}.json`
-    );
+    let urlStr;
+    if (process.env.NODE_ENV === "development") {
+      urlStr = `http://localhost:3000/${modelName}.json`;
+    } else {
+      urlStr = `https://calm-thicket-77808.herokuapp.com/${modelName}.json`;
+    }
+    console.log("URLSTR", urlStr);
+    const preTrainedModel = await tf.loadModel(urlStr);
     preTrainedModel.preTrainedModelName = modelName;
     console.log(modelName, preTrainedModel);
     this.props.onLoadPreTrainedModel(preTrainedModel);
