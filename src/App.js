@@ -65,12 +65,10 @@ class App extends Component {
 
   getRandomTestImage = () => {
     const randomTestImage = this.dataRef.current.getRandomTestImage();
-    console.log(randomTestImage);
     return randomTestImage;
   };
 
   getTrainData = () => {
-    console.log(this.dataRef.current.getTrainData());
     return this.dataRef.current.getTrainData();
   };
   getTestData = () => {

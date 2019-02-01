@@ -23,34 +23,35 @@ function reshapeArrayTo2D(arr, numRows, numCols) {
   return newArr;
 }
 
-function reshapeArrayTo3D(arr, numA, numB, numC) {
-  const sizeSquares = numA * numB;
-
-  let newArr = [];
-  for (let c = 0; c < numC; c++) {
-    const slicedArray = arr.slice(sizeSquares * c, sizeSquares * (c + 1));
-    const squareArray = reshapeArrayTo2D(slicedArray, numA, numB);
-    newArr.push(squareArray);
-  }
-  return newArr;
-}
 // function reshapeArrayTo3D(arr, numA, numB, numC) {
 //   const sizeSquares = numA * numB;
 
 //   let newArr = [];
 //   for (let c = 0; c < numC; c++) {
-//     let oneFilterArr = [];
-//     for (let i = 0; i < sizeSquares; i++) {
-//       oneFilterArr.push(arr[i + i * numC]);
-//     }
-//     // const slicedArray = arr.slice(sizeSquares * c, sizeSquares * (c + 1));
-//     // const squareArray = reshapeArrayTo2D(slicedArray, numA, numB);
-//     // newArr.push(squareArray);
-//     newArr.push(reshapeArrayTo2D(oneFilterArr, 28, 28));
+//     const slicedArray = arr.slice(sizeSquares * c, sizeSquares * (c + 1));
+//     const squareArray = reshapeArrayTo2D(slicedArray, numA, numB);
+//     newArr.push(squareArray);
 //   }
-//   console.log("NEWARR", newArr);
 //   return newArr;
 // }
+function reshapeArrayTo3D(arr, numA, numB, numC) {
+  const sizeSquares = numA * numB;
+  console.log(sizeSquares, numA, numB, numC);
+
+  let newArr = [];
+  for (let c = 0; c < numC; c++) {
+    let oneFilterArr = [];
+    for (let i = 0; i < sizeSquares; i++) {
+      oneFilterArr.push(arr[c + i * numC]);
+    }
+    // const slicedArray = arr.slice(sizeSquares * c, sizeSquares * (c + 1));
+    // const squareArray = reshapeArrayTo2D(slicedArray, numA, numB);
+    // newArr.push(squareArray);
+    newArr.push(reshapeArrayTo2D(oneFilterArr, numA, numB));
+  }
+  console.log("NEWARR", newArr);
+  return newArr;
+}
 
 function fracToHex(frac) {
   return Math.round(frac * 255) * 65793;
@@ -214,13 +215,11 @@ class NetworkScene extends Component {
       const lO = layerOutputs[outputIndex];
       let values = lO.dataSync();
 
-      // const colors = values.map(v => fracToHex(v));
       const colors = values.map(v => fracToHex(v));
       if (isSquare) {
         // return [reshapeArrayTo2D(values, 28, 28)]; //TODO BAD BAD
         allLayerOutputColors.push(reshapeArrayTo3D(colors, ...dimensions));
       } else {
-        // console.log("VALUES", values.map(v => v * 65793 * 255));
         allLayerOutputColors.push(colors);
       }
       outputIndex += 1;
