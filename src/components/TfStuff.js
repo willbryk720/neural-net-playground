@@ -18,7 +18,8 @@ class TfStuff extends Component {
     this.state = {
       status: "",
       currentlyTraining: false,
-      trainingAccuracyValues: []
+      trainingAccuracyValues: [],
+      showChart: false
     };
   }
 
@@ -213,44 +214,43 @@ class TfStuff extends Component {
     ];
     return (
       <div className="tfjs-example-container">
-        <h3>Recognize handwritten digits from the MNIST database</h3>
-        <section>
-          <div>
-            <label># of training epochs:</label>
-            <Input
-              value={this.props.numEpochs}
-              onChange={(e, { value }) => this.props.onChangeNumEpochs(value)}
-            />
-          </div>
-          <br />
-
-          <Button
-            disabled={
-              this.state.currentlyTraining ||
-              !this.props.datasetName ||
-              this.props.layers.length === 0
-            }
-            loading={this.state.currentlyTraining}
-            color="blue"
-            onClick={() => {
-              this.setState({ currentlyTraining: true });
-              this.runTF();
-            }}
-          >
-            Train New Model
-          </Button>
-        </section>
-        <p>{this.state.status} </p>
-        <LineChart
-          width={600}
-          height={400}
-          data={data}
-          xLabel={"Batch"}
-          yLabel={"Accuracy"}
-          pointRadius={2}
-          yMax={1}
-        />{" "}
+        <div>
+          <label># Training Epochs:</label>
+          <Input
+            width={1}
+            type={"Number"}
+            value={this.props.numEpochs}
+            onChange={(e, { value }) => this.props.onChangeNumEpochs(value)}
+          />
+        </div>
         <br />
+        <Button
+          disabled={
+            this.state.currentlyTraining ||
+            !this.props.datasetName ||
+            this.props.layers.length === 0
+          }
+          loading={this.state.currentlyTraining}
+          color="blue"
+          onClick={() => {
+            this.setState({ currentlyTraining: true, showChart: true });
+            this.runTF();
+          }}
+        >
+          Train New Model
+        </Button>
+        <p>{this.state.status} </p>
+        {this.state.showChart && (
+          <LineChart
+            width={600}
+            height={400}
+            data={data}
+            xLabel={"Batch"}
+            yLabel={"Accuracy"}
+            pointRadius={2}
+            yMax={1}
+          />
+        )}
         <br />
       </div>
     );

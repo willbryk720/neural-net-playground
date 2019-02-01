@@ -97,7 +97,6 @@ class Draw extends Component {
     const { trainedModel, datasetName } = this.props;
     return (
       <div>
-        <h3>Predict</h3>
         <CanvasDraw
           loadTimeOffset={5}
           lazyRadius={0}

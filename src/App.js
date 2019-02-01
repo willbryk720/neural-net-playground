@@ -14,6 +14,13 @@ import Info from "./components/Info";
 
 import { Input, Button } from "semantic-ui-react";
 
+const preTrainedModelOptions = [
+  { name: "Dense-1epoch" },
+  { name: "Dense-3epochs" },
+  { name: "Conv-1epoch" },
+  { name: "Conv-3epochs" }
+];
+
 class App extends Component {
   constructor(props) {
     super(props);
@@ -88,36 +95,65 @@ class App extends Component {
 
   render() {
     return (
-      <div className="App">
+      <div
+        className="App"
+        style={{
+          height: "100%"
+        }}
+      >
         <div
           style={{
             display: "inline-block",
             width: "50%",
-            verticalAlign: "top"
+            verticalAlign: "top",
+            height: "100%",
+            overflowY: "auto"
           }}
         >
-          <div style={{ marginLeft: "2%", marginRight: "2%" }}>
-            <Info
-              datasetName={this.state.datasetName}
-              starterNetworkName={this.state.starterNetworkName}
-              trainedModel={this.state.trainedModel}
-            />
+          <div
+            style={{
+              marginLeft: "2%",
+              marginRight: "2%",
+              height: "100%"
+            }}
+          >
             <ShowLoading isCurrentlyTraining={this.state.isCurrentlyTraining} />
-            <Draw
-              onMakePrediction={this.onMakePrediction}
-              trainedModel={this.state.trainedModel}
-              getRandomTestImage={this.getRandomTestImage}
-              datasetName={this.state.datasetName}
+            <h1>1. Load Data</h1>
+            <LoadData
+              ref={this.dataRef}
+              onLoadedDataset={this.onLoadedDataset}
             />
+            <h1>2. Create Layers</h1>
+            <Left updateLayers={this.updateLayers} />
+
+            <h1>3. Create Weights</h1>
             <AddPreTrainedModel
               onLoadPreTrainedModel={this.onLoadPreTrainedModel}
               starterNetworkName={this.state.starterNetworkName}
+              preTrainedModelOptions={preTrainedModelOptions}
             />
-            <Left updateLayers={this.updateLayers} />
+            {preTrainedModelOptions.find(
+              pTM => pTM.name.split("-")[0] === this.state.starterNetworkName
+            ) ? (
+              <h5>Or train model from scratch:</h5>
+            ) : (
+              <h5>Train model from scratch:</h5>
+            )}
+            <TfStuff
+              layers={this.state.layers}
+              numEpochs={this.state.numEpochs}
+              onChangeNumEpochs={this.onChangeNumEpochs}
+              onFinishedTrainingModel={this.onFinishedTrainingModel}
+              onStartTrainingModel={this.onStartTrainingModel}
+              drawing={this.state.drawing}
+              datasetName={this.state.datasetName}
+              getTrainData={this.getTrainData}
+              getTestData={this.getTestData}
+            />
           </div>
         </div>
 
-        <div style={{ display: "inline-block", width: "50%" }}>
+        <div style={{ display: "inline-block", width: "50%", height: "100%" }}>
           <NetworkScene
             windowHeightRatio={
               this.state.networkSceneWindowRatios.windowHeightRatio
@@ -129,10 +165,10 @@ class App extends Component {
             drawing={this.state.drawing}
             layerOutputs={this.state.layerOutputs}
           />
-          <Button
+          {/* <Button
             onClick={() => {
               const isHalfScreen =
-                this.state.networkSceneWindowRatios.windowHeightRatio === 0.5;
+                this.state.networkSceneWindowRatios.windowWidthRatio === 0.5;
               console.log(this.state.networkSceneWindowRatios);
               let networkSceneWindowRatios;
               if (isHalfScreen) {
@@ -152,19 +188,19 @@ class App extends Component {
             }}
           >
             FullScreen
-          </Button>
-          <LoadData ref={this.dataRef} onLoadedDataset={this.onLoadedDataset} />
-          <TfStuff
-            layers={this.state.layers}
-            numEpochs={this.state.numEpochs}
-            onChangeNumEpochs={this.onChangeNumEpochs}
-            onFinishedTrainingModel={this.onFinishedTrainingModel}
-            onStartTrainingModel={this.onStartTrainingModel}
-            drawing={this.state.drawing}
+          </Button> */}
+          <h1>Predict</h1>
+          <Draw
+            onMakePrediction={this.onMakePrediction}
+            trainedModel={this.state.trainedModel}
+            getRandomTestImage={this.getRandomTestImage}
             datasetName={this.state.datasetName}
-            getTrainData={this.getTrainData}
-            getTestData={this.getTestData}
           />
+          {/* <Info
+            datasetName={this.state.datasetName}
+            starterNetworkName={this.state.starterNetworkName}
+            trainedModel={this.state.trainedModel}
+          /> */}
         </div>
       </div>
     );

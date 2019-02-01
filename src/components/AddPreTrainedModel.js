@@ -3,13 +3,6 @@ import { Button, Icon, Segment, Input, Dropdown } from "semantic-ui-react";
 
 import * as tf from "@tensorflow/tfjs";
 
-const preTrainedModelOptions = [
-  { name: "Dense-1epoch" },
-  { name: "Dense-3epochs" },
-  { name: "Conv-1epoch" },
-  { name: "Conv-3epochs" }
-];
-
 class AddPreTrainedModel extends Component {
   constructor(props) {
     super(props);
@@ -26,16 +19,24 @@ class AddPreTrainedModel extends Component {
   }
 
   render() {
-    const { onLoadPreTrainedModel } = this.props;
+    const { onLoadPreTrainedModel, preTrainedModelOptions } = this.props;
+
+    const preTrainedModelAllowedOptions = preTrainedModelOptions.filter(
+      pTM => this.props.starterNetworkName === pTM.name.split("-")[0]
+    );
+
+    if (preTrainedModelAllowedOptions.length === 0) {
+      return <div />;
+    }
+
     return (
       <div>
-        <h3>Load Pre-trained Model</h3>
-        {preTrainedModelOptions.map(pTM => (
+        <h5>Choose from Pre-trained options:</h5>
+        {preTrainedModelAllowedOptions.map(pTM => (
           <Button
             key={pTM.name}
             size="small"
             color="green"
-            disabled={this.props.starterNetworkName !== pTM.name.split("-")[0]}
             onClick={() => this.downloadPreTrainedModel(pTM.name)}
           >
             {pTM.name}

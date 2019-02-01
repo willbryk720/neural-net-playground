@@ -64,9 +64,9 @@ class SortableLayers extends Component {
   render() {
     return (
       <div>
-        <h1>Layers</h1>
+        <h5>Choose Defaults:</h5>
         <AddStarterNetworks loadStarterNetwork={this.loadStarterNetwork} />
-
+        <h5>Or build your own:</h5>
         <Button
           color="blue"
           size="large"
