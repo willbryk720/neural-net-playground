@@ -11,6 +11,7 @@ import LoadData from "./components/LoadData";
 
 import ShowLoading from "./components/ShowLoading";
 import Info from "./components/Info";
+import AnalyzeLayers from "./components/AnalyzeLayers";
 
 import CircularLoading from "./components/common/CircularLoading";
 
@@ -35,10 +36,7 @@ class App extends Component {
       isCurrentlyTraining: false,
       datasetName: null,
       starterNetworkName: null,
-      networkSceneWindowRatios: {
-        windowHeightRatio: 0.5,
-        windowWidthRatio: 0.5
-      }
+      isFullScreenMode: false
     };
     this.dataRef = React.createRef();
   }
@@ -75,7 +73,8 @@ class App extends Component {
   onLoadPreTrainedModel = preTrainedModel => {
     // isLoadingPreTrainedModel
     this.setState({
-      trainedModel: preTrainedModel
+      trainedModel: preTrainedModel,
+      layerOutputs: []
     });
   };
 
@@ -101,6 +100,38 @@ class App extends Component {
   // onEndUpdateNetwork = () => this.setState({ networkLoading: false });
 
   render() {
+    if (this.state.isFullScreenMode) {
+      return (
+        <div>
+          <div style={{ width: "70%", display: "inline-block" }}>
+            <NetworkScene
+              windowHeightRatio={1.0}
+              windowWidthRatio={0.68}
+              layers={this.state.layers}
+              drawing={this.state.drawing}
+              layerOutputs={this.state.layerOutputs}
+              onBeginUpdateNetwork={this.onBeginUpdateNetwork}
+              onEndUpdateNetwork={this.onEndUpdateNetwork}
+            />
+          </div>
+          <div
+            style={{
+              width: "30%",
+              display: "inline-block",
+              verticalAlign: "top"
+            }}
+          >
+            <Button
+              onClick={() => this.setState({ isFullScreenMode: false })}
+              style={{ float: "right" }}
+            >
+              Back
+            </Button>
+            <AnalyzeLayers />
+          </div>
+        </div>
+      );
+    }
     return (
       <div
         className="App"
@@ -171,42 +202,18 @@ class App extends Component {
 
         <div style={{ display: "inline-block", width: "50%", height: "100%" }}>
           <NetworkScene
-            windowHeightRatio={
-              this.state.networkSceneWindowRatios.windowHeightRatio
-            }
-            windowWidthRatio={
-              this.state.networkSceneWindowRatios.windowWidthRatio
-            }
+            windowHeightRatio={0.5}
+            windowWidthRatio={0.5}
             layers={this.state.layers}
             drawing={this.state.drawing}
             layerOutputs={this.state.layerOutputs}
             onBeginUpdateNetwork={this.onBeginUpdateNetwork}
             onEndUpdateNetwork={this.onEndUpdateNetwork}
           />
-          {/* <Button
-            onClick={() => {
-              const isHalfScreen =
-                this.state.networkSceneWindowRatios.windowWidthRatio === 0.5;
-              console.log(this.state.networkSceneWindowRatios);
-              let networkSceneWindowRatios;
-              if (isHalfScreen) {
-                networkSceneWindowRatios = {
-                  windowHeightRatio: 0.9,
-                  windowWidthRatio: 1.0
-                };
-              } else {
-                networkSceneWindowRatios = {
-                  windowHeightRatio: 0.5,
-                  windowWidthRatio: 0.5
-                };
-              }
-              this.setState({
-                networkSceneWindowRatios
-              });
-            }}
-          >
+          <Button onClick={() => this.setState({ isFullScreenMode: true })}>
             FullScreen
-          </Button> */}
+          </Button>
+          <AnalyzeLayers />
 
           {/* <Info
             datasetName={this.state.datasetName}

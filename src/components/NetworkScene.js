@@ -95,7 +95,7 @@ class NetworkScene extends Component {
       1,
       1600
     );
-    this.camera.position.set(-2, -50, 2);
+    this.camera.position.set(0, -40, 40);
     this.camera.up.set(0, 0, 1);
 
     this.mouse = new THREE.Vector2();

@@ -15,7 +15,8 @@ class CanvasComponent extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      points: getStartDrawing()
+      points: getStartDrawing(),
+      lineWidth: 0
     };
   }
   componentDidMount() {}
@@ -61,7 +62,6 @@ class CanvasComponent extends React.Component {
       const r = point[1];
       const c = point[0];
 
-      console.log(this.state.points, r, c);
       if (this.state.points[r][c] === 0) {
         let copyPoints = this.state.points.slice();
         copyPoints[r][c] = 1;
