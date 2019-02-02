@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 // import "./App.css";
 import NetworkScene from "./components/NetworkScene";
-import Left from "./components/Left";
+import SortableLayers from "./components/SortableLayers";
 
 import TfStuff from "./components/TfStuff";
 import Draw from "./components/Draw";
@@ -163,7 +163,11 @@ class App extends Component {
               datasetName={this.state.datasetName}
             />
             <h1>2. Create Layers</h1>
-            <Left updateLayers={this.updateLayers} />
+            {/* <Left updateLayers={this.updateLayers} layers={this.state.layers} /> */}
+            <SortableLayers
+              updateLayers={this.updateLayers}
+              layers={this.state.layers}
+            />
 
             <h1>3. Create Weights</h1>
             <AddPreTrainedModel

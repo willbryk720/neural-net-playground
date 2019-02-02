@@ -29,7 +29,7 @@ const SortableItem = SortableElement(
 
 class SortableLayers extends Component {
   state = {
-    layers: []
+    layers: this.props.layers
   };
   onSortEnd = ({ oldIndex, newIndex }) => {
     this.setState(({ layers }) => ({
