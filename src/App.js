@@ -159,6 +159,13 @@ class App extends Component {
               getTrainData={this.getTrainData}
               getTestData={this.getTestData}
             />
+            <h1>4. Predict</h1>
+            <Draw
+              onMakePrediction={this.onMakePrediction}
+              trainedModel={this.state.trainedModel}
+              getRandomTestImage={this.getRandomTestImage}
+              datasetName={this.state.datasetName}
+            />
           </div>
         </div>
 
@@ -200,13 +207,7 @@ class App extends Component {
           >
             FullScreen
           </Button> */}
-          <h1>Predict</h1>
-          <Draw
-            onMakePrediction={this.onMakePrediction}
-            trainedModel={this.state.trainedModel}
-            getRandomTestImage={this.getRandomTestImage}
-            datasetName={this.state.datasetName}
-          />
+
           {/* <Info
             datasetName={this.state.datasetName}
             starterNetworkName={this.state.starterNetworkName}

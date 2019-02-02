@@ -1,7 +1,8 @@
 import React, { Component } from "react";
-import SortableLayers from "./SortableLayers";
 import CanvasDraw from "react-canvas-draw";
 import { Button } from "semantic-ui-react";
+
+import CanvasComponent from "./CanvasComponent";
 
 import * as tf from "@tensorflow/tfjs";
 
@@ -27,15 +28,15 @@ class Draw extends Component {
     this.myRef = React.createRef();
   }
 
-  getDrawingFromPoints = points => {
-    let drawing = Array.from(Array(28), _ => Array(28).fill(0));
-    points.forEach(p => {
-      const row = Math.floor((28 * p.y) / CANVAS_HEIGHT);
-      const col = Math.floor((28 * p.x) / CANVAS_WIDTH);
-      drawing[row][col] = 0.95;
-    });
-    return drawing;
-  };
+  // getDrawingFromPoints = points => {
+  //   let drawing = Array.from(Array(28), _ => Array(28).fill(0));
+  //   points.forEach(p => {
+  //     const row = Math.floor((28 * p.y) / CANVAS_HEIGHT);
+  //     const col = Math.floor((28 * p.x) / CANVAS_WIDTH);
+  //     drawing[row][col] = 0.95;
+  //   });
+  //   return drawing;
+  // };
 
   clearDrawing = () => {
     this.myRef.current.clear();
@@ -45,18 +46,18 @@ class Draw extends Component {
     // console.log(t.shape);
   };
 
-  getDrawing = () => {
-    const node = this.myRef.current;
-    const drawingData = JSON.parse(node.getSaveData()).lines;
-    let points = [];
-    console.log(drawingData);
-    drawingData.forEach(l => {
-      points = points.concat(l.points);
-    });
-    const drawing = this.getDrawingFromPoints(points);
+  // getDrawing = () => {
+  //   const node = this.myRef.current;
+  //   const drawingData = JSON.parse(node.getSaveData()).lines;
+  //   let points = [];
+  //   console.log(drawingData);
+  //   drawingData.forEach(l => {
+  //     points = points.concat(l.points);
+  //   });
+  //   const drawing = this.getDrawingFromPoints(points);
 
-    return drawing;
-  };
+  //   return drawing;
+  // };
 
   getLayerOutputs = async inputTensor => {
     const { trainedModel } = this.props;
@@ -78,7 +79,8 @@ class Draw extends Component {
   };
 
   makeDrawingPrediction = async () => {
-    const drawing = this.getDrawing();
+    // const drawing = this.getDrawing();
+    const drawing = this.myRef.current.state.points;
     const imageTensor = tf.tensor(drawing).reshape([1, 28, 28, 1]);
     const layerOutputs = await this.getLayerOutputs(imageTensor);
     this.props.onMakePrediction(layerOutputs, drawing);
@@ -97,7 +99,7 @@ class Draw extends Component {
     const { trainedModel, datasetName } = this.props;
     return (
       <div>
-        <CanvasDraw
+        {/* <CanvasDraw
           loadTimeOffset={5}
           lazyRadius={0}
           brushRadius={4}
@@ -105,6 +107,11 @@ class Draw extends Component {
           canvasWidth={CANVAS_WIDTH}
           canvasHeight={CANVAS_HEIGHT}
           ref={this.myRef}
+        /> */}
+        <CanvasComponent
+          ref={this.myRef}
+          canvasWidth={CANVAS_WIDTH}
+          canvasHeight={CANVAS_HEIGHT}
         />
         <Button size="mini" onClick={this.clearDrawing}>
           Clear

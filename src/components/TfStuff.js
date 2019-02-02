@@ -251,7 +251,6 @@ class TfStuff extends Component {
             yMax={1}
           />
         )}
-        <br />
       </div>
     );
   }
