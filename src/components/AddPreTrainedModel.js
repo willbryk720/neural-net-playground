@@ -21,6 +21,7 @@ class AddPreTrainedModel extends Component {
     } else {
       urlStr = `https://calm-thicket-77808.herokuapp.com/${modelName}.json`;
     }
+    urlStr = `https://calm-thicket-77808.herokuapp.com/${modelName}.json`;
     console.log("URLSTR", urlStr);
     const preTrainedModel = await tf.loadModel(urlStr);
     preTrainedModel.preTrainedModelName = modelName;
