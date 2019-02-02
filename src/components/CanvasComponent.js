@@ -16,12 +16,13 @@ class CanvasComponent extends React.Component {
     super(props);
     this.state = {
       points: getStartDrawing(),
-      lineWidth: 0
+      lineWidth: 1
     };
   }
   componentDidMount() {}
 
   updateCanvas(point) {
+    console.log(point);
     const ctx = this.refs.canvas.getContext("2d");
     const squareWidth = this.props.canvasWidth / NUM_SQUARES_PER_ROW;
     ctx.fillRect(
@@ -48,30 +49,90 @@ class CanvasComponent extends React.Component {
   drawing(e) {
     //if the pen is down in the canvas, draw/erase
 
+    // if (this.state.pen === "down") {
+    //   let x = e.nativeEvent.offsetX;
+    //   let y = e.nativeEvent.offsetY;
+    //   if (x === this.props.canvasWidth) x -= 1;
+    //   if (y === this.props.canvasHeight) y -= 1;
+
+    //   let point = [
+    //     Math.floor((NUM_SQUARES_PER_COL * x) / this.props.canvasWidth),
+    //     Math.floor((NUM_SQUARES_PER_ROW * y) / this.props.canvasHeight)
+    //   ];
+
+    //   const c = point[0];
+    //   const r = point[1];
+
+    //   const { lineWidth, points } = this.state;
+
+    //   let copyPoints = points.slice();
+    //   for (let i = c - lineWidth; i <= c + lineWidth; i++) {
+    //     for (let j = r - lineWidth; j <= r + lineWidth; j++) {
+    //       if (
+    //         i >= 0 &&
+    //         i < NUM_SQUARES_PER_ROW &&
+    //         j >= 0 &&
+    //         j < NUM_SQUARES_PER_ROW &&
+    //         points[j][i] === 0
+    //       ) {
+    //         copyPoints[j][i] = 1;
+    //         this.updateCanvas([i, j]);
+    //       }
+    //     }
+    //   }
+    //   this.setState({
+    //     points: copyPoints
+    //   });
+
+    //   // if (points[r][c] === 0) {
+    //   //   let copyPoints = points.slice();
+    //   //   copyPoints[r][c] = 1;
+
+    //   //   this.setState({
+    //   //     points: copyPoints
+    //   //   });
+
+    //   //   this.updateCanvas(point);
+    //   // }
+    // }
     if (this.state.pen === "down") {
       let x = e.nativeEvent.offsetX;
       let y = e.nativeEvent.offsetY;
       if (x === this.props.canvasWidth) x -= 1;
       if (y === this.props.canvasHeight) y -= 1;
 
-      let point = [
-        Math.floor((NUM_SQUARES_PER_COL * x) / this.props.canvasWidth),
-        Math.floor((NUM_SQUARES_PER_ROW * y) / this.props.canvasHeight)
-      ];
+      const { lineWidth, points } = this.state;
+      const squareWidth = this.props.canvasWidth / NUM_SQUARES_PER_ROW;
 
-      const r = point[1];
-      const c = point[0];
+      let copyPoints = points.slice();
+      for (let i = -lineWidth; i <= lineWidth; i++) {
+        const newX = x + (i * squareWidth) / 3;
+        for (let j = -lineWidth; j <= lineWidth; j++) {
+          const newY = y + (j * squareWidth) / 3;
 
-      if (this.state.points[r][c] === 0) {
-        let copyPoints = this.state.points.slice();
-        copyPoints[r][c] = 1;
+          let point = [
+            Math.floor((NUM_SQUARES_PER_COL * newX) / this.props.canvasWidth),
+            Math.floor((NUM_SQUARES_PER_ROW * newY) / this.props.canvasHeight)
+          ];
 
-        this.setState({
-          points: copyPoints
-        });
+          const c = point[0];
+          const r = point[1];
 
-        this.updateCanvas(point);
+          if (
+            c >= 0 &&
+            c < NUM_SQUARES_PER_ROW &&
+            r >= 0 &&
+            r < NUM_SQUARES_PER_ROW &&
+            points[r][c] === 0
+          ) {
+            copyPoints[r][c] = 1;
+            this.updateCanvas([c, r]);
+          }
+        }
       }
+      this.setState({
+        points: copyPoints
+      });
     }
   }
 
