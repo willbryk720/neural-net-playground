@@ -77,21 +77,17 @@ class Predict extends Component {
       weightsObj = weightsAndBiases[0];
       biases = weightsAndBiases[1];
 
-      if (weightsObj.shape.length === 4 && weightsObj.shape[2] > 1) {
-        console.log("CHECK");
-        console.log(weightsObj.dataSync());
-        console.log(biases.dataSync());
-        console.log(
-          reshapeArrayTo4D(weightsObj.dataSync(), ...weightsObj.shape)
-        );
-      }
-
-      // console.log("BIASES", biases, biases.dataSync());
-      // console.log("WEIGHTS", weightsObj, weightsObj.dataSync());
-
-      // if (weightsObj.shape.length === 4) {
-      //   console.log(weightsObj.slice([0, 0], [3, 3, 1, 1]).dataSync());
+      // if (weightsObj.shape.length === 4 && weightsObj.shape[2] > 1) {
+      //   console.log("CHECK");
+      //   console.log(weightsObj.dataSync());
+      //   console.log(biases.dataSync());
+      //   console.log(
+      //     reshapeArrayTo4D(weightsObj.dataSync(), ...weightsObj.shape)
+      //   );
       // }
+
+      console.log("BIASES", biases, biases.dataSync());
+      console.log("WEIGHTS", weightsObj, weightsObj.dataSync());
     }
 
     // const output42 = layerOutputs[1];

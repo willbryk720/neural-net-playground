@@ -6,49 +6,15 @@ import * as OrbitControls from "three-orbitcontrols";
 
 import {
   getAllNeuronPositions,
-  getLayersMetadataFromLayers
+  getLayersMetadataFromLayers,
+  fracToHex,
+  isObjectsEquivalent,
+  getAllNeuronEdgesData
 } from "../utils/scene";
 
 import { NEURON_WIDTH, LAYER_VERTICAL_SPACING } from "../utils/constants";
 
-import { reshapeArrayTo3D, reshapeArrayTo4D } from "../utils/reshaping";
-
-function reshapeArrayTo2D(arr, numRows, numCols) {
-  let newArr = [];
-  for (let i = 0; i < numRows; i++) {
-    let row = [];
-    for (let j = 0; j < numCols; j++) {
-      row.push(arr[i * numRows + j]);
-    }
-    newArr.push(row);
-  }
-  return newArr;
-}
-
-function getAllNeuronEdges(layersMetadata, trainedModel, layerOutputs) {}
-
-function fracToHex(frac) {
-  return Math.round(frac * 255) * 65793;
-}
-
-function isObjectsEquivalent(a, b) {
-  // Create arrays of property names
-  const aProps = Object.getOwnPropertyNames(a);
-  const bProps = Object.getOwnPropertyNames(b);
-
-  if (aProps.length != bProps.length) {
-    return false;
-  }
-
-  for (let i = 0; i < aProps.length; i++) {
-    const propName = aProps[i];
-    if (a[propName] !== b[propName]) {
-      return false;
-    }
-  }
-
-  return true;
-}
+import { reshapeArrayTo3D } from "../utils/reshaping";
 
 class NetworkScene extends Component {
   componentDidMount() {
@@ -98,6 +64,7 @@ class NetworkScene extends Component {
     this.controls.panSpeed = 0.6;
     this.controls.rotateSpeed = 0.05;
 
+    this.allNeuronEdgesData = [];
     this.updateNetworkSetup(this.props);
 
     // lights
@@ -141,28 +108,31 @@ class NetworkScene extends Component {
     );
 
     allNeuronPositions.forEach(layerOfPositions => {
-      const { isSquare, neuronPositions } = layerOfPositions;
-      neuronPositions.forEach(neuronGrouping => {
+      const { isSquare, neuronPositions, layerType } = layerOfPositions;
+      neuronPositions.forEach((neuronGrouping, g) => {
         if (isSquare) {
-          neuronGrouping.forEach(row => {
-            row.forEach(pos => {
+          neuronGrouping.forEach((row, r) => {
+            row.forEach((pos, c) => {
               const material = new THREE.MeshBasicMaterial({ color: 0x000000 });
               let mesh = new THREE.Mesh(geometry, material);
               mesh.position.x = pos[0];
               mesh.position.y = pos[1];
               mesh.position.z = pos[2];
+              mesh.layerType = layerType;
+              mesh.indexInfo = { group: g, row: r, col: c };
               this.scene.add(mesh);
             });
           });
         } else {
           // draw line
-          neuronGrouping.forEach(pos => {
+          neuronGrouping.forEach((pos, i) => {
             const material = new THREE.MeshBasicMaterial({ color: 0x000000 });
             let mesh = new THREE.Mesh(geometry, material);
             mesh.position.x = pos[0];
             mesh.position.y = pos[1];
             mesh.position.z = pos[2];
-            mesh.layerShape = "line";
+            mesh.layerType = layerType;
+            mesh.indexInfo = { col: i };
             this.scene.add(mesh);
           });
         }
@@ -222,7 +192,7 @@ class NetworkScene extends Component {
     // console.log("allLayerOutputColors", allLayerOutputColors);
 
     allNeuronPositions.forEach((layerOfPositions, index) => {
-      const { isSquare, neuronPositions } = layerOfPositions;
+      const { isSquare, neuronPositions, layerType } = layerOfPositions;
       const outputColors = allLayerOutputColors[index];
 
       neuronPositions.forEach((neuronGrouping, g) => {
@@ -235,6 +205,8 @@ class NetworkScene extends Component {
               mesh.position.x = pos[0];
               mesh.position.y = pos[1];
               mesh.position.z = pos[2];
+              mesh.layerType = layerType;
+              mesh.indexInfo = { group: g, row: r, col: c };
               this.scene.add(mesh);
             });
           });
@@ -248,7 +220,8 @@ class NetworkScene extends Component {
             mesh.position.x = pos[0];
             mesh.position.y = pos[1];
             mesh.position.z = pos[2];
-            mesh.layerShape = "line";
+            mesh.layerType = layerType;
+            mesh.indexInfo = { col: i };
             this.scene.add(mesh);
           });
         }
@@ -272,11 +245,12 @@ class NetworkScene extends Component {
     );
 
     this.allNeuronPositions = getAllNeuronPositions(layersMetadata);
-    this.allNeuronEdges = getAllNeuronEdges(
+    this.allNeuronEdgesData = getAllNeuronEdgesData(
       layersMetadata,
       trainedModel,
       layerOutputs
     );
+    console.log(this.allNeuronPositions, this.allNeuronEdgesData);
 
     if (layerOutputs.length === 0) {
       this.drawAllNeuronPositionsBlack(this.allNeuronPositions);
@@ -328,7 +302,7 @@ class NetworkScene extends Component {
   };
 
   drawEdges = neuron => {
-    const { trainedModel } = this.props;
+    const edgesData = this.allNeuronEdgesData;
 
     // remove previous edges
     this.neuronEdges.forEach(edge => {
@@ -336,32 +310,41 @@ class NetworkScene extends Component {
     });
 
     let neuronEdges = [];
-    if (neuron.layerShape === "line") {
+    console.log(neuron);
+    const { layerType, indexInfo } = neuron;
+    if (layerType === "dense") {
       const previousLayerIndex =
         Math.round(neuron.position.z / LAYER_VERTICAL_SPACING) - 1;
       const { isSquare, neuronPositions } = this.allNeuronPositions[
         previousLayerIndex
       ];
-      const secondPos = [
+      const targetNeuronPos = [
         neuron.position.x,
         neuron.position.y,
         neuron.position.z - NEURON_WIDTH / 2
       ];
 
-      neuronPositions.forEach(neuronGrouping => {
+      const edgesLayerWeights = edgesData[previousLayerIndex].weights;
+
+      neuronPositions.forEach((neuronGrouping, g) => {
+        const neuronGroupingSize =
+          neuronGrouping.length * neuronGrouping[0].length;
         if (isSquare) {
-          neuronGrouping.forEach(row => {
-            row.forEach(pos => {
+          neuronGrouping.forEach((row, r) => {
+            row.forEach((pos, c) => {
               let axisGeometry = new THREE.Geometry();
               axisGeometry.vertices.push(
-                new THREE.Vector3(...secondPos),
+                new THREE.Vector3(...targetNeuronPos),
                 new THREE.Vector3(...pos)
               );
               neuronEdges.push(
                 new THREE.Line(
                   axisGeometry,
                   new THREE.LineBasicMaterial({
-                    color: fracToHex(Math.random())
+                    color:
+                      edgesLayerWeights[g * neuronGroupingSize + r * c][
+                        indexInfo["col"]
+                      ]
                   })
                 )
               );
@@ -371,7 +354,7 @@ class NetworkScene extends Component {
           neuronGrouping.forEach(pos => {
             let axisGeometry = new THREE.Geometry();
             axisGeometry.vertices.push(
-              new THREE.Vector3(...secondPos),
+              new THREE.Vector3(...targetNeuronPos),
               new THREE.Vector3(...pos)
             );
             neuronEdges.push(
@@ -546,4 +529,5 @@ class NetworkScene extends Component {
     );
   }
 }
+
 export default NetworkScene;

@@ -6,6 +6,8 @@ import {
   NEURON_WIDTH
 } from "./constants";
 
+import { reshapeArrayTo4D, reshapeArrayTo2D } from "./reshaping";
+
 // Returns 1d array of positions of neurons spaced evenly with the line center at [0,0,height]
 export const getPositionsOfLineOfItems = (
   itemSpacing,
@@ -264,4 +266,70 @@ export const getAllNeuronPositions = layersMetadata => {
   });
 
   return allNeuronPositions;
+};
+
+export function fracToHex(frac) {
+  return Math.round(frac * 255) * 65793;
+}
+
+export function isObjectsEquivalent(a, b) {
+  // Create arrays of property names
+  const aProps = Object.getOwnPropertyNames(a);
+  const bProps = Object.getOwnPropertyNames(b);
+
+  if (aProps.length != bProps.length) {
+    return false;
+  }
+
+  for (let i = 0; i < aProps.length; i++) {
+    const propName = aProps[i];
+    if (a[propName] !== b[propName]) {
+      return false;
+    }
+  }
+
+  return true;
+}
+
+export const getAllNeuronEdgesData = (
+  layersMetadata,
+  trainedModel,
+  layerOutputs
+) => {
+  if (Object.keys(trainedModel).length === 0) return;
+  let edgesData = [];
+
+  for (let i = 0; i < trainedModel.layers.length; i++) {
+    if (trainedModel.layers[i].name.split("_")[0] === "flatten") continue;
+
+    const weightsAndBiases = trainedModel.layers[i].getWeights();
+    if (weightsAndBiases.length != 2) {
+      edgesData.push({
+        name: trainedModel.layers[i].name
+      });
+      continue;
+    }
+
+    const weightsObj = weightsAndBiases[0];
+    const biasesObj = weightsAndBiases[1];
+    let weightsData;
+    if (weightsObj.shape.length === 4) {
+      weightsData = reshapeArrayTo4D(
+        weightsObj.dataSync(),
+        ...weightsObj.shape
+      );
+    } else if (weightsObj.shape.length === 2) {
+      weightsData = reshapeArrayTo2D(
+        weightsObj.dataSync(),
+        ...weightsObj.shape
+      );
+    }
+    edgesData.push({
+      biases: biasesObj.dataSync(),
+      weights: weightsData,
+      name: weightsObj.name
+    });
+  }
+
+  return edgesData;
 };
