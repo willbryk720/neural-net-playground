@@ -11,6 +11,8 @@ import {
 
 import { NEURON_WIDTH, LAYER_VERTICAL_SPACING } from "../utils/constants";
 
+import { reshapeArrayTo3D, reshapeArrayTo4D } from "../utils/reshaping";
+
 function reshapeArrayTo2D(arr, numRows, numCols) {
   let newArr = [];
   for (let i = 0; i < numRows; i++) {
@@ -23,32 +25,7 @@ function reshapeArrayTo2D(arr, numRows, numCols) {
   return newArr;
 }
 
-// function reshapeArrayTo3D(arr, numA, numB, numC) {
-//   const sizeSquares = numA * numB;
-
-//   let newArr = [];
-//   for (let c = 0; c < numC; c++) {
-//     const slicedArray = arr.slice(sizeSquares * c, sizeSquares * (c + 1));
-//     const squareArray = reshapeArrayTo2D(slicedArray, numA, numB);
-//     newArr.push(squareArray);
-//   }
-//   return newArr;
-// }
-function reshapeArrayTo3D(arr, numA, numB, numC) {
-  const sizeSquares = numA * numB;
-  console.log(sizeSquares, numA, numB, numC);
-
-  let newArr = [];
-  for (let c = 0; c < numC; c++) {
-    let oneFilterArr = [];
-    for (let i = 0; i < sizeSquares; i++) {
-      oneFilterArr.push(arr[c + i * numC]);
-    }
-    newArr.push(reshapeArrayTo2D(oneFilterArr, numA, numB));
-  }
-  console.log("NEWARR", newArr);
-  return newArr;
-}
+function getAllNeuronEdges(layersMetadata, trainedModel, layerOutputs) {}
 
 function fracToHex(frac) {
   return Math.round(frac * 255) * 65793;
@@ -136,6 +113,7 @@ class NetworkScene extends Component {
     window.addEventListener("resize", this.onWindowResize, false);
     window.addEventListener("mousemove", this.onDocumentMouseMove, false);
     window.addEventListener("mousedown", this.onDocumentMouseDown, false);
+    window.addEventListener("dblclick", this.onDocumentDblClick, false);
 
     this.start();
   }
@@ -241,12 +219,11 @@ class NetworkScene extends Component {
       }
       outputIndex += 1;
     }
-    console.log("allLayerOutputColors", allLayerOutputColors);
+    // console.log("allLayerOutputColors", allLayerOutputColors);
 
     allNeuronPositions.forEach((layerOfPositions, index) => {
       const { isSquare, neuronPositions } = layerOfPositions;
       const outputColors = allLayerOutputColors[index];
-      console.log(outputColors);
 
       neuronPositions.forEach((neuronGrouping, g) => {
         if (isSquare) {
@@ -281,20 +258,25 @@ class NetworkScene extends Component {
 
   async updateNetworkSetup(nextProps) {
     // this.props.onBeginUpdateNetwork();
-    console.log("STARTING");
 
-    const { layers, drawing, layerOutputs } = nextProps;
+    const { layers, drawing, layerOutputs, trainedModel } = nextProps;
 
     const layersMetadata = getLayersMetadataFromLayers(layers);
     console.log(
-      "IMPORTANT: drawing, layers, layerOutputs, layersMetadata ",
+      "IMPORTANT: drawing, layers, layerOutputs, layerOutputDataSync, layersMetadata ",
       drawing,
       layers,
       layerOutputs,
+      layerOutputs.map(lO => lO.dataSync()),
       layersMetadata
     );
 
     this.allNeuronPositions = getAllNeuronPositions(layersMetadata);
+    this.allNeuronEdges = getAllNeuronEdges(
+      layersMetadata,
+      trainedModel,
+      layerOutputs
+    );
 
     if (layerOutputs.length === 0) {
       this.drawAllNeuronPositionsBlack(this.allNeuronPositions);
@@ -307,7 +289,6 @@ class NetworkScene extends Component {
       );
     }
 
-    console.log("ENDING");
     // this.props.onEndUpdateNetwork();
   }
 
@@ -347,6 +328,8 @@ class NetworkScene extends Component {
   };
 
   drawEdges = neuron => {
+    const { trainedModel } = this.props;
+
     // remove previous edges
     this.neuronEdges.forEach(edge => {
       this.scene.remove(edge);
@@ -378,7 +361,7 @@ class NetworkScene extends Component {
                 new THREE.Line(
                   axisGeometry,
                   new THREE.LineBasicMaterial({
-                    color: 0xff0000
+                    color: fracToHex(Math.random())
                   })
                 )
               );
@@ -395,7 +378,8 @@ class NetworkScene extends Component {
               new THREE.Line(
                 axisGeometry,
                 new THREE.LineBasicMaterial({
-                  color: 0xff0000
+                  color: fracToHex(Math.random()),
+                  linewidth: 10
                 })
               )
             );
@@ -473,18 +457,7 @@ class NetworkScene extends Component {
     }
 
     // update mouse x and y for raycaster
-    this.mouse.x =
-      ((event.clientX - canvasBounds.left) /
-        (canvasBounds.right - canvasBounds.left)) *
-        2 -
-      1;
-    this.mouse.y =
-      -(
-        (event.clientY - canvasBounds.top) /
-        (canvasBounds.bottom - canvasBounds.top)
-      ) *
-        2 +
-      1;
+    this.updateMouse(event, canvasBounds);
   };
 
   onDocumentMouseDown = event => {
@@ -499,33 +472,67 @@ class NetworkScene extends Component {
       this.markLastChange();
 
       // update mouse
-      this.mouse.x =
-        ((event.clientX - canvasBounds.left) /
-          (canvasBounds.right - canvasBounds.left)) *
-          2 -
-        1;
-      this.mouse.y =
-        -(
-          (event.clientY - canvasBounds.top) /
-          (canvasBounds.bottom - canvasBounds.top)
-        ) *
-          2 +
-        1;
+      this.updateMouse(event, canvasBounds);
 
       this.raycaster.setFromCamera(this.mouse, this.camera);
       const intersects = this.raycaster
         .intersectObjects(this.scene.children)
         .filter(o => o.object.type === "Mesh");
       if (intersects.length > 0) {
-        const intersectObject = intersects[0].object;
+        this.onClickNode(intersects[0].object);
         // dont want this to trigger for a Line
         // intersectObject.material.color.set(0x00ffff);
         // TODO use this.clickIntersectObject
         // intersectObject.formerColorHex = 0x0000ff;
-
-        this.drawEdges(intersectObject);
       }
     }
+  };
+
+  onClickNode = neuron => {
+    this.drawEdges(neuron);
+  };
+
+  onDblClickNode = neuron => {
+    console.log("double");
+  };
+
+  onDocumentDblClick = event => {
+    const canvasBounds = this.renderer.context.canvas.getBoundingClientRect();
+    if (
+      event.clientX >= canvasBounds.left &&
+      event.clientX <= canvasBounds.right &&
+      event.clientY >= canvasBounds.top &&
+      event.clientY <= canvasBounds.bottom
+    ) {
+      event.preventDefault();
+      this.markLastChange();
+
+      // update mouse
+      this.updateMouse(event, canvasBounds);
+
+      this.raycaster.setFromCamera(this.mouse, this.camera);
+      const intersects = this.raycaster
+        .intersectObjects(this.scene.children)
+        .filter(o => o.object.type === "Mesh");
+      if (intersects.length > 0) {
+        this.onDblClickNode(intersects[0].object);
+      }
+    }
+  };
+
+  updateMouse = (event, canvasBounds) => {
+    this.mouse.x =
+      ((event.clientX - canvasBounds.left) /
+        (canvasBounds.right - canvasBounds.left)) *
+        2 -
+      1;
+    this.mouse.y =
+      -(
+        (event.clientY - canvasBounds.top) /
+        (canvasBounds.bottom - canvasBounds.top)
+      ) *
+        2 +
+      1;
   };
 
   render() {

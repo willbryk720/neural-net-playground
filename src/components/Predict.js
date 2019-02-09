@@ -1,42 +1,25 @@
 import React, { Component } from "react";
-import CanvasDraw from "react-canvas-draw";
 import { Button } from "semantic-ui-react";
 
 import CanvasComponent from "./CanvasComponent";
 
 import * as tf from "@tensorflow/tfjs";
 
+import {
+  reshapeArrayTo4D,
+  reshapeArrayTo3D,
+  reshapeArrayTo2D
+} from "../utils/reshaping";
+
 const CANVAS_WIDTH = 200;
 const CANVAS_HEIGHT = 200;
 
-function reshapeArrayTo2D(arr, numRows, numCols) {
-  let newArr = [];
-  for (let i = 0; i < numRows; i++) {
-    let row = [];
-    for (let j = 0; j < numCols; j++) {
-      row.push(arr[i * numRows + j]);
-    }
-    newArr.push(row);
-  }
-  return newArr;
-}
-
-class Draw extends Component {
+class Predict extends Component {
   constructor(props) {
     super(props);
     this.state = {};
     this.myRef = React.createRef();
   }
-
-  // getDrawingFromPoints = points => {
-  //   let drawing = Array.from(Array(28), _ => Array(28).fill(0));
-  //   points.forEach(p => {
-  //     const row = Math.floor((28 * p.y) / CANVAS_HEIGHT);
-  //     const col = Math.floor((28 * p.x) / CANVAS_WIDTH);
-  //     drawing[row][col] = 0.95;
-  //   });
-  //   return drawing;
-  // };
 
   clearDrawing = () => {
     this.myRef.current.clear();
@@ -45,19 +28,6 @@ class Draw extends Component {
     // console.log(t.dataSync());
     // console.log(t.shape);
   };
-
-  // getDrawing = () => {
-  //   const node = this.myRef.current;
-  //   const drawingData = JSON.parse(node.getSaveData()).lines;
-  //   let points = [];
-  //   console.log(drawingData);
-  //   drawingData.forEach(l => {
-  //     points = points.concat(l.points);
-  //   });
-  //   const drawing = this.getDrawingFromPoints(points);
-
-  //   return drawing;
-  // };
 
   getLayerOutputs = async inputTensor => {
     const { trainedModel } = this.props;
@@ -78,6 +48,64 @@ class Draw extends Component {
     return layerOutputs;
   };
 
+  async testWeightCreation(layerOutputs, image, model) {
+    console.log(
+      "----------------------------------------------------------------------"
+    );
+    console.log("layers", model.layers);
+    console.log(layerOutputs);
+
+    console.log(
+      "FIRST",
+      reshapeArrayTo3D(layerOutputs[1].dataSync(), 13, 13, 2)
+    );
+    console.log(
+      "SECOND",
+      reshapeArrayTo3D(layerOutputs[2].dataSync(), 11, 11, 4)
+    );
+
+    let weightsObj;
+    let biases;
+    for (let i = 0; i < model.layers.length; i++) {
+      console.log("-------LAYER_" + i + "-------");
+      const weightsAndBiases = model.layers[i].getWeights();
+      if (weightsAndBiases.length != 2) {
+        console.log(weightsAndBiases);
+        continue;
+      }
+
+      weightsObj = weightsAndBiases[0];
+      biases = weightsAndBiases[1];
+
+      if (weightsObj.shape.length === 4 && weightsObj.shape[2] > 1) {
+        console.log("CHECK");
+        console.log(weightsObj.dataSync());
+        console.log(biases.dataSync());
+        console.log(
+          reshapeArrayTo4D(weightsObj.dataSync(), ...weightsObj.shape)
+        );
+      }
+
+      // console.log("BIASES", biases, biases.dataSync());
+      // console.log("WEIGHTS", weightsObj, weightsObj.dataSync());
+
+      // if (weightsObj.shape.length === 4) {
+      //   console.log(weightsObj.slice([0, 0], [3, 3, 1, 1]).dataSync());
+      // }
+    }
+
+    // const output42 = layerOutputs[1];
+    // const output10 = layerOutputs[2];
+
+    // console.log(
+    //   output42
+    //     .matMul(weightsObj)
+    //     .add(biases)
+    //     .dataSync()
+    // );
+    // console.log(output10.dataSync());
+  }
+
   makeDrawingPrediction = async () => {
     // const drawing = this.getDrawing();
     const drawing = this.myRef.current.state.points;
@@ -93,21 +121,14 @@ class Draw extends Component {
     const image = reshapeArrayTo2D(imageVector, 28, 28);
     const layerOutputs = await this.getLayerOutputs(imageTensor);
     this.props.onMakePrediction(layerOutputs, image);
+
+    this.testWeightCreation(layerOutputs, image, this.props.trainedModel);
   };
 
   render() {
     const { trainedModel, datasetName } = this.props;
     return (
       <div>
-        {/* <CanvasDraw
-          loadTimeOffset={5}
-          lazyRadius={0}
-          brushRadius={4}
-          hideGrid={false}
-          canvasWidth={CANVAS_WIDTH}
-          canvasHeight={CANVAS_HEIGHT}
-          ref={this.myRef}
-        /> */}
         <CanvasComponent
           ref={this.myRef}
           canvasWidth={CANVAS_WIDTH}
@@ -137,4 +158,4 @@ class Draw extends Component {
   }
 }
 
-export default Draw;
+export default Predict;

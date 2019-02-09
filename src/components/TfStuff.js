@@ -188,7 +188,7 @@ class TfStuff extends Component {
 
     this.props.onFinishedTrainingModel(model);
 
-    // await model.save("downloads:///conv-1epoch");
+    // await model.save("downloads:///conv-testweights");
 
     console.log("PRINT WEIGHTS AFTER TRAINING");
     this.printStuff(model);

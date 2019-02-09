@@ -4,7 +4,7 @@ import NetworkScene from "./components/NetworkScene";
 import SortableLayers from "./components/SortableLayers";
 
 import TfStuff from "./components/TfStuff";
-import Draw from "./components/Draw";
+import Predict from "./components/Predict";
 
 import AddPreTrainedModel from "./components/AddPreTrainedModel";
 import LoadData from "./components/LoadData";
@@ -21,7 +21,8 @@ const preTrainedModelOptions = [
   { name: "Dense-1epoch" },
   { name: "Dense-3epochs" },
   { name: "Conv-1epoch" },
-  { name: "Conv-3epochs" }
+  { name: "Conv-3epochs" },
+  { name: "Conv-testweights" }
 ];
 
 class App extends Component {
@@ -195,7 +196,7 @@ class App extends Component {
               getTestData={this.getTestData}
             />
             <h1>4. Predict</h1>
-            <Draw
+            <Predict
               onMakePrediction={this.onMakePrediction}
               trainedModel={this.state.trainedModel}
               getRandomTestImage={this.getRandomTestImage}
@@ -211,6 +212,7 @@ class App extends Component {
             layers={this.state.layers}
             drawing={this.state.drawing}
             layerOutputs={this.state.layerOutputs}
+            trainedModel={this.state.trainedModel}
             onBeginUpdateNetwork={this.onBeginUpdateNetwork}
             onEndUpdateNetwork={this.onEndUpdateNetwork}
           />

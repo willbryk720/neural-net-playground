@@ -22,7 +22,6 @@ class CanvasComponent extends React.Component {
   componentDidMount() {}
 
   updateCanvas(point) {
-    console.log(point);
     const ctx = this.refs.canvas.getContext("2d");
     const squareWidth = this.props.canvasWidth / NUM_SQUARES_PER_ROW;
     ctx.fillRect(
