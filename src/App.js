@@ -111,6 +111,7 @@ class App extends Component {
               layers={this.state.layers}
               drawing={this.state.drawing}
               layerOutputs={this.state.layerOutputs}
+              trainedModel={this.state.trainedModel}
               onBeginUpdateNetwork={this.onBeginUpdateNetwork}
               onEndUpdateNetwork={this.onEndUpdateNetwork}
             />
