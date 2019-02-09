@@ -36,7 +36,7 @@ export function reshapeArrayTo2D(arr, numRows, numCols) {
   for (let i = 0; i < numRows; i++) {
     let row = [];
     for (let j = 0; j < numCols; j++) {
-      row.push(arr[i * numRows + j]);
+      row.push(arr[i * numCols + j]);
     }
     newArr.push(row);
   }
