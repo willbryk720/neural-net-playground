@@ -278,23 +278,29 @@ class NetworkScene extends Component {
       this.scene.remove(edge);
     });
 
-    let neuronEdges = [];
+    const targetNeuronPos = [
+      neuron.position.x,
+      neuron.position.y,
+      neuron.position.z - NEURON_WIDTH / 2
+    ];
+
     const { layerType, indexInfo } = neuron;
+    if (layerType === "input") {
+      return;
+    }
+
+    const previousLayerIndex =
+      Math.round(neuron.position.z / LAYER_VERTICAL_SPACING) - 1;
+    const {
+      isSquare,
+      neuronPositions: prevNeuronPositions
+    } = this.allNeuronPositions[previousLayerIndex];
+    const edgesLayerWeights = edgesData[previousLayerIndex].weights;
+    console.log(layerType);
+
+    let neuronEdges = [];
     if (layerType === "dense") {
-      const previousLayerIndex =
-        Math.round(neuron.position.z / LAYER_VERTICAL_SPACING) - 1;
-      const { isSquare, neuronPositions } = this.allNeuronPositions[
-        previousLayerIndex
-      ];
-      const targetNeuronPos = [
-        neuron.position.x,
-        neuron.position.y,
-        neuron.position.z - NEURON_WIDTH / 2
-      ];
-
-      const edgesLayerWeights = edgesData[previousLayerIndex].weights;
-
-      neuronPositions.forEach((neuronGrouping, g) => {
+      prevNeuronPositions.forEach((neuronGrouping, g) => {
         const neuronGroupingSize =
           neuronGrouping.length * neuronGrouping[0].length;
         if (isSquare) {
@@ -320,7 +326,7 @@ class NetworkScene extends Component {
             });
           });
         } else {
-          neuronGrouping.forEach(pos => {
+          neuronGrouping.forEach((pos, i) => {
             let axisGeometry = new THREE.Geometry();
             const adjustedPos = [pos[0], pos[1], pos[2] + NEURON_WIDTH / 2];
             axisGeometry.vertices.push(
@@ -331,20 +337,45 @@ class NetworkScene extends Component {
               new THREE.Line(
                 axisGeometry,
                 new THREE.LineBasicMaterial({
-                  color: fracToHex(Math.random()),
-                  linewidth: 10
+                  color: edgesLayerWeights[i][indexInfo["col"]]
                 })
               )
             );
           });
         }
       });
+    } else if (layerType === "conv2d") {
+      const { group, row: rowIndex, col: colIndex } = indexInfo;
+      prevNeuronPositions.forEach((neuronGrouping, g) => {
+        console.log(edgesLayerWeights[group], rowIndex, colIndex);
+        const prevWindow = edgesLayerWeights[group][g];
 
-      this.neuronEdges = neuronEdges;
-      this.neuronEdges.forEach(edge => {
-        this.scene.add(edge);
+        prevWindow.forEach((row, r) => {
+          row.forEach((col, c) => {
+            const pos = neuronGrouping[rowIndex + r][colIndex + c];
+            const adjustedPos = [pos[0], pos[1], pos[2] + NEURON_WIDTH / 2];
+            let axisGeometry = new THREE.Geometry();
+            axisGeometry.vertices.push(
+              new THREE.Vector3(...targetNeuronPos),
+              new THREE.Vector3(...adjustedPos)
+            );
+            neuronEdges.push(
+              new THREE.Line(
+                axisGeometry,
+                new THREE.LineBasicMaterial({
+                  color: edgesLayerWeights[group][g][r][c]
+                })
+              )
+            );
+          });
+        });
       });
+    } else if (layerType === "maxPooling2d") {
     }
+    this.neuronEdges = neuronEdges;
+    this.neuronEdges.forEach(edge => {
+      this.scene.add(edge);
+    });
   };
 
   renderScene = () => {

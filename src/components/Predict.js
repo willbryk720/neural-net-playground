@@ -48,59 +48,59 @@ class Predict extends Component {
     return layerOutputs;
   };
 
-  async testWeightCreation(layerOutputs, image, model) {
-    console.log(
-      "----------------------------------------------------------------------"
-    );
-    console.log("layers", model.layers);
-    console.log(layerOutputs);
+  // async testWeightCreation(layerOutputs, image, model) {
+  //   console.log(
+  //     "----------------------------------------------------------------------"
+  //   );
+  //   console.log("layers", model.layers);
+  //   console.log(layerOutputs);
 
-    console.log(
-      "FIRST",
-      reshapeArrayTo3D(layerOutputs[1].dataSync(), 13, 13, 2)
-    );
-    console.log(
-      "SECOND",
-      reshapeArrayTo3D(layerOutputs[2].dataSync(), 11, 11, 4)
-    );
+  //   console.log(
+  //     "FIRST",
+  //     reshapeArrayTo3D(layerOutputs[1].dataSync(), 13, 13, 2)
+  //   );
+  //   console.log(
+  //     "SECOND",
+  //     reshapeArrayTo3D(layerOutputs[2].dataSync(), 11, 11, 4)
+  //   );
 
-    let weightsObj;
-    let biases;
-    for (let i = 0; i < model.layers.length; i++) {
-      console.log("-------LAYER_" + i + "-------");
-      const weightsAndBiases = model.layers[i].getWeights();
-      if (weightsAndBiases.length != 2) {
-        console.log(weightsAndBiases);
-        continue;
-      }
+  //   let weightsObj;
+  //   let biases;
+  //   for (let i = 0; i < model.layers.length; i++) {
+  //     console.log("-------LAYER_" + i + "-------");
+  //     const weightsAndBiases = model.layers[i].getWeights();
+  //     if (weightsAndBiases.length != 2) {
+  //       console.log(weightsAndBiases);
+  //       continue;
+  //     }
 
-      weightsObj = weightsAndBiases[0];
-      biases = weightsAndBiases[1];
+  //     weightsObj = weightsAndBiases[0];
+  //     biases = weightsAndBiases[1];
 
-      // if (weightsObj.shape.length === 4 && weightsObj.shape[2] > 1) {
-      //   console.log("CHECK");
-      //   console.log(weightsObj.dataSync());
-      //   console.log(biases.dataSync());
-      //   console.log(
-      //     reshapeArrayTo4D(weightsObj.dataSync(), ...weightsObj.shape)
-      //   );
-      // }
+  //     // if (weightsObj.shape.length === 4 && weightsObj.shape[2] > 1) {
+  //     //   console.log("CHECK");
+  //     //   console.log(weightsObj.dataSync());
+  //     //   console.log(biases.dataSync());
+  //     //   console.log(
+  //     //     reshapeArrayTo4D(weightsObj.dataSync(), ...weightsObj.shape)
+  //     //   );
+  //     // }
 
-      console.log("BIASES", biases, biases.dataSync());
-      console.log("WEIGHTS", weightsObj, weightsObj.dataSync());
-    }
+  //     console.log("BIASES", biases, biases.dataSync());
+  //     console.log("WEIGHTS", weightsObj, weightsObj.dataSync());
+  //   }
 
-    // const output42 = layerOutputs[1];
-    // const output10 = layerOutputs[2];
+  //   // const output42 = layerOutputs[1];
+  //   // const output10 = layerOutputs[2];
 
-    // console.log(
-    //   output42
-    //     .matMul(weightsObj)
-    //     .add(biases)
-    //     .dataSync()
-    // );
-    // console.log(output10.dataSync());
-  }
+  //   // console.log(
+  //   //   output42
+  //   //     .matMul(weightsObj)
+  //   //     .add(biases)
+  //   //     .dataSync()
+  //   // );
+  //   // console.log(output10.dataSync());
+  // }
 
   makeDrawingPrediction = async () => {
     // const drawing = this.getDrawing();
@@ -118,7 +118,7 @@ class Predict extends Component {
     const layerOutputs = await this.getLayerOutputs(imageTensor);
     this.props.onMakePrediction(layerOutputs, image);
 
-    this.testWeightCreation(layerOutputs, image, this.props.trainedModel);
+    // this.testWeightCreation(layerOutputs, image, this.props.trainedModel);
   };
 
   render() {
