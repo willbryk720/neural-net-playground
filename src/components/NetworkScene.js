@@ -47,10 +47,15 @@ class NetworkScene extends Component {
     this.hoverIntersectObject = null;
     this.clickIntersectObject = null;
 
+    // For selecting layer
+    this.selectedSquare = null;
+
     this.raycaster = new THREE.Raycaster();
 
     // initialize neuron edges
     this.neuronEdges = [];
+
+    this.allNeuronObjects = [];
 
     // controls
     this.controls = new OrbitControls(this.camera, this.renderer.domElement);
@@ -81,6 +86,7 @@ class NetworkScene extends Component {
     window.addEventListener("mousemove", this.onDocumentMouseMove, false);
     window.addEventListener("mousedown", this.onDocumentMouseDown, false);
     window.addEventListener("dblclick", this.onDocumentDblClick, false);
+    document.addEventListener("keydown", this.onDocumentKeyDown, false);
 
     this.start();
   }
@@ -163,12 +169,17 @@ class NetworkScene extends Component {
       );
     }
 
+    const allNeuronObjects = [];
+
     allNeuronPositions.forEach((layerOfPositions, index) => {
       const { isSquare, neuronPositions, layerType } = layerOfPositions;
 
+      let layerOfGroups = [];
       neuronPositions.forEach((neuronGrouping, g) => {
+        let groupOfRows = [];
         if (isSquare) {
           neuronGrouping.forEach((row, r) => {
+            let rowObjects = [];
             row.forEach((pos, c) => {
               const color = hasLayerOutputs
                 ? layerOutputColors[index][g][r][c]
@@ -181,9 +192,12 @@ class NetworkScene extends Component {
               mesh.layerType = layerType;
               mesh.indexInfo = { group: g, row: r, col: c };
               this.scene.add(mesh);
+              rowObjects.push(mesh);
             });
+            groupOfRows.push(rowObjects);
           });
         } else {
+          let rowObjects = [];
           // draw line
           neuronGrouping.forEach((pos, i) => {
             const material = new THREE.MeshBasicMaterial({
@@ -196,9 +210,47 @@ class NetworkScene extends Component {
             mesh.layerType = layerType;
             mesh.indexInfo = { col: i };
             this.scene.add(mesh);
+            rowObjects.push(mesh);
           });
+          groupOfRows.push(rowObjects);
         }
+        layerOfGroups.push(groupOfRows);
       });
+      allNeuronObjects.push(layerOfGroups);
+    });
+
+    this.allNeuronObjects = allNeuronObjects;
+    console.log(this.allNeuronObjects);
+  };
+
+  drawSquareSelects = allNeuronPositions => {
+    // VISUALIZE
+    const geometry = new THREE.BoxGeometry(3, 1, 0.3);
+
+    allNeuronPositions.forEach((layerOfPositions, index) => {
+      const {
+        isSquare,
+        neuronPositions,
+        layerType,
+        squareCenters
+      } = layerOfPositions;
+
+      if (!isSquare || !squareCenters) return;
+
+      for (let i = 0; i < squareCenters.length; i++) {
+        const squareXpos = squareCenters[i][0];
+        const neuronGroup = neuronPositions[i];
+        const bottomNeuron = neuronGroup[neuronGroup.length - 1][0];
+        const material = new THREE.MeshBasicMaterial({ color: 0x0000ff });
+        let mesh = new THREE.Mesh(geometry, material);
+        mesh.position.x = squareXpos;
+        mesh.position.y = bottomNeuron[1] - 5;
+        mesh.position.z = bottomNeuron[2];
+        mesh.isSquareSelect = true;
+        mesh.layerIndex = index;
+        mesh.squareIndex = i;
+        this.scene.add(mesh);
+      }
     });
   };
 
@@ -231,6 +283,8 @@ class NetworkScene extends Component {
       layersMetadata,
       drawing
     );
+
+    this.drawSquareSelects(this.allNeuronPositions);
 
     // this.props.onEndUpdateNetwork();
   }
@@ -463,7 +517,15 @@ class NetworkScene extends Component {
         .intersectObjects(this.scene.children)
         .filter(o => o.object.type === "Mesh");
       if (intersects.length > 0) {
-        this.onClickNode(intersects[0].object);
+        const clickedObj = intersects[0].object;
+
+        if (clickedObj.isSquareSelect) {
+          this.selectedSquare = clickedObj;
+        } else {
+          this.selectedSquare = null;
+          this.onClickNode(clickedObj);
+        }
+
         // dont want this to trigger for a Line
         // intersectObject.material.color.set(0x00ffff);
         // TODO use this.clickIntersectObject
@@ -519,6 +581,31 @@ class NetworkScene extends Component {
       ) *
         2 +
       1;
+  };
+
+  onDocumentKeyDown = event => {
+    if (this.selectedSquare) {
+      var keyCode = event.which;
+      if (keyCode !== 37 && keyCode !== 39) return;
+
+      // event.preventDefault();
+      // event.stopPropagation();
+      const { layerIndex, squareIndex } = this.selectedSquare;
+      const square = this.allNeuronObjects[layerIndex][squareIndex];
+
+      const moveDistance = keyCode === 37 ? -3.0 : 3.0;
+      square.forEach((row, r) => {
+        row.forEach((col, c) => {
+          square[r][c].position.x += moveDistance;
+          this.allNeuronPositions[layerIndex].neuronPositions[squareIndex][r][
+            c
+          ][0] += moveDistance;
+        });
+      });
+      this.selectedSquare.position.x += moveDistance;
+
+      this.allNeuronObjects[layerIndex][squareIndex] = square;
+    }
   };
 
   render() {

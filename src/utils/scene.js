@@ -217,6 +217,7 @@ export const getAllNeuronPositions = layersMetadata => {
           })
         );
       } else {
+        // dont think this has been used yet (input to network as line)
         neuronPositions.push(
           getNeuronsInLine({
             center: [0, 0, layerHeight],
@@ -260,7 +261,8 @@ export const getAllNeuronPositions = layersMetadata => {
       isSquare,
       dimensions,
       layerType,
-      neuronPositions
+      neuronPositions,
+      squareCenters: previousSquareCenters
     });
     layerHeight += LAYER_VERTICAL_SPACING;
   });
