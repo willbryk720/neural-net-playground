@@ -56,10 +56,12 @@ class NetworkScene extends Component {
 
     this.raycaster = new THREE.Raycaster();
 
-    // initialize neuron edges
-    this.neuronEdges = [];
-
+    // initialize neuron cubes and edges
+    this.neuronEdgeObjects = [];
     this.allNeuronObjects = [];
+
+    this.allNeuronPositions = [];
+    this.allNeuronEdgesData = [];
 
     // controls
     this.controls = new OrbitControls(this.camera, this.renderer.domElement);
@@ -73,7 +75,6 @@ class NetworkScene extends Component {
     this.controls.panSpeed = 0.6;
     this.controls.rotateSpeed = 0.05;
 
-    this.allNeuronEdgesData = [];
     this.updateNetworkSetup(this.props);
 
     // lights
@@ -268,9 +269,10 @@ class NetworkScene extends Component {
 
   drawEdges = neuron => {
     const edgesData = this.allNeuronEdgesData;
+    console.log(edgesData);
 
     // remove previous edges
-    this.neuronEdges.forEach(edge => {
+    this.neuronEdgeObjects.forEach(edge => {
       this.scene.remove(edge);
     });
 
@@ -287,7 +289,6 @@ class NetworkScene extends Component {
 
     const previousLayerIndex = neuron.layerIndex - 1;
 
-    console.log(this.allNeuronPositions, previousLayerIndex, neuron);
     const {
       isSquare,
       neuronPositions: prevNeuronPositions
@@ -393,8 +394,8 @@ class NetworkScene extends Component {
         }
       }
     }
-    this.neuronEdges = neuronEdges;
-    this.neuronEdges.forEach(edge => {
+    this.neuronEdgeObjects = neuronEdges;
+    this.neuronEdgeObjects.forEach(edge => {
       this.scene.add(edge);
     });
   };
@@ -566,7 +567,20 @@ class NetworkScene extends Component {
   };
 
   onDblClickNode = neuron => {
+    const { layerOutputs } = this.props;
+    const { layerIndex, position, indexInfo, layerType } = neuron;
+
+    console.log(neuron, layerOutputs);
     console.log("double");
+    const analyzeInfo = {
+      layerIndex,
+      position,
+      indexInfo,
+      layerType,
+      edges: layerIndex > 0 ? this.allNeuronEdgesData[layerIndex - 1] : null,
+      layerOutput: layerOutputs.length > 0 ? layerOutputs[layerIndex - 1] : null
+    };
+    this.props.onDblClickNeuron(analyzeInfo);
   };
 
   onDocumentDblClick = event => {

@@ -37,7 +37,8 @@ class App extends Component {
       isCurrentlyTraining: false,
       datasetName: null,
       starterNetworkName: null,
-      isFullScreenMode: false
+      isFullScreenMode: false,
+      analyzeInfo: null
     };
     this.dataRef = React.createRef();
   }
@@ -95,6 +96,11 @@ class App extends Component {
     this.setState({ datasetName });
   };
 
+  onDblClickNeuron = analyzeInfo => {
+    console.log(analyzeInfo);
+    // this.setState({ analyzeInfo: analyzeInfo });
+  };
+
   // onBeginUpdateNetwork = () => {
   //   this.setState({ networkLoading: true });
   // };
@@ -114,6 +120,7 @@ class App extends Component {
               trainedModel={this.state.trainedModel}
               onBeginUpdateNetwork={this.onBeginUpdateNetwork}
               onEndUpdateNetwork={this.onEndUpdateNetwork}
+              onDblClickNeuron={this.onDblClickNeuron}
             />
           </div>
           <div
@@ -129,7 +136,7 @@ class App extends Component {
             >
               Back
             </Button>
-            <AnalyzeLayers />
+            <AnalyzeLayers analyzeInfo={this.state.analyzeInfo} />
           </div>
         </div>
       );
@@ -216,11 +223,12 @@ class App extends Component {
             trainedModel={this.state.trainedModel}
             onBeginUpdateNetwork={this.onBeginUpdateNetwork}
             onEndUpdateNetwork={this.onEndUpdateNetwork}
+            onDblClickNeuron={this.onDblClickNeuron}
           />
           <Button onClick={() => this.setState({ isFullScreenMode: true })}>
             FullScreen
           </Button>
-          <AnalyzeLayers />
+          <AnalyzeLayers analyzeInfo={this.state.analyzeInfo} />
 
           {/* <Info
             datasetName={this.state.datasetName}
