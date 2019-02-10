@@ -7,9 +7,9 @@ import * as OrbitControls from "three-orbitcontrols";
 import {
   getAllNeuronPositions,
   getLayersMetadataFromLayers,
-  fracToHex,
   isObjectsEquivalent,
-  getAllNeuronEdgesData
+  getAllNeuronEdgesData,
+  getOutputColors
 } from "../utils/scene";
 
 import { NEURON_WIDTH, KEY_A, KEY_D, KEY_W, KEY_S } from "../utils/constants";
@@ -62,6 +62,8 @@ class NetworkScene extends Component {
 
     this.allNeuronPositions = [];
     this.allNeuronEdgesData = [];
+
+    this.layersMetadata = [];
 
     // controls
     this.controls = new OrbitControls(this.camera, this.renderer.domElement);
@@ -121,6 +123,7 @@ class NetworkScene extends Component {
     const { layers, drawing, layerOutputs, trainedModel } = nextProps;
 
     const layersMetadata = getLayersMetadataFromLayers(layers);
+    this.layersMetadata = layersMetadata;
     console.log(
       "IMPORTANT: drawing, layers, layerOutputs, layerOutputDataSync, layersMetadata ",
       drawing,
@@ -131,11 +134,7 @@ class NetworkScene extends Component {
     );
 
     this.allNeuronPositions = getAllNeuronPositions(layersMetadata);
-    this.allNeuronEdgesData = getAllNeuronEdgesData(
-      layersMetadata,
-      trainedModel,
-      layerOutputs
-    );
+    this.allNeuronEdgesData = getAllNeuronEdgesData(trainedModel);
 
     this.drawAllNeuronPositions(
       this.allNeuronPositions,
@@ -148,46 +147,6 @@ class NetworkScene extends Component {
 
     // this.props.onEndUpdateNetwork();
   }
-
-  getLayerOutputColors = (layerOutputs, layersMetadata, input2DArray) => {
-    let layerOutputColors = [];
-
-    // change input colors to hex
-    let input2DArrayColors = [];
-    input2DArray.forEach(r => {
-      let rArr = [];
-      r.forEach(c => rArr.push(fracToHex(c)));
-      input2DArrayColors.push(rArr);
-    });
-    layerOutputColors.push([input2DArrayColors]); // push input as 3d array
-
-    // going to be skipping flatten layersMetadata but dont want layerOutputs index to increment too
-    // so layerOutputs needs its own index
-    //loop starts at 1 bc skips input metadata layer
-    let outputIndex = 0;
-    for (let i = 1; i < layersMetadata.length; i++) {
-      const layerMetadata = layersMetadata[i];
-      const { isSquare, dimensions, layerType } = layerMetadata;
-
-      if (layerType === "flatten") {
-        outputIndex += 1;
-        continue;
-      }
-
-      const lO = layerOutputs[outputIndex];
-      let values = lO.dataSync();
-
-      const colors = values.map(v => fracToHex(v));
-      if (isSquare) {
-        // return [reshapeArrayTo2D(values, 28, 28)]; //TODO BAD BAD
-        layerOutputColors.push(reshapeArrayTo3D(colors, ...dimensions));
-      } else {
-        layerOutputColors.push(colors);
-      }
-      outputIndex += 1;
-    }
-    return layerOutputColors;
-  };
 
   drawAllNeuronPositions = (
     allNeuronPositions,
@@ -205,7 +164,7 @@ class NetworkScene extends Component {
 
     let layerOutputColors;
     if (hasLayerOutputs) {
-      layerOutputColors = this.getLayerOutputColors(
+      layerOutputColors = getOutputColors(
         layerOutputs,
         layersMetadata,
         input2DArray
@@ -295,6 +254,9 @@ class NetworkScene extends Component {
     } = this.allNeuronPositions[previousLayerIndex];
     const edgesLayer = edgesData[previousLayerIndex];
     const edgesLayerWeights = edgesLayer.weights;
+    const outLayerMetadata = this.layersMetadata.filter(
+      lM => lM.layerType !== "flatten"
+    )[previousLayerIndex + 1]; // layersMetadata has an extra input layer, and want to remove flatten layer
 
     let neuronEdges = [];
     if (layerType === "dense") {
@@ -371,7 +333,8 @@ class NetworkScene extends Component {
     } else if (layerType === "maxPooling2d") {
       const { group, row: rowIndex, col: colIndex } = indexInfo;
       const neuronGrouping = prevNeuronPositions[group];
-      const { poolSize, strides } = edgesLayer.layerMetadata.options;
+      // const { poolSize, strides } = edgesLayer.outLayerMetadata.options;
+      const { poolSize, strides } = outLayerMetadata.options;
 
       for (let r = 0; r < poolSize; r++) {
         for (let c = 0; c < poolSize; c++) {
@@ -570,15 +533,25 @@ class NetworkScene extends Component {
     const { layerOutputs } = this.props;
     const { layerIndex, position, indexInfo, layerType } = neuron;
 
-    console.log(neuron, layerOutputs);
-    console.log("double");
+    if (layerIndex === 0) return;
+
     const analyzeInfo = {
       layerIndex,
       position,
       indexInfo,
       layerType,
-      edges: layerIndex > 0 ? this.allNeuronEdgesData[layerIndex - 1] : null,
-      layerOutput: layerOutputs.length > 0 ? layerOutputs[layerIndex - 1] : null
+      inLayerMetadata: this.layersMetadata.filter(
+        lM => lM.layerType !== "flatten"
+      )[layerIndex - 1],
+      edges:
+        this.allNeuronEdgesData.length > 0
+          ? this.allNeuronEdgesData[layerIndex - 1]
+          : null,
+      inLayerOutput:
+        layerOutputs.length > 0 && layerIndex >= 2
+          ? layerOutputs[layerIndex - 2]
+          : null,
+      drawing: this.props.drawing
     };
     this.props.onDblClickNeuron(analyzeInfo);
   };

@@ -38,7 +38,7 @@ class App extends Component {
       datasetName: null,
       starterNetworkName: null,
       isFullScreenMode: false,
-      analyzeInfo: null
+      analyzeInfo: {}
     };
     this.dataRef = React.createRef();
   }
@@ -97,8 +97,9 @@ class App extends Component {
   };
 
   onDblClickNeuron = analyzeInfo => {
-    console.log(analyzeInfo);
-    // this.setState({ analyzeInfo: analyzeInfo });
+    // console.log(analyzeInfo.layerIndex);
+    // this.setState({ analyzeInfo: { ...analyzeInfo } });
+    this.setState({ analyzeInfo });
   };
 
   // onBeginUpdateNetwork = () => {

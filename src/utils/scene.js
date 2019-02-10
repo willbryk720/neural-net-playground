@@ -6,7 +6,11 @@ import {
   NEURON_WIDTH
 } from "./constants";
 
-import { reshapeArrayTo4D, reshapeArrayTo2D } from "./reshaping";
+import {
+  reshapeArrayTo2D,
+  reshapeArrayTo3D,
+  reshapeArrayTo4D
+} from "./reshaping";
 
 // Returns 1d array of positions of neurons spaced evenly with the line center at [0,0,height]
 export const getPositionsOfLineOfItems = (
@@ -273,6 +277,55 @@ export const getAllNeuronPositions = layersMetadata => {
   return allNeuronPositions;
 };
 
+export function getOutputColors(layerOutputs, layersMetadata, input2DArray) {
+  let layerOutputColors = [];
+
+  // change input colors to hex
+  let input2DArrayColors = [];
+  input2DArray.forEach(r => {
+    let rArr = [];
+    r.forEach(c => rArr.push(fracToHex(c)));
+    input2DArrayColors.push(rArr);
+  });
+  layerOutputColors.push([input2DArrayColors]); // push input as 3d array
+
+  // going to be skipping flatten layersMetadata but dont want layerOutputs index to increment too
+  // so layerOutputs needs its own index
+  // loop starts at 1 bc skips input metadata layer
+  let outputIndex = 0;
+  for (let i = 1; i < layersMetadata.length; i++) {
+    const layerMetadata = layersMetadata[i];
+    const { isSquare, dimensions, layerType } = layerMetadata;
+
+    if (layerType === "flatten") {
+      outputIndex += 1;
+      continue;
+    }
+
+    const lO = layerOutputs[outputIndex];
+    const oneLayerOutputColors = getOneLayerOutputColors(
+      lO,
+      isSquare,
+      dimensions
+    );
+    layerOutputColors.push(oneLayerOutputColors);
+
+    outputIndex += 1;
+  }
+  return layerOutputColors;
+}
+
+export function getOneLayerOutputColors(layerOutput, isSquare, dimensions) {
+  const values = layerOutput.dataSync();
+
+  const colors = values.map(v => fracToHex(v));
+  if (isSquare) {
+    return reshapeArrayTo3D(colors, ...dimensions);
+  } else {
+    return colors;
+  }
+}
+
 export function fracToHex(frac) {
   return Math.round(frac * 255) * 65793;
 }
@@ -296,25 +349,19 @@ export function isObjectsEquivalent(a, b) {
   return true;
 }
 
-export const getAllNeuronEdgesData = (
-  layersMetadata,
-  trainedModel,
-  layerOutputs
-) => {
-  if (Object.keys(trainedModel).length === 0) return;
+export const getAllNeuronEdgesData = trainedModel => {
+  if (Object.keys(trainedModel).length === 0) return [];
   let edgesData = [];
 
   for (let i = 0; i < trainedModel.layers.length; i++) {
     const layer = trainedModel.layers[i];
-    const layerMetadata = layersMetadata[i + 1]; // layersMetadata has an extra input layer
 
     if (layer.name.split("_")[0] === "flatten") continue;
 
     const weightsAndBiases = layer.getWeights();
     if (weightsAndBiases.length != 2) {
       edgesData.push({
-        name: layer.name,
-        layerMetadata: layerMetadata
+        name: layer.name
       });
       continue;
     }
@@ -336,8 +383,7 @@ export const getAllNeuronEdgesData = (
     edgesData.push({
       biases: biasesObj.dataSync(),
       weights: weightsData,
-      name: weightsObj.name,
-      layerMetadata: layerMetadata
+      name: weightsObj.name
     });
   }
 

@@ -73,8 +73,6 @@ class TfStuff extends Component {
 
     const trainData = this.props.getTrainData();
     const testData = this.props.getTestData();
-    // const trainData = data.getTrainData();
-    // const testData = data.getTestData();
 
     const totalNumBatches =
       Math.ceil((trainData.xs.shape[0] * (1 - validationSplit)) / batchSize) *
@@ -192,15 +190,6 @@ class TfStuff extends Component {
 
     console.log("PRINT WEIGHTS AFTER TRAINING");
     this.printStuff(model);
-
-    // console.log("SHAPES");
-    // console.log(data.xs.slice([0, 0], [1, 28, 28, 1]).shape());
-    // console.log(trainData.labels.slice([0, 0], [1, 10]).shape());
-
-    // const { xs, labels } = data.getTestData(4);
-    // let input = xs.slice([3, 0], [1, 28, 28, 1]);
-    // console.log(input, input.dataSync());
-    // console.log(JSON.stringify(input.dataSync()));
 
     this.setState({ currentlyTraining: false });
   }
