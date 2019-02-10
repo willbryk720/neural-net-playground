@@ -122,7 +122,8 @@ export const getLayersMetadataFromLayers = newLayers => {
           dimensions: [units],
           isSquare: false,
           directlyAbovePrevious: false,
-          layerType
+          layerType,
+          options: options
         };
         layersMetadata.push(previousLayerMetadata);
         break;
@@ -148,7 +149,8 @@ export const getLayersMetadataFromLayers = newLayers => {
           dimensions: dimensions,
           isSquare: true,
           directlyAbovePrevious: false,
-          layerType
+          layerType,
+          options: options
         };
         layersMetadata.push(previousLayerMetadata);
         break;
@@ -174,7 +176,8 @@ export const getLayersMetadataFromLayers = newLayers => {
           dimensions: dimensions,
           isSquare: true,
           directlyAbovePrevious: true,
-          layerType
+          layerType,
+          options: options
         };
         layersMetadata.push(previousLayerMetadata);
         break;
@@ -302,12 +305,16 @@ export const getAllNeuronEdgesData = (
   let edgesData = [];
 
   for (let i = 0; i < trainedModel.layers.length; i++) {
-    if (trainedModel.layers[i].name.split("_")[0] === "flatten") continue;
+    const layer = trainedModel.layers[i];
+    const layerMetadata = layersMetadata[i + 1]; // layersMetadata has an extra input layer
 
-    const weightsAndBiases = trainedModel.layers[i].getWeights();
+    if (layer.name.split("_")[0] === "flatten") continue;
+
+    const weightsAndBiases = layer.getWeights();
     if (weightsAndBiases.length != 2) {
       edgesData.push({
-        name: trainedModel.layers[i].name
+        name: layer.name,
+        layerMetadata: layerMetadata
       });
       continue;
     }
@@ -329,7 +336,8 @@ export const getAllNeuronEdgesData = (
     edgesData.push({
       biases: biasesObj.dataSync(),
       weights: weightsData,
-      name: weightsObj.name
+      name: weightsObj.name,
+      layerMetadata: layerMetadata
     });
   }
 
