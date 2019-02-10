@@ -137,7 +137,10 @@ class App extends Component {
             >
               Back
             </Button>
-            <AnalyzeLayers analyzeInfo={this.state.analyzeInfo} />
+            <AnalyzeLayers
+              analyzeInfo={this.state.analyzeInfo}
+              trainedModel={this.state.trainedModel}
+            />
           </div>
         </div>
       );
@@ -229,7 +232,10 @@ class App extends Component {
           <Button onClick={() => this.setState({ isFullScreenMode: true })}>
             FullScreen
           </Button>
-          <AnalyzeLayers analyzeInfo={this.state.analyzeInfo} />
+          <AnalyzeLayers
+            analyzeInfo={this.state.analyzeInfo}
+            trainedModel={this.state.trainedModel}
+          />
 
           {/* <Info
             datasetName={this.state.datasetName}

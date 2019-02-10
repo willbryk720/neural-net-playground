@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import { Button } from "semantic-ui-react";
 
 import { getOneLayerOutputColors } from "../utils/scene";
+import { getLayerOutputs } from "../utils/prediction";
 
 class AnalyzeLayers extends Component {
   constructor(props) {
@@ -14,7 +15,7 @@ class AnalyzeLayers extends Component {
   // }
 
   render() {
-    const { analyzeInfo } = this.props;
+    const { analyzeInfo, trainedModel } = this.props;
 
     if (Object.keys(analyzeInfo).length === 0) {
       return <h1>Analyze Neurons</h1>;
@@ -52,6 +53,9 @@ class AnalyzeLayers extends Component {
         <h3>
           {indexInfo.group}, {indexInfo.row}, {indexInfo.col}
         </h3>
+        <Button color="green" size="small">
+          Update Weights
+        </Button>
       </div>
     );
   }
