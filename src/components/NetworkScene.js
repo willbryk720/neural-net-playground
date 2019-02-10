@@ -12,7 +12,14 @@ import {
   getAllNeuronEdgesData
 } from "../utils/scene";
 
-import { NEURON_WIDTH, LAYER_VERTICAL_SPACING } from "../utils/constants";
+import {
+  NEURON_WIDTH,
+  LAYER_VERTICAL_SPACING,
+  KEY_A,
+  KEY_D,
+  KEY_W,
+  KEY_S
+} from "../utils/constants";
 
 import { reshapeArrayTo3D } from "../utils/reshaping";
 
@@ -586,25 +593,40 @@ class NetworkScene extends Component {
   onDocumentKeyDown = event => {
     if (this.selectedSquare) {
       var keyCode = event.which;
-      if (keyCode !== 37 && keyCode !== 39) return;
+      if (![KEY_A, KEY_D, KEY_W, KEY_S].includes(keyCode)) return;
 
       // event.preventDefault();
       // event.stopPropagation();
       const { layerIndex, squareIndex } = this.selectedSquare;
       const square = this.allNeuronObjects[layerIndex][squareIndex];
 
-      const moveDistance = keyCode === 37 ? -3.0 : 3.0;
-      square.forEach((row, r) => {
-        row.forEach((col, c) => {
-          square[r][c].position.x += moveDistance;
-          this.allNeuronPositions[layerIndex].neuronPositions[squareIndex][r][
-            c
-          ][0] += moveDistance;
+      if ([KEY_A, KEY_D].includes(keyCode)) {
+        const moveDistance = keyCode === KEY_A ? -3.0 : 3.0;
+        square.forEach((row, r) => {
+          row.forEach((col, c) => {
+            square[r][c].position.x += moveDistance;
+            this.allNeuronPositions[layerIndex].neuronPositions[squareIndex][r][
+              c
+            ][0] += moveDistance;
+          });
         });
-      });
-      this.selectedSquare.position.x += moveDistance;
+        this.selectedSquare.position.x += moveDistance;
+      } else {
+        const moveDistance = keyCode === KEY_S ? -3.0 : 3.0;
+        square.forEach((row, r) => {
+          row.forEach((col, c) => {
+            square[r][c].position.y += moveDistance;
+            this.allNeuronPositions[layerIndex].neuronPositions[squareIndex][r][
+              c
+            ][1] += moveDistance;
+          });
+        });
+        this.selectedSquare.position.y += moveDistance;
+      }
 
       this.allNeuronObjects[layerIndex][squareIndex] = square;
+
+      this.markLastChange();
     }
   };
 
