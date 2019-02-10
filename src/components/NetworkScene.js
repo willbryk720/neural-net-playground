@@ -109,6 +109,45 @@ class NetworkScene extends Component {
     }
   }
 
+  componentWillUnmount() {
+    this.stop();
+    this.mount.removeChild(this.renderer.domElement);
+  }
+
+  async updateNetworkSetup(nextProps) {
+    // this.props.onBeginUpdateNetwork();
+
+    const { layers, drawing, layerOutputs, trainedModel } = nextProps;
+
+    const layersMetadata = getLayersMetadataFromLayers(layers);
+    console.log(
+      "IMPORTANT: drawing, layers, layerOutputs, layerOutputDataSync, layersMetadata ",
+      drawing,
+      layers,
+      layerOutputs,
+      layerOutputs.map(lO => lO.dataSync()),
+      layersMetadata
+    );
+
+    this.allNeuronPositions = getAllNeuronPositions(layersMetadata);
+    this.allNeuronEdgesData = getAllNeuronEdgesData(
+      layersMetadata,
+      trainedModel,
+      layerOutputs
+    );
+
+    this.drawAllNeuronPositions(
+      this.allNeuronPositions,
+      layerOutputs,
+      layersMetadata,
+      drawing
+    );
+
+    this.drawSquareSelects(this.allNeuronPositions);
+
+    // this.props.onEndUpdateNetwork();
+  }
+
   getLayerOutputColors = (layerOutputs, layersMetadata, input2DArray) => {
     let layerOutputColors = [];
 
@@ -155,7 +194,6 @@ class NetworkScene extends Component {
     layersMetadata,
     input2DArray
   ) => {
-    // VISUALIZE
     const geometry = new THREE.BoxGeometry(
       NEURON_WIDTH,
       NEURON_WIDTH,
@@ -214,6 +252,7 @@ class NetworkScene extends Component {
             mesh.position.z = pos[2];
             mesh.layerType = layerType;
             mesh.indexInfo = { col: i };
+            mesh.layerIndex = index;
             this.scene.add(mesh);
             rowObjects.push(mesh);
           });
@@ -225,106 +264,6 @@ class NetworkScene extends Component {
     });
 
     this.allNeuronObjects = allNeuronObjects;
-  };
-
-  drawSquareSelects = allNeuronPositions => {
-    // VISUALIZE
-    const geometry = new THREE.BoxGeometry(3, 1, 0.3);
-
-    allNeuronPositions.forEach((layerOfPositions, index) => {
-      const {
-        isSquare,
-        neuronPositions,
-        layerType,
-        squareCenters
-      } = layerOfPositions;
-
-      if (!isSquare || !squareCenters) return;
-
-      for (let i = 0; i < squareCenters.length; i++) {
-        const squareXpos = squareCenters[i][0];
-        const neuronGroup = neuronPositions[i];
-        const bottomNeuron = neuronGroup[neuronGroup.length - 1][0];
-        const material = new THREE.MeshBasicMaterial({ color: 0x0000ff });
-        let mesh = new THREE.Mesh(geometry, material);
-        mesh.position.x = squareXpos;
-        mesh.position.y = bottomNeuron[1] - 5;
-        mesh.position.z = bottomNeuron[2];
-        mesh.isSquareSelect = true;
-        mesh.layerIndex = index;
-        mesh.squareIndex = i;
-        this.scene.add(mesh);
-      }
-    });
-  };
-
-  async updateNetworkSetup(nextProps) {
-    // this.props.onBeginUpdateNetwork();
-
-    const { layers, drawing, layerOutputs, trainedModel } = nextProps;
-
-    const layersMetadata = getLayersMetadataFromLayers(layers);
-    console.log(
-      "IMPORTANT: drawing, layers, layerOutputs, layerOutputDataSync, layersMetadata ",
-      drawing,
-      layers,
-      layerOutputs,
-      layerOutputs.map(lO => lO.dataSync()),
-      layersMetadata
-    );
-
-    this.allNeuronPositions = getAllNeuronPositions(layersMetadata);
-    this.allNeuronEdgesData = getAllNeuronEdgesData(
-      layersMetadata,
-      trainedModel,
-      layerOutputs
-    );
-
-    this.drawAllNeuronPositions(
-      this.allNeuronPositions,
-      layerOutputs,
-      layersMetadata,
-      drawing
-    );
-
-    this.drawSquareSelects(this.allNeuronPositions);
-
-    // this.props.onEndUpdateNetwork();
-  }
-
-  componentWillUnmount() {
-    this.stop();
-    this.mount.removeChild(this.renderer.domElement);
-  }
-  start = () => {
-    if (!this.frameId) {
-      this.frameId = requestAnimationFrame(this.animate);
-
-      this.countSincelastControlsChange = 0;
-
-      // this saves computer processing, because nothing updates after a few seconds
-      // after the last change of the
-      this.controls.addEventListener("change", this.markLastChange);
-    }
-  };
-  stop = () => {
-    cancelAnimationFrame(this.frameId);
-  };
-  animate = () => {
-    this.renderScene();
-    this.countSincelastControlsChange += 1;
-
-    if (this.countSincelastControlsChange < 100) {
-      this.frameId = window.requestAnimationFrame(this.animate);
-    }
-    // console.log("rendering again", this.countSincelastControlsChange);
-
-    this.controls.update();
-
-    // const cameraPos = this.camera.position;
-    // if (this.camera.position.x > 748) {
-    //   this.camera.position.set(600, cameraPos[1], cameraPos[2]);
-    // }
   };
 
   drawEdges = neuron => {
@@ -347,6 +286,8 @@ class NetworkScene extends Component {
     }
 
     const previousLayerIndex = neuron.layerIndex - 1;
+
+    console.log(this.allNeuronPositions, previousLayerIndex, neuron);
     const {
       isSquare,
       neuronPositions: prevNeuronPositions
@@ -456,6 +397,64 @@ class NetworkScene extends Component {
     this.neuronEdges.forEach(edge => {
       this.scene.add(edge);
     });
+  };
+
+  drawSquareSelects = allNeuronPositions => {
+    const geometry = new THREE.BoxGeometry(3, 1, 0.3);
+
+    allNeuronPositions.forEach((layerOfPositions, index) => {
+      const {
+        isSquare,
+        neuronPositions,
+        layerType,
+        squareCenters
+      } = layerOfPositions;
+
+      if (!isSquare || !squareCenters) return;
+
+      for (let i = 0; i < squareCenters.length; i++) {
+        const squareXpos = squareCenters[i][0];
+        const neuronGroup = neuronPositions[i];
+        const bottomNeuron = neuronGroup[neuronGroup.length - 1][0];
+        const material = new THREE.MeshBasicMaterial({ color: 0x0000ff });
+        let mesh = new THREE.Mesh(geometry, material);
+        mesh.position.x = squareXpos;
+        mesh.position.y = bottomNeuron[1] - 5;
+        mesh.position.z = bottomNeuron[2];
+        mesh.isSquareSelect = true;
+        mesh.layerIndex = index;
+        mesh.squareIndex = i;
+        this.scene.add(mesh);
+      }
+    });
+  };
+
+  start = () => {
+    if (!this.frameId) {
+      this.frameId = requestAnimationFrame(this.animate);
+      this.countSincelastControlsChange = 0;
+      // this saves computer processing, because nothing updates after a few seconds
+      // after the last change of the
+      this.controls.addEventListener("change", this.markLastChange);
+    }
+  };
+  stop = () => {
+    cancelAnimationFrame(this.frameId);
+  };
+  animate = () => {
+    this.renderScene();
+    this.countSincelastControlsChange += 1;
+
+    if (this.countSincelastControlsChange < 100) {
+      this.frameId = window.requestAnimationFrame(this.animate);
+    }
+    // console.log("rendering again", this.countSincelastControlsChange);
+    this.controls.update();
+
+    // const cameraPos = this.camera.position;
+    // if (this.camera.position.x > 748) {
+    //   this.camera.position.set(600, cameraPos[1], cameraPos[2]);
+    // }
   };
 
   renderScene = () => {
