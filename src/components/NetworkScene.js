@@ -416,6 +416,13 @@ class NetworkScene extends Component {
         this.hoverIntersectObject = intersects[0].object;
         this.hoverIntersectObject.formerColorHex = this.hoverIntersectObject.material.color.getHex();
         this.hoverIntersectObject.material.color.set(0x00ff00);
+
+        if (
+          this.hoverIntersectObject.isNeuron &&
+          Object.keys(this.props.trainedModel).length !== 0
+        ) {
+          this.drawEdges(this.hoverIntersectObject);
+        }
       }
     } else {
       if (this.hoverIntersectObject) {
@@ -424,6 +431,7 @@ class NetworkScene extends Component {
       }
       this.hoverIntersectObject = null;
     }
+
     this.renderer.render(this.scene, this.camera);
   };
 
@@ -496,7 +504,7 @@ class NetworkScene extends Component {
 
   onClickNode = neuron => {
     if (Object.keys(this.props.trainedModel).length !== 0) {
-      this.drawEdges(neuron);
+      // this.drawEdges(neuron);
     }
   };
 
