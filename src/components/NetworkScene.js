@@ -154,6 +154,7 @@ class NetworkScene extends Component {
     neuronObj.layerType = layerType;
     neuronObj.indexInfo = indexInfo;
     neuronObj.isNeuron = true;
+    neuronObj.color = color;
     this.scene.add(neuronObj);
     return neuronObj;
   };
@@ -503,16 +504,15 @@ class NetworkScene extends Component {
 
     const analyzeInfo = {
       layerIndex,
-      position,
-      indexInfo,
-      layerType,
+      neuron,
       inLayerMetadata: this.layersMetadata.filter(lM => lM.layerType !== "flatten")[layerIndex - 1],
       edges: this.allNeuronEdgesData.length > 0 ? this.allNeuronEdgesData[layerIndex - 1] : null,
       inLayerOutput:
         layerOutputs.length > 0 && layerIndex >= 2
           ? layerOutputs.filter(lM => lM.layerType !== "flatten")[layerIndex - 2]
           : null,
-      drawing: this.props.drawing
+      drawing: this.props.drawing,
+      hasOutputs: layerOutputs.length > 0
     };
     this.props.onDblClickNeuron(analyzeInfo);
   };

@@ -24,12 +24,7 @@ class CanvasComponent extends React.Component {
   updateCanvas(point) {
     const ctx = this.refs.canvas.getContext("2d");
     const squareWidth = this.props.canvasWidth / NUM_SQUARES_PER_ROW;
-    ctx.fillRect(
-      point[0] * squareWidth,
-      point[1] * squareWidth,
-      squareWidth,
-      squareWidth
-    );
+    ctx.fillRect(point[0] * squareWidth, point[1] * squareWidth, squareWidth, squareWidth);
   }
 
   clear = () => {
@@ -46,54 +41,6 @@ class CanvasComponent extends React.Component {
   };
 
   drawing(e) {
-    //if the pen is down in the canvas, draw/erase
-
-    // if (this.state.pen === "down") {
-    //   let x = e.nativeEvent.offsetX;
-    //   let y = e.nativeEvent.offsetY;
-    //   if (x === this.props.canvasWidth) x -= 1;
-    //   if (y === this.props.canvasHeight) y -= 1;
-
-    //   let point = [
-    //     Math.floor((NUM_SQUARES_PER_COL * x) / this.props.canvasWidth),
-    //     Math.floor((NUM_SQUARES_PER_ROW * y) / this.props.canvasHeight)
-    //   ];
-
-    //   const c = point[0];
-    //   const r = point[1];
-
-    //   const { lineWidth, points } = this.state;
-
-    //   let copyPoints = points.slice();
-    //   for (let i = c - lineWidth; i <= c + lineWidth; i++) {
-    //     for (let j = r - lineWidth; j <= r + lineWidth; j++) {
-    //       if (
-    //         i >= 0 &&
-    //         i < NUM_SQUARES_PER_ROW &&
-    //         j >= 0 &&
-    //         j < NUM_SQUARES_PER_ROW &&
-    //         points[j][i] === 0
-    //       ) {
-    //         copyPoints[j][i] = 1;
-    //         this.updateCanvas([i, j]);
-    //       }
-    //     }
-    //   }
-    //   this.setState({
-    //     points: copyPoints
-    //   });
-
-    //   // if (points[r][c] === 0) {
-    //   //   let copyPoints = points.slice();
-    //   //   copyPoints[r][c] = 1;
-
-    //   //   this.setState({
-    //   //     points: copyPoints
-    //   //   });
-
-    //   //   this.updateCanvas(point);
-    //   // }
-    // }
     if (this.state.pen === "down") {
       let x = e.nativeEvent.offsetX;
       let y = e.nativeEvent.offsetY;

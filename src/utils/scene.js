@@ -6,19 +6,13 @@ import {
   NEURON_WIDTH
 } from "./constants";
 
-import {
-  reshapeArrayTo2D,
-  reshapeArrayTo3D,
-  reshapeArrayTo4D
-} from "./reshaping";
+import { reshapeArrayTo2D, reshapeArrayTo3D, reshapeArrayTo4D } from "./reshaping";
+
+const getArrayMax = array => array.reduce((a, b) => Math.max(a, b));
+const getArrayMax2d = array2d => getArrayMax(array2d.map(getArrayMax));
 
 // Returns 1d array of positions of neurons spaced evenly with the line center at [0,0,height]
-export const getPositionsOfLineOfItems = (
-  itemSpacing,
-  itemWidth,
-  numItems,
-  height
-) => {
+export const getPositionsOfLineOfItems = (itemSpacing, itemWidth, numItems, height) => {
   const itemPositions = [];
 
   const spacingAndWidth = itemSpacing + itemWidth;
@@ -26,14 +20,12 @@ export const getPositionsOfLineOfItems = (
   const oddNumNeurons = numItems % 2 == 1;
 
   for (let i = halfNumItems - 1; i >= 0; i--) {
-    const distance =
-      spacingAndWidth * (i + 0.5) + (oddNumNeurons ? spacingAndWidth / 2 : 0);
+    const distance = spacingAndWidth * (i + 0.5) + (oddNumNeurons ? spacingAndWidth / 2 : 0);
     itemPositions.push([-distance, 0, height]);
   }
   if (oddNumNeurons) itemPositions.push([0, 0, height]);
   for (let i = 0; i < halfNumItems; i++) {
-    const distance =
-      spacingAndWidth * (i + 0.5) + (oddNumNeurons ? spacingAndWidth / 2 : 0);
+    const distance = spacingAndWidth * (i + 0.5) + (oddNumNeurons ? spacingAndWidth / 2 : 0);
     itemPositions.push([distance, 0, height]);
   }
 
@@ -85,8 +77,7 @@ export const getSquareCenters = (dimensions, layerHeight) => {
   const numNodesPerSide = dimensions[0];
 
   const squareWidth =
-    numNodesPerSide * (NEURON_WIDTH + SQUARE_NEURON_SPACING) -
-    SQUARE_NEURON_SPACING;
+    numNodesPerSide * (NEURON_WIDTH + SQUARE_NEURON_SPACING) - SQUARE_NEURON_SPACING;
 
   const squareCenters = getPositionsOfLineOfItems(
     CONV_FILTERS_SPACING,
@@ -140,11 +131,7 @@ export const getLayersMetadataFromLayers = newLayers => {
         const prevDims = previousLayerMetadata.dimensions;
         let dimensions;
         if (!Array.isArray(kernelSize) && !Array.isArray(strides)) {
-          dimensions = [
-            prevDims[0] - kernelSize + 1,
-            prevDims[1] - kernelSize + 1,
-            numSquares
-          ];
+          dimensions = [prevDims[0] - kernelSize + 1, prevDims[1] - kernelSize + 1, numSquares];
         } else {
           throw "Havent implemented array kernelSize or array strides";
         }
@@ -205,12 +192,7 @@ export const getAllNeuronPositions = layersMetadata => {
   let previousSquareCenters;
 
   layersMetadata.forEach((layerMetadata, index) => {
-    const {
-      dimensions,
-      isSquare,
-      directlyAbovePrevious,
-      layerType
-    } = layerMetadata;
+    const { dimensions, isSquare, directlyAbovePrevious, layerType } = layerMetadata;
 
     if (layerType === "flatten") return; // skip flatten layers
 
@@ -281,10 +263,11 @@ export function getOutputColors(layerOutputs, layersMetadata, input2DArray) {
   let layerOutputColors = [];
 
   // change input colors to hex
+  const maxValue = getArrayMax2d(input2DArray);
   let input2DArrayColors = [];
   input2DArray.forEach(r => {
     let rArr = [];
-    r.forEach(c => rArr.push(fracToHex(c)));
+    r.forEach(c => rArr.push(valueToHex(c, maxValue)));
     input2DArrayColors.push(rArr);
   });
   layerOutputColors.push([input2DArrayColors]); // push input as 3d array
@@ -303,11 +286,7 @@ export function getOutputColors(layerOutputs, layersMetadata, input2DArray) {
     }
 
     const lO = layerOutputs[outputIndex];
-    const oneLayerOutputColors = getOneLayerOutputColors(
-      lO,
-      isSquare,
-      dimensions
-    );
+    const oneLayerOutputColors = getOneLayerOutputColors(lO, isSquare, dimensions);
     layerOutputColors.push(oneLayerOutputColors);
 
     outputIndex += 1;
@@ -317,8 +296,9 @@ export function getOutputColors(layerOutputs, layersMetadata, input2DArray) {
 
 export function getOneLayerOutputColors(layerOutput, isSquare, dimensions) {
   const values = layerOutput.dataSync();
+  const maxValue = getArrayMax(values);
 
-  const colors = values.map(v => fracToHex(v));
+  const colors = values.map(v => valueToHex(v, maxValue));
   if (isSquare) {
     return reshapeArrayTo3D(colors, ...dimensions);
   } else {
@@ -326,7 +306,9 @@ export function getOneLayerOutputColors(layerOutput, isSquare, dimensions) {
   }
 }
 
-export function fracToHex(frac) {
+export function valueToHex(value, maxValue) {
+  if (value <= 0) return 0;
+  const frac = value / maxValue;
   return Math.round(frac * 255) * 65793;
 }
 
@@ -370,15 +352,9 @@ export const getAllNeuronEdgesData = trainedModel => {
     const biasesObj = weightsAndBiases[1];
     let weightsData;
     if (weightsObj.shape.length === 4) {
-      weightsData = reshapeArrayTo4D(
-        weightsObj.dataSync(),
-        ...weightsObj.shape
-      );
+      weightsData = reshapeArrayTo4D(weightsObj.dataSync(), ...weightsObj.shape);
     } else if (weightsObj.shape.length === 2) {
-      weightsData = reshapeArrayTo2D(
-        weightsObj.dataSync(),
-        ...weightsObj.shape
-      );
+      weightsData = reshapeArrayTo2D(weightsObj.dataSync(), ...weightsObj.shape);
     }
     edgesData.push({
       biases: biasesObj.dataSync(),
