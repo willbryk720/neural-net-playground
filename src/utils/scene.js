@@ -6,7 +6,11 @@ import {
   NEURON_WIDTH
 } from "./constants";
 
-import { reshapeArrayTo2D, reshapeArrayTo3D, reshapeArrayTo4D } from "./reshaping";
+import {
+  reshape2DTensorToArray,
+  reshape3DTensorToArray,
+  reshape4DTensorToArray
+} from "./reshaping";
 
 const getArrayMax = array => array.reduce((a, b) => Math.max(a, b));
 const getArrayMax2d = array2d => getArrayMax(array2d.map(getArrayMax));
@@ -300,7 +304,7 @@ export function getOneLayerOutputColors(layerOutput, isSquare, dimensions) {
 
   const colors = values.map(v => valueToHex(v, maxValue));
   if (isSquare) {
-    return reshapeArrayTo3D(colors, ...dimensions);
+    return reshape3DTensorToArray(colors, ...dimensions);
   } else {
     return colors;
   }
@@ -352,9 +356,9 @@ export const getAllNeuronEdgesData = trainedModel => {
     const biasesObj = weightsAndBiases[1];
     let weightsData;
     if (weightsObj.shape.length === 4) {
-      weightsData = reshapeArrayTo4D(weightsObj.dataSync(), ...weightsObj.shape);
+      weightsData = reshape4DTensorToArray(weightsObj.dataSync(), ...weightsObj.shape);
     } else if (weightsObj.shape.length === 2) {
-      weightsData = reshapeArrayTo2D(weightsObj.dataSync(), ...weightsObj.shape);
+      weightsData = reshape2DTensorToArray(weightsObj.dataSync(), ...weightsObj.shape);
     }
     edgesData.push({
       biases: biasesObj.dataSync(),

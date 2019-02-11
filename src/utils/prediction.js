@@ -13,7 +13,7 @@ export async function getLayerOutputs(inputTensor, trainedModel) {
   return layerOutputs;
 }
 
-function getLayerTypeFromLayerName(layerName) {
+export function getLayerTypeFromLayerName(layerName) {
   const splitArr = layerName.split("_");
   if (splitArr.length === 0) {
     return splitArr[0];

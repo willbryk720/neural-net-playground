@@ -4,7 +4,7 @@ import CanvasComponent from "./CanvasComponent";
 
 import * as tf from "@tensorflow/tfjs";
 
-import { reshapeArrayTo2D } from "../utils/reshaping";
+import { reshape2DTensorToArray } from "../utils/reshaping";
 import { getLayerOutputs } from "../utils/prediction";
 
 const CANVAS_WIDTH = 200;
@@ -29,10 +29,7 @@ class Predict extends Component {
     // const drawing = this.getDrawing();
     const drawing = this.myRef.current.state.points;
     const imageTensor = tf.tensor(drawing).reshape([1, 28, 28, 1]);
-    const layerOutputs = await getLayerOutputs(
-      imageTensor,
-      this.props.trainedModel
-    );
+    const layerOutputs = await getLayerOutputs(imageTensor, this.props.trainedModel);
     this.props.onMakePrediction(layerOutputs, drawing);
   };
 
@@ -40,11 +37,8 @@ class Predict extends Component {
     const { xs, labels } = this.props.getRandomTestImage();
     const imageTensor = xs;
     const imageVector = await imageTensor.dataSync();
-    const image = reshapeArrayTo2D(imageVector, 28, 28);
-    const layerOutputs = await getLayerOutputs(
-      imageTensor,
-      this.props.trainedModel
-    );
+    const image = reshape2DTensorToArray(imageVector, 28, 28);
+    const layerOutputs = await getLayerOutputs(imageTensor, this.props.trainedModel);
     this.props.onMakePrediction(layerOutputs, image);
   };
 
@@ -52,11 +46,7 @@ class Predict extends Component {
     const { trainedModel, datasetName } = this.props;
     return (
       <div>
-        <CanvasComponent
-          ref={this.myRef}
-          canvasWidth={CANVAS_WIDTH}
-          canvasHeight={CANVAS_HEIGHT}
-        />
+        <CanvasComponent ref={this.myRef} canvasWidth={CANVAS_WIDTH} canvasHeight={CANVAS_HEIGHT} />
         <Button size="mini" onClick={this.clearDrawing}>
           Clear
         </Button>

@@ -21,7 +21,6 @@ class NeuronAnalyzeCanvas extends React.Component {
     const ctx = this.refs.canvas.getContext("2d");
 
     const { colorSquare } = this.props;
-    console.log(colorSquare);
 
     const squareWidth = this.props.canvasWidth / colorSquare.length;
 

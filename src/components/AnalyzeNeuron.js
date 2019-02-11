@@ -2,7 +2,13 @@ import React, { Component } from "react";
 import { Button } from "semantic-ui-react";
 
 import { getOneLayerOutputColors } from "../utils/scene";
-import { getLayerOutputs } from "../utils/prediction";
+import { getLayerOutputs, getLayerTypeFromLayerName } from "../utils/prediction";
+import {
+  reshape4DTensorToArray,
+  reshape2DTensorToArray,
+  reshapeArrayTo4DTensor,
+  reshapeArrayTo2DTensor
+} from "../utils/reshaping";
 
 import NeuronAnalyzeCanvas from "./analyze/NeuronAnalyzeCanvas";
 import DenseAnalyze from "./analyze/DenseAnalyze";
@@ -15,6 +21,44 @@ class AnalyzeNeuron extends Component {
     // this.myRefs = [1, 2, 3, 4, 5, 6, 7, 8, 9].map(i => React.createRef());
     // this.myRefs = [];
   }
+
+  onChangeWeightsToZero = () => {
+    const { analyzeInfo, trainedModel } = this.props;
+    const { layerIndex, group, row: rowIndex, col: colIndex } = analyzeInfo.neuron.indexInfo;
+
+    const inLayer = trainedModel.layers.filter(
+      l => getLayerTypeFromLayerName(l.name) !== "flatten"
+    )[layerIndex - 1];
+    const weightsAndBiases = inLayer.getWeights();
+    if (weightsAndBiases.length != 2) {
+      return; // actually shouldnt ever get to here, this is for testing
+    }
+
+    const weightsTensor = weightsAndBiases[0];
+    const biasesTensor = weightsAndBiases[1];
+    let weightsData = [];
+    if (weightsTensor.shape.length === 4) {
+      weightsData = reshape4DTensorToArray(weightsTensor.dataSync(), ...weightsTensor.shape);
+      weightsData[group].forEach((neuronGroup, g) => {
+        weightsData[group][g].forEach((row, r) => {
+          row.forEach((_c, c) => {
+            weightsData[group][g][r][c] = 0;
+          });
+        });
+
+        const newTensor = reshapeArrayTo4DTensor(weightsData);
+        inLayer.setWeights([newTensor, biasesTensor]);
+      });
+    } else if (weightsTensor.shape.length === 2) {
+      weightsData = reshape2DTensorToArray(weightsTensor.dataSync(), ...weightsTensor.shape);
+      weightsData.forEach((_, g) => {
+        weightsData[g][colIndex] = 0;
+      });
+      const newTensor = reshapeArrayTo2DTensor(weightsData);
+      inLayer.setWeights([newTensor, biasesTensor]);
+      console.log("WEIGHTSDATA", weightsData);
+    }
+  };
 
   render() {
     const { analyzeInfo, trainedModel } = this.props;
@@ -31,7 +75,7 @@ class AnalyzeNeuron extends Component {
     const { position, indexInfo, layerType, color } = neuron;
     const { layerIndex, group, row, col } = indexInfo;
 
-    console.log("analyzeInfo", analyzeInfo);
+    console.log("analyzeInfo, trainedModel", analyzeInfo, trainedModel);
 
     let canvases;
     if (layerIndex == 1 && hasOutputs) {
@@ -86,7 +130,7 @@ class AnalyzeNeuron extends Component {
           )}
           <div>Color: {color}</div>
         </h3>
-        <Button color="green" size="small">
+        <Button color="green" size="small" onClick={this.onChangeWeightsToZero}>
           Set All Weights to 0
         </Button>
         {canvases}

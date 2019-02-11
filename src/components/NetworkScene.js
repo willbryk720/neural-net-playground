@@ -22,7 +22,7 @@ import {
   SELECTED_SQUARE_COLOR
 } from "../utils/constants";
 
-import { reshapeArrayTo3D } from "../utils/reshaping";
+import { reshape3DTensorToArray } from "../utils/reshaping";
 
 const NEURON_GEOMETRY = new THREE.BoxGeometry(NEURON_WIDTH, NEURON_WIDTH, NEURON_WIDTH);
 
@@ -551,15 +551,15 @@ class NetworkScene extends Component {
         this.selectedSquare = null;
         if (clickedObj.isNeuron) {
           if (this.selectedNeuron) {
-            this.selectedNeuron.material.color.set(0x000000);
-            this.selectedNeuron.formerColorHex = 0x000000;
+            // this.selectedNeuron.material.color.set(this.selectedNeuron.beforeSelectedHex);
+            // this.selectedNeuron.formerColorHex = 0x000000;
           }
           this.selectedNeuron = null;
         }
         if (clickedObj.isNeuron) {
           this.selectedNeuron = clickedObj;
-          this.selectedNeuron.formerColorHex = SELECTED_NEURON_COLOR;
-          this.selectedNeuron.material.color.set(SELECTED_NEURON_COLOR);
+          // this.selectedNeuron.beforeSelectedHex = this.selectedNeuron.formerColorHex;
+          // this.selectedNeuron.material.color.set(SELECTED_NEURON_COLOR);
           this.onDblClickNode(clickedObj);
         } else if (clickedObj.isSquareSelect) {
           this.selectedSquare = clickedObj;
