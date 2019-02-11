@@ -97,8 +97,6 @@ class App extends Component {
   };
 
   onDblClickNeuron = analyzeInfo => {
-    // console.log(analyzeInfo.layerIndex);
-    // this.setState({ analyzeInfo: { ...analyzeInfo } });
     this.setState({ analyzeInfo });
   };
 

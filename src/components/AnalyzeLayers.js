@@ -22,7 +22,6 @@ class AnalyzeLayers extends Component {
     }
 
     const {
-      layerIndex,
       position,
       layerType,
       indexInfo,
@@ -31,6 +30,8 @@ class AnalyzeLayers extends Component {
       inLayerMetadata,
       drawing
     } = analyzeInfo;
+
+    const { layerIndex, group, row, col } = indexInfo;
 
     console.log("analyzeInfo", analyzeInfo);
 
@@ -54,7 +55,8 @@ class AnalyzeLayers extends Component {
         <h1>Analyze Layers</h1>
         <h3>LayerType: {layerType}</h3>
         <h3>
-          {indexInfo.group}, {indexInfo.row}, {indexInfo.col}
+          {layerIndex} <br />
+          {group}, {row}, {col}
         </h3>
         <Button color="green" size="small">
           Update Weights

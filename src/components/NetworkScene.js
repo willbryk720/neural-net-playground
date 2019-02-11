@@ -16,11 +16,7 @@ import { NEURON_WIDTH, KEY_A, KEY_D, KEY_W, KEY_S } from "../utils/constants";
 
 import { reshapeArrayTo3D } from "../utils/reshaping";
 
-const NEURON_GEOMETRY = new THREE.BoxGeometry(
-  NEURON_WIDTH,
-  NEURON_WIDTH,
-  NEURON_WIDTH
-);
+const NEURON_GEOMETRY = new THREE.BoxGeometry(NEURON_WIDTH, NEURON_WIDTH, NEURON_WIDTH);
 
 function getEdgeColor(edgeValue) {
   return edgeValue;
@@ -142,19 +138,14 @@ class NetworkScene extends Component {
     this.allNeuronPositions = getAllNeuronPositions(layersMetadata);
     this.allNeuronEdgesData = getAllNeuronEdgesData(trainedModel);
 
-    this.drawAllNeuronPositions(
-      this.allNeuronPositions,
-      layerOutputs,
-      layersMetadata,
-      drawing
-    );
+    this.drawAllNeuronPositions(this.allNeuronPositions, layerOutputs, layersMetadata, drawing);
 
     this.drawSquareSelects(this.allNeuronPositions);
 
     // this.props.onEndUpdateNetwork();
   }
 
-  drawNeuron = (pos, color, layerType, index, indexInfo) => {
+  drawNeuron = (pos, color, layerType, indexInfo) => {
     const material = new THREE.MeshBasicMaterial({ color: color });
     let neuronObj = new THREE.Mesh(NEURON_GEOMETRY, material);
     neuronObj.position.x = pos[0];
@@ -162,32 +153,22 @@ class NetworkScene extends Component {
     neuronObj.position.z = pos[2];
     neuronObj.layerType = layerType;
     neuronObj.indexInfo = indexInfo;
-    neuronObj.layerIndex = index;
     neuronObj.isNeuron = true;
     this.scene.add(neuronObj);
     return neuronObj;
   };
 
-  drawAllNeuronPositions = (
-    allNeuronPositions,
-    layerOutputs,
-    layersMetadata,
-    input2DArray
-  ) => {
+  drawAllNeuronPositions = (allNeuronPositions, layerOutputs, layersMetadata, input2DArray) => {
     const hasLayerOutputs = layerOutputs.length > 0;
 
     let layerOutputColors;
     if (hasLayerOutputs) {
-      layerOutputColors = getOutputColors(
-        layerOutputs,
-        layersMetadata,
-        input2DArray
-      );
+      layerOutputColors = getOutputColors(layerOutputs, layersMetadata, input2DArray);
     }
 
     const allNeuronObjects = [];
 
-    allNeuronPositions.forEach((layerOfPositions, index) => {
+    allNeuronPositions.forEach((layerOfPositions, layerIndex) => {
       const { isSquare, neuronPositions, layerType } = layerOfPositions;
 
       let layerOfGroups = [];
@@ -195,41 +176,25 @@ class NetworkScene extends Component {
         let groupOfRows = [];
         if (isSquare) {
           neuronGrouping.forEach((row, r) => {
-            let rowObjects = [];
+            let rowOfObjects = []; // row of neuron objects
             row.forEach((pos, c) => {
-              const color = hasLayerOutputs
-                ? layerOutputColors[index][g][r][c]
-                : 0x000000;
-              const indexInfo = { group: g, row: r, col: c };
-              const neuronObj = this.drawNeuron(
-                pos,
-                color,
-                layerType,
-                index,
-                indexInfo
-              );
-              rowObjects.push(neuronObj);
+              const color = hasLayerOutputs ? layerOutputColors[layerIndex][g][r][c] : 0x000000;
+              const indexInfo = { group: g, row: r, col: c, layerIndex };
+              const neuronObj = this.drawNeuron(pos, color, layerType, indexInfo);
+              rowOfObjects.push(neuronObj);
             });
-            groupOfRows.push(rowObjects);
+            groupOfRows.push(rowOfObjects);
           });
         } else {
-          let rowObjects = [];
+          let rowOfObjects = [];
           // draw line
           neuronGrouping.forEach((pos, i) => {
-            const color = hasLayerOutputs
-              ? layerOutputColors[index][i]
-              : 0x000000;
-            const indexInfo = { col: i };
-            const neuronObj = this.drawNeuron(
-              pos,
-              color,
-              layerType,
-              index,
-              indexInfo
-            );
-            rowObjects.push(neuronObj);
+            const color = hasLayerOutputs ? layerOutputColors[layerIndex][i] : 0x000000;
+            const indexInfo = { col: i, layerIndex };
+            const neuronObj = this.drawNeuron(pos, color, layerType, indexInfo);
+            rowOfObjects.push(neuronObj);
           });
-          groupOfRows.push(rowObjects);
+          groupOfRows.push(rowOfObjects);
         }
         layerOfGroups.push(groupOfRows);
       });
@@ -259,23 +224,21 @@ class NetworkScene extends Component {
       return;
     }
 
-    const previousLayerIndex = neuron.layerIndex - 1;
+    const previousLayerIndex = neuron.indexInfo.layerIndex - 1;
 
-    const {
-      isSquare,
-      neuronPositions: prevNeuronPositions
-    } = this.allNeuronPositions[previousLayerIndex];
+    const { isSquare, neuronPositions: prevNeuronPositions } = this.allNeuronPositions[
+      previousLayerIndex
+    ];
     const edgesLayer = edgesData[previousLayerIndex];
     const edgesLayerWeights = edgesLayer.weights;
-    const outLayerMetadata = this.layersMetadata.filter(
-      lM => lM.layerType !== "flatten"
-    )[previousLayerIndex + 1]; // layersMetadata has an extra input layer, and want to remove flatten layer
+    const outLayerMetadata = this.layersMetadata.filter(lM => lM.layerType !== "flatten")[
+      previousLayerIndex + 1
+    ]; // layersMetadata has an extra input layer, and want to remove flatten layer
 
     let neuronEdges = [];
     if (layerType === "dense") {
       prevNeuronPositions.forEach((neuronGrouping, g) => {
-        const neuronGroupingSize =
-          neuronGrouping.length * neuronGrouping[0].length;
+        const neuronGroupingSize = neuronGrouping.length * neuronGrouping[0].length;
         if (isSquare) {
           neuronGrouping.forEach((row, r) => {
             row.forEach((pos, c) => {
@@ -290,9 +253,7 @@ class NetworkScene extends Component {
                   axisGeometry,
                   new THREE.LineBasicMaterial({
                     color: getEdgeColor(
-                      edgesLayerWeights[g * neuronGroupingSize + r * c][
-                        indexInfo["col"]
-                      ]
+                      edgesLayerWeights[g * neuronGroupingSize + r * c][indexInfo["col"]]
                     )
                   })
                 )
@@ -351,8 +312,7 @@ class NetworkScene extends Component {
 
       for (let r = 0; r < poolSize; r++) {
         for (let c = 0; c < poolSize; c++) {
-          const pos =
-            neuronGrouping[rowIndex * poolSize + r][colIndex * poolSize + c];
+          const pos = neuronGrouping[rowIndex * poolSize + r][colIndex * poolSize + c];
           const adjustedPos = [pos[0], pos[1], pos[2] + NEURON_WIDTH / 2];
           let axisGeometry = new THREE.Geometry();
           axisGeometry.vertices.push(
@@ -380,12 +340,7 @@ class NetworkScene extends Component {
     const geometry = new THREE.BoxGeometry(3, 1, 0.3);
 
     allNeuronPositions.forEach((layerOfPositions, index) => {
-      const {
-        isSquare,
-        neuronPositions,
-        layerType,
-        squareCenters
-      } = layerOfPositions;
+      const { isSquare, neuronPositions, layerType, squareCenters } = layerOfPositions;
 
       if (!isSquare || !squareCenters) return;
 
@@ -409,7 +364,7 @@ class NetworkScene extends Component {
   start = () => {
     if (!this.frameId) {
       this.frameId = requestAnimationFrame(this.animate);
-      this.countSincelastControlsChange = 0;
+      this.countSinceCtrlChange = 0;
       // this saves computer processing, because nothing updates after a few seconds
       // after the last change of the
       this.controls.addEventListener("change", this.markLastChange);
@@ -420,12 +375,12 @@ class NetworkScene extends Component {
   };
   animate = () => {
     this.renderScene();
-    this.countSincelastControlsChange += 1;
+    this.countSinceCtrlChange += 1;
 
-    if (this.countSincelastControlsChange < 100) {
+    if (this.countSinceCtrlChange < 100) {
       this.frameId = window.requestAnimationFrame(this.animate);
     }
-    // console.log("rendering again", this.countSincelastControlsChange);
+    // console.log("rendering again", this.countSinceCtrlChange);
     this.controls.update();
 
     // const cameraPos = this.camera.position;
@@ -444,9 +399,7 @@ class NetworkScene extends Component {
       if (this.hoverIntersectObject != intersects[0].object) {
         if (this.hoverIntersectObject) {
           // set back to former color
-          this.hoverIntersectObject.material.color.set(
-            this.hoverIntersectObject.formerColorHex
-          );
+          this.hoverIntersectObject.material.color.set(this.hoverIntersectObject.formerColorHex);
         }
 
         this.hoverIntersectObject = intersects[0].object;
@@ -456,9 +409,7 @@ class NetworkScene extends Component {
     } else {
       if (this.hoverIntersectObject) {
         // set back to former color
-        this.hoverIntersectObject.material.color.set(
-          this.hoverIntersectObject.formerColorHex
-        );
+        this.hoverIntersectObject.material.color.set(this.hoverIntersectObject.formerColorHex);
       }
       this.hoverIntersectObject = null;
     }
@@ -466,8 +417,8 @@ class NetworkScene extends Component {
   };
 
   markLastChange = () => {
-    if (this.countSincelastControlsChange >= 100) {
-      this.countSincelastControlsChange = 0;
+    if (this.countSinceCtrlChange >= 100) {
+      this.countSinceCtrlChange = 0;
       this.animate();
     }
   };
@@ -544,8 +495,9 @@ class NetworkScene extends Component {
 
   onDblClickNode = neuron => {
     const { layerOutputs } = this.props;
-    const { layerIndex, position, indexInfo, layerType } = neuron;
+    const { position, indexInfo, layerType } = neuron;
     console.log(layerOutputs);
+    const layerIndex = indexInfo.layerIndex;
 
     if (layerIndex === 0) return;
 
@@ -554,18 +506,11 @@ class NetworkScene extends Component {
       position,
       indexInfo,
       layerType,
-      inLayerMetadata: this.layersMetadata.filter(
-        lM => lM.layerType !== "flatten"
-      )[layerIndex - 1],
-      edges:
-        this.allNeuronEdgesData.length > 0
-          ? this.allNeuronEdgesData[layerIndex - 1]
-          : null,
+      inLayerMetadata: this.layersMetadata.filter(lM => lM.layerType !== "flatten")[layerIndex - 1],
+      edges: this.allNeuronEdgesData.length > 0 ? this.allNeuronEdgesData[layerIndex - 1] : null,
       inLayerOutput:
         layerOutputs.length > 0 && layerIndex >= 2
-          ? layerOutputs.filter(lM => lM.layerType !== "flatten")[
-              layerIndex - 2
-            ]
+          ? layerOutputs.filter(lM => lM.layerType !== "flatten")[layerIndex - 2]
           : null,
       drawing: this.props.drawing
     };
@@ -599,17 +544,9 @@ class NetworkScene extends Component {
 
   updateMouse = (event, canvasBounds) => {
     this.mouse.x =
-      ((event.clientX - canvasBounds.left) /
-        (canvasBounds.right - canvasBounds.left)) *
-        2 -
-      1;
+      ((event.clientX - canvasBounds.left) / (canvasBounds.right - canvasBounds.left)) * 2 - 1;
     this.mouse.y =
-      -(
-        (event.clientY - canvasBounds.top) /
-        (canvasBounds.bottom - canvasBounds.top)
-      ) *
-        2 +
-      1;
+      -((event.clientY - canvasBounds.top) / (canvasBounds.bottom - canvasBounds.top)) * 2 + 1;
   };
 
   onDocumentKeyDown = event => {
