@@ -1,6 +1,8 @@
 import React, { Component } from "react";
 import { Button } from "semantic-ui-react";
 
+import * as tf from "@tensorflow/tfjs";
+
 import { getOneLayerOutputColors } from "../utils/scene";
 import { getLayerOutputs, getLayerTypeFromLayerName } from "../utils/prediction";
 import {
@@ -24,7 +26,12 @@ class AnalyzeNeuron extends Component {
 
   onChangeWeightsToZero = () => {
     const { analyzeInfo, trainedModel } = this.props;
-    const { layerIndex, group, row: rowIndex, col: colIndex } = analyzeInfo.neuron.indexInfo;
+    const {
+      layerIndex,
+      group: groupIndex,
+      row: rowIndex,
+      col: colIndex
+    } = analyzeInfo.neuron.indexInfo;
 
     const inLayer = trainedModel.layers.filter(
       l => getLayerTypeFromLayerName(l.name) !== "flatten"
@@ -39,10 +46,10 @@ class AnalyzeNeuron extends Component {
     let weightsData = [];
     if (weightsTensor.shape.length === 4) {
       weightsData = reshape4DTensorToArray(weightsTensor.dataSync(), ...weightsTensor.shape);
-      weightsData[group].forEach((neuronGroup, g) => {
-        weightsData[group][g].forEach((row, r) => {
+      weightsData[groupIndex].forEach((neuronGroup, g) => {
+        weightsData[groupIndex][g].forEach((row, r) => {
           row.forEach((_c, c) => {
-            weightsData[group][g][r][c] = 0;
+            weightsData[groupIndex][g][r][c] = 0;
           });
         });
 
@@ -54,9 +61,15 @@ class AnalyzeNeuron extends Component {
       weightsData.forEach((_, g) => {
         weightsData[g][colIndex] = 0;
       });
-      const newTensor = reshapeArrayTo2DTensor(weightsData);
-      inLayer.setWeights([newTensor, biasesTensor]);
-      console.log("WEIGHTSDATA", weightsData);
+      let newBiasesData = biasesTensor.dataSync();
+      if (groupIndex) {
+        newBiasesData[groupIndex] = -1000;
+      } else {
+        newBiasesData[colIndex] = -1000;
+      }
+      const newWeightsTensor = reshapeArrayTo2DTensor(weightsData);
+      const newBiasesTensor = tf.tensor(newBiasesData);
+      inLayer.setWeights([newWeightsTensor, newBiasesTensor]);
     }
   };
 

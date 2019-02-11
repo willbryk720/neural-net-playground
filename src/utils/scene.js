@@ -290,6 +290,7 @@ export function getOutputColors(layerOutputs, layersMetadata, input2DArray) {
     }
 
     const lO = layerOutputs[outputIndex];
+
     const oneLayerOutputColors = getOneLayerOutputColors(lO, isSquare, dimensions);
     layerOutputColors.push(oneLayerOutputColors);
 
