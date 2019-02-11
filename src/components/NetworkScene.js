@@ -16,6 +16,12 @@ import { NEURON_WIDTH, KEY_A, KEY_D, KEY_W, KEY_S } from "../utils/constants";
 
 import { reshapeArrayTo3D } from "../utils/reshaping";
 
+const NEURON_GEOMETRY = new THREE.BoxGeometry(
+  NEURON_WIDTH,
+  NEURON_WIDTH,
+  NEURON_WIDTH
+);
+
 function getEdgeColor(edgeValue) {
   return edgeValue;
 }
@@ -148,18 +154,26 @@ class NetworkScene extends Component {
     // this.props.onEndUpdateNetwork();
   }
 
+  drawNeuron = (pos, color, layerType, index, indexInfo) => {
+    const material = new THREE.MeshBasicMaterial({ color: color });
+    let neuronObj = new THREE.Mesh(NEURON_GEOMETRY, material);
+    neuronObj.position.x = pos[0];
+    neuronObj.position.y = pos[1];
+    neuronObj.position.z = pos[2];
+    neuronObj.layerType = layerType;
+    neuronObj.indexInfo = indexInfo;
+    neuronObj.layerIndex = index;
+    neuronObj.isNeuron = true;
+    this.scene.add(neuronObj);
+    return neuronObj;
+  };
+
   drawAllNeuronPositions = (
     allNeuronPositions,
     layerOutputs,
     layersMetadata,
     input2DArray
   ) => {
-    const geometry = new THREE.BoxGeometry(
-      NEURON_WIDTH,
-      NEURON_WIDTH,
-      NEURON_WIDTH
-    );
-
     const hasLayerOutputs = layerOutputs.length > 0;
 
     let layerOutputColors;
@@ -186,16 +200,15 @@ class NetworkScene extends Component {
               const color = hasLayerOutputs
                 ? layerOutputColors[index][g][r][c]
                 : 0x000000;
-              const material = new THREE.MeshBasicMaterial({ color: color });
-              let mesh = new THREE.Mesh(geometry, material);
-              mesh.position.x = pos[0];
-              mesh.position.y = pos[1];
-              mesh.position.z = pos[2];
-              mesh.layerType = layerType;
-              mesh.indexInfo = { group: g, row: r, col: c };
-              mesh.layerIndex = index;
-              this.scene.add(mesh);
-              rowObjects.push(mesh);
+              const indexInfo = { group: g, row: r, col: c };
+              const neuronObj = this.drawNeuron(
+                pos,
+                color,
+                layerType,
+                index,
+                indexInfo
+              );
+              rowObjects.push(neuronObj);
             });
             groupOfRows.push(rowObjects);
           });
@@ -203,18 +216,18 @@ class NetworkScene extends Component {
           let rowObjects = [];
           // draw line
           neuronGrouping.forEach((pos, i) => {
-            const material = new THREE.MeshBasicMaterial({
-              color: hasLayerOutputs ? layerOutputColors[index][i] : 0x000000
-            });
-            let mesh = new THREE.Mesh(geometry, material);
-            mesh.position.x = pos[0];
-            mesh.position.y = pos[1];
-            mesh.position.z = pos[2];
-            mesh.layerType = layerType;
-            mesh.indexInfo = { col: i };
-            mesh.layerIndex = index;
-            this.scene.add(mesh);
-            rowObjects.push(mesh);
+            const color = hasLayerOutputs
+              ? layerOutputColors[index][i]
+              : 0x000000;
+            const indexInfo = { col: i };
+            const neuronObj = this.drawNeuron(
+              pos,
+              color,
+              layerType,
+              index,
+              indexInfo
+            );
+            rowObjects.push(neuronObj);
           });
           groupOfRows.push(rowObjects);
         }
@@ -532,6 +545,7 @@ class NetworkScene extends Component {
   onDblClickNode = neuron => {
     const { layerOutputs } = this.props;
     const { layerIndex, position, indexInfo, layerType } = neuron;
+    console.log(layerOutputs);
 
     if (layerIndex === 0) return;
 
@@ -549,7 +563,9 @@ class NetworkScene extends Component {
           : null,
       inLayerOutput:
         layerOutputs.length > 0 && layerIndex >= 2
-          ? layerOutputs[layerIndex - 2]
+          ? layerOutputs.filter(lM => lM.layerType !== "flatten")[
+              layerIndex - 2
+            ]
           : null,
       drawing: this.props.drawing
     };
@@ -575,7 +591,8 @@ class NetworkScene extends Component {
         .intersectObjects(this.scene.children)
         .filter(o => o.object.type === "Mesh");
       if (intersects.length > 0) {
-        this.onDblClickNode(intersects[0].object);
+        const clickedObj = intersects[0].object;
+        if (clickedObj.isNeuron) this.onDblClickNode(clickedObj);
       }
     }
   };

@@ -1,16 +1,10 @@
 import React, { Component } from "react";
 import { Button } from "semantic-ui-react";
-
 import CanvasComponent from "./CanvasComponent";
 
 import * as tf from "@tensorflow/tfjs";
 
-import {
-  reshapeArrayTo4D,
-  reshapeArrayTo3D,
-  reshapeArrayTo2D
-} from "../utils/reshaping";
-
+import { reshapeArrayTo2D } from "../utils/reshaping";
 import { getLayerOutputs } from "../utils/prediction";
 
 const CANVAS_WIDTH = 200;
@@ -30,24 +24,6 @@ class Predict extends Component {
     // console.log(t.dataSync());
     // console.log(t.shape);
   };
-
-  // getLayerOutputs = async inputTensor => {
-  //   const { trainedModel } = this.props;
-  //   let layerOutputs = [];
-
-  //   // console.log("INPUT", inputTensor, inputTensor.dataSync());
-  //   const layers = trainedModel.layers;
-  //   for (var i = 0; i < layers.length; i++) {
-  //     var layer = layers[i];
-  //     var output = await layer.apply(inputTensor);
-  //     inputTensor = output;
-  //     // console.log("OUTPUT BRO");
-  //     // console.log(output, output.dataSync());
-  //     layerOutputs.push(output);
-  //   }
-
-  //   return layerOutputs;
-  // };
 
   makeDrawingPrediction = async () => {
     // const drawing = this.getDrawing();
@@ -70,8 +46,6 @@ class Predict extends Component {
       this.props.trainedModel
     );
     this.props.onMakePrediction(layerOutputs, image);
-
-    // this.testWeightCreation(layerOutputs, image, this.props.trainedModel);
   };
 
   render() {
