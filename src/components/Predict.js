@@ -19,10 +19,6 @@ class Predict extends Component {
 
   clearDrawing = () => {
     this.myRef.current.clear();
-
-    // const t = tf.tensor([[[1, 2, 3], [4, 5, 6]], [[7, 8, 9], [10, 11, 12]]]);
-    // console.log(t.dataSync());
-    // console.log(t.shape);
   };
 
   makeDrawingPrediction = async () => {
@@ -46,7 +42,12 @@ class Predict extends Component {
     const { trainedModel, datasetName } = this.props;
     return (
       <div>
-        <CanvasComponent ref={this.myRef} canvasWidth={CANVAS_WIDTH} canvasHeight={CANVAS_HEIGHT} />
+        <CanvasComponent
+          ref={this.myRef}
+          canvasWidth={CANVAS_WIDTH}
+          canvasHeight={CANVAS_HEIGHT}
+          drawing={this.props.drawing}
+        />
         <Button size="mini" onClick={this.clearDrawing}>
           Clear
         </Button>

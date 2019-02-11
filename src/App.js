@@ -204,6 +204,7 @@ class App extends Component {
             />
             <h1>4. Predict</h1>
             <Predict
+              drawing={this.state.drawing}
               onMakePrediction={this.onMakePrediction}
               trainedModel={this.state.trainedModel}
               getRandomTestImage={this.getRandomTestImage}

@@ -110,7 +110,7 @@ class NetworkScene extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    console.log(nextProps);
+    console.log("Rendered Scene Again");
     // if (nextProps.layers !== this.props.numLayers) {
     //   //Perform some operation here
 
@@ -135,14 +135,14 @@ class NetworkScene extends Component {
 
     const layersMetadata = getLayersMetadataFromLayers(layers);
     this.layersMetadata = layersMetadata;
-    console.log(
-      "IMPORTANT: drawing, layers, layerOutputs, layerOutputDataSync, layersMetadata ",
-      drawing,
-      layers,
-      layerOutputs,
-      layerOutputs.map(lO => lO.dataSync()),
-      layersMetadata
-    );
+    // console.log(
+    //   "IMPORTANT: drawing, layers, layerOutputs, layerOutputDataSync, layersMetadata ",
+    //   drawing,
+    //   layers,
+    //   layerOutputs,
+    //   layerOutputs.map(lO => lO.dataSync()),
+    //   layersMetadata
+    // );
 
     this.allNeuronPositions = getAllNeuronPositions(layersMetadata);
     this.allNeuronEdgesData = getAllNeuronEdgesData(trainedModel);

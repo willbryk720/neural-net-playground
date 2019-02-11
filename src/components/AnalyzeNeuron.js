@@ -38,6 +38,7 @@ class AnalyzeNeuron extends Component {
     )[layerIndex - 1];
     const weightsAndBiases = inLayer.getWeights();
     if (weightsAndBiases.length != 2) {
+      console.log("Shouldnt be able to zero pooling layer");
       return; // actually shouldnt ever get to here, this is for testing
     }
 
@@ -112,6 +113,9 @@ class AnalyzeNeuron extends Component {
           <div key={"" + i + neuron.id}>
             <hr />
             <NeuronAnalyzeCanvas canvasWidth={200} canvasHeight={200} colorSquare={colorSquare} />
+            <Button color="green" size="mini">
+              Set weights to 0
+            </Button>
           </div>
         ));
       } else {

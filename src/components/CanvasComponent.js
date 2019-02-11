@@ -1,6 +1,8 @@
 import React, { Component } from "react";
 import { Button } from "semantic-ui-react";
 
+import { getColorStyle } from "../utils/analyze";
+
 const NUM_SQUARES_PER_ROW = 28;
 const NUM_SQUARES_PER_COL = 28;
 const BORDER_WIDTH = 2;
@@ -15,11 +17,35 @@ class CanvasComponent extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      points: getStartDrawing(),
+      points: this.props.drawing.length > 0 ? this.props.drawing : getStartDrawing(),
       lineWidth: 1
     };
   }
-  componentDidMount() {}
+
+  componentWillReceiveProps(nextProps) {
+    console.log("Rendered Predict CanvasComponent");
+    if (nextProps.drawing.length > 0) this.setState({ points: nextProps.drawing });
+  }
+  componentDidMount() {
+    this.setCanvasToDrawing();
+  }
+
+  setCanvasToDrawing = () => {
+    // const { drawing } = this.props;
+    // if (drawing.length === 0) return;
+
+    const { points } = this.state;
+    const ctx = this.refs.canvas.getContext("2d");
+    const squareWidth = this.props.canvasWidth / NUM_SQUARES_PER_ROW;
+    points.forEach((row, r) => {
+      row.forEach((col, c) => {
+        const colorStyle = getColorStyle(points[r][c] * 0xffffff);
+        ctx.fillStyle = colorStyle;
+        ctx.fillRect(c * squareWidth, r * squareWidth, squareWidth, squareWidth);
+      });
+    });
+    // this.setState({ points: drawing });
+  };
 
   updateCanvas(point) {
     const ctx = this.refs.canvas.getContext("2d");
@@ -64,13 +90,7 @@ class CanvasComponent extends React.Component {
           const c = point[0];
           const r = point[1];
 
-          if (
-            c >= 0 &&
-            c < NUM_SQUARES_PER_ROW &&
-            r >= 0 &&
-            r < NUM_SQUARES_PER_ROW &&
-            points[r][c] === 0
-          ) {
+          if (c >= 0 && c < NUM_SQUARES_PER_ROW && r >= 0 && r < NUM_SQUARES_PER_ROW) {
             copyPoints[r][c] = 1;
             this.updateCanvas([c, r]);
           }
@@ -96,6 +116,8 @@ class CanvasComponent extends React.Component {
   }
 
   render() {
+    if (this.refs.canvas) this.setCanvasToDrawing(); // it takes a bit to load canvas
+
     return (
       <div>
         <div
