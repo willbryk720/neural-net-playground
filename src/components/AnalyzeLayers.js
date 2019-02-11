@@ -35,8 +35,6 @@ class AnalyzeLayers extends Component {
 
     console.log("analyzeInfo", analyzeInfo);
 
-    // const { weights, biases } = edges;
-
     if (layerIndex == 1) {
       console.log(drawing);
     } else if (inLayerOutput) {
@@ -46,7 +44,7 @@ class AnalyzeLayers extends Component {
         inLayerMetadata.isSquare,
         inLayerMetadata.dimensions
       );
-      console.log(oneLayerOutputColors);
+      console.log(analyzeInfo, oneLayerOutputColors);
     } else {
     }
 

@@ -206,7 +206,6 @@ class NetworkScene extends Component {
 
   drawEdges = neuron => {
     const edgesData = this.allNeuronEdgesData;
-    console.log(edgesData);
 
     // remove previous edges
     this.neuronEdgeObjects.forEach(edge => {
@@ -238,7 +237,9 @@ class NetworkScene extends Component {
     let neuronEdges = [];
     if (layerType === "dense") {
       prevNeuronPositions.forEach((neuronGrouping, g) => {
-        const neuronGroupingSize = neuronGrouping.length * neuronGrouping[0].length;
+        const rowSize = neuronGrouping[0].length;
+        const neuronGroupingSize = neuronGrouping.length * rowSize;
+
         if (isSquare) {
           neuronGrouping.forEach((row, r) => {
             row.forEach((pos, c) => {
@@ -253,7 +254,7 @@ class NetworkScene extends Component {
                   axisGeometry,
                   new THREE.LineBasicMaterial({
                     color: getEdgeColor(
-                      edgesLayerWeights[g * neuronGroupingSize + r * c][indexInfo["col"]]
+                      edgesLayerWeights[g * neuronGroupingSize + r * rowSize + c][indexInfo["col"]]
                     )
                   })
                 )
@@ -496,7 +497,6 @@ class NetworkScene extends Component {
   onDblClickNode = neuron => {
     const { layerOutputs } = this.props;
     const { position, indexInfo, layerType } = neuron;
-    console.log(layerOutputs);
     const layerIndex = indexInfo.layerIndex;
 
     if (layerIndex === 0) return;
