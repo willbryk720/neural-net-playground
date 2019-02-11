@@ -350,7 +350,7 @@ class NetworkScene extends Component {
         const squareXpos = squareCenters[i][0];
         const neuronGroup = neuronPositions[i];
         const bottomNeuron = neuronGroup[neuronGroup.length - 1][0];
-        const material = new THREE.MeshBasicMaterial({ color: 0x0000ff });
+        const material = new THREE.MeshBasicMaterial({ color: 0x000000 });
         let mesh = new THREE.Mesh(geometry, material);
         mesh.position.x = squareXpos;
         mesh.position.y = bottomNeuron[1] - 5;

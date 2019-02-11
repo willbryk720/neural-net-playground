@@ -11,7 +11,7 @@ import LoadData from "./components/LoadData";
 
 import ShowLoading from "./components/ShowLoading";
 import Info from "./components/Info";
-import AnalyzeLayers from "./components/AnalyzeLayers";
+import AnalyzeNeuron from "./components/AnalyzeNeuron";
 
 import CircularLoading from "./components/common/CircularLoading";
 
@@ -135,7 +135,7 @@ class App extends Component {
             >
               Back
             </Button>
-            <AnalyzeLayers
+            <AnalyzeNeuron
               analyzeInfo={this.state.analyzeInfo}
               trainedModel={this.state.trainedModel}
             />
@@ -175,10 +175,7 @@ class App extends Component {
             />
             <h1>2. Create Layers</h1>
             {/* <Left updateLayers={this.updateLayers} layers={this.state.layers} /> */}
-            <SortableLayers
-              updateLayers={this.updateLayers}
-              layers={this.state.layers}
-            />
+            <SortableLayers updateLayers={this.updateLayers} layers={this.state.layers} />
 
             <h1>3. Create Weights</h1>
             <AddPreTrainedModel
@@ -227,10 +224,8 @@ class App extends Component {
             onEndUpdateNetwork={this.onEndUpdateNetwork}
             onDblClickNeuron={this.onDblClickNeuron}
           />
-          <Button onClick={() => this.setState({ isFullScreenMode: true })}>
-            FullScreen
-          </Button>
-          <AnalyzeLayers
+          <Button onClick={() => this.setState({ isFullScreenMode: true })}>FullScreen</Button>
+          <AnalyzeNeuron
             analyzeInfo={this.state.analyzeInfo}
             trainedModel={this.state.trainedModel}
           />

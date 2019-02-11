@@ -7,7 +7,7 @@ import { getLayerOutputs } from "../utils/prediction";
 import NeuronAnalyzeCanvas from "./analyze/NeuronAnalyzeCanvas";
 import DenseAnalyze from "./analyze/DenseAnalyze";
 
-class AnalyzeLayers extends Component {
+class AnalyzeNeuron extends Component {
   constructor(props) {
     super(props);
     this.state = {};
@@ -15,10 +15,6 @@ class AnalyzeLayers extends Component {
     // this.myRefs = [1, 2, 3, 4, 5, 6, 7, 8, 9].map(i => React.createRef());
     // this.myRefs = [];
   }
-
-  // componentWillReceiveProps(nextProps) {
-  //   this.setState({ analyzeInfo: nextProps.analyzeInfo });
-  // }
 
   render() {
     const { analyzeInfo, trainedModel } = this.props;
@@ -38,7 +34,7 @@ class AnalyzeLayers extends Component {
     console.log("analyzeInfo", analyzeInfo);
 
     let canvases;
-    if (layerIndex == 1) {
+    if (layerIndex == 1 && hasOutputs) {
       // drawing is in fraction, but need hex
       const newDrawing = drawing.map(row => row.map(color => color * 0xffffff));
       canvases = (
@@ -77,7 +73,7 @@ class AnalyzeLayers extends Component {
 
     return (
       <div>
-        <h1>Analyze Layers</h1>
+        <h1>Analyze Neuron</h1>
         <h3>LayerType: {layerType}</h3>
         <h3>
           Layer: {layerIndex} <br />
@@ -90,13 +86,13 @@ class AnalyzeLayers extends Component {
           )}
           <div>Color: {color}</div>
         </h3>
-        {canvases}
         <Button color="green" size="small">
-          Update Weights
+          Set All Weights to 0
         </Button>
+        {canvases}
       </div>
     );
   }
 }
 
-export default AnalyzeLayers;
+export default AnalyzeNeuron;
