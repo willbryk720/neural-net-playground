@@ -12,7 +12,15 @@ import {
   getOutputColors
 } from "../utils/scene";
 
-import { NEURON_WIDTH, KEY_A, KEY_D, KEY_W, KEY_S } from "../utils/constants";
+import {
+  NEURON_WIDTH,
+  KEY_A,
+  KEY_D,
+  KEY_W,
+  KEY_S,
+  SELECTED_NEURON_COLOR,
+  SELECTED_SQUARE_COLOR
+} from "../utils/constants";
 
 import { reshapeArrayTo3D } from "../utils/reshaping";
 
@@ -53,7 +61,8 @@ class NetworkScene extends Component {
     this.hoverIntersectObject = null;
     this.clickIntersectObject = null;
 
-    // For selecting layer
+    // For selecting neuron or square
+    this.selectedNeuron = null;
     this.selectedSquare = null;
 
     this.raycaster = new THREE.Raycaster();
@@ -473,18 +482,14 @@ class NetworkScene extends Component {
         .filter(o => o.object.type === "Mesh");
       if (intersects.length > 0) {
         const clickedObj = intersects[0].object;
-
-        if (clickedObj.isSquareSelect) {
-          this.selectedSquare = clickedObj;
-        } else {
-          this.selectedSquare = null;
+        if (clickedObj.isNeuron) {
           this.onClickNode(clickedObj);
         }
 
         // dont want this to trigger for a Line
         // intersectObject.material.color.set(0x00ffff);
         // TODO use this.clickIntersectObject
-        // intersectObject.formerColorHex = 0x0000ff;
+        // intersectObject.formerColorHex = 0xffff00;
       }
     }
   };
@@ -537,7 +542,30 @@ class NetworkScene extends Component {
         .filter(o => o.object.type === "Mesh");
       if (intersects.length > 0) {
         const clickedObj = intersects[0].object;
-        if (clickedObj.isNeuron) this.onDblClickNode(clickedObj);
+
+        // remove color from previously selected objects
+        if (this.selectedSquare) {
+          this.selectedSquare.material.color.set(0x000000);
+          this.selectedSquare.formerColorHex = 0x000000;
+        }
+        this.selectedSquare = null;
+        if (clickedObj.isNeuron) {
+          if (this.selectedNeuron) {
+            this.selectedNeuron.material.color.set(0x000000);
+            this.selectedNeuron.formerColorHex = 0x000000;
+          }
+          this.selectedNeuron = null;
+        }
+        if (clickedObj.isNeuron) {
+          this.selectedNeuron = clickedObj;
+          this.selectedNeuron.formerColorHex = SELECTED_NEURON_COLOR;
+          this.selectedNeuron.material.color.set(SELECTED_NEURON_COLOR);
+          this.onDblClickNode(clickedObj);
+        } else if (clickedObj.isSquareSelect) {
+          this.selectedSquare = clickedObj;
+          this.selectedSquare.formerColorHex = SELECTED_SQUARE_COLOR;
+          this.selectedSquare.material.color.set(SELECTED_SQUARE_COLOR);
+        }
       }
     }
   };

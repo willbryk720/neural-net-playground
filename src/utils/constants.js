@@ -8,3 +8,6 @@ export const KEY_A = 65;
 export const KEY_D = 68;
 export const KEY_W = 87;
 export const KEY_S = 83;
+
+export const SELECTED_NEURON_COLOR = 0xffff00;
+export const SELECTED_SQUARE_COLOR = 0xffff00;
