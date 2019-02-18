@@ -110,11 +110,11 @@ class NetworkScene extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    console.log("Rendered Scene Again");
     // if (nextProps.layers !== this.props.numLayers) {
     //   //Perform some operation here
 
     if (!isObjectsEquivalent(this.props, nextProps)) {
+      console.log("Rendered Whole Scene Again");
       // Clear all objects (check that this doesnt have memory leaks TODO)
       this.scene.remove.apply(this.scene, this.scene.children);
       this.updateNetworkSetup(nextProps);

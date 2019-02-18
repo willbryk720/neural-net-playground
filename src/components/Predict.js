@@ -17,6 +17,12 @@ class Predict extends Component {
     this.myRef = React.createRef();
   }
 
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.countForRendering !== this.props.countForRendering) {
+      this.makeDrawingPrediction();
+    }
+  }
+
   clearDrawing = () => {
     this.myRef.current.clear();
   };

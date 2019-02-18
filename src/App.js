@@ -38,7 +38,8 @@ class App extends Component {
       datasetName: null,
       starterNetworkName: null,
       isFullScreenMode: false,
-      analyzeInfo: {}
+      analyzeInfo: {},
+      countForRendering: 0
     };
     this.dataRef = React.createRef();
   }
@@ -50,6 +51,10 @@ class App extends Component {
       trainedModel: {},
       starterNetworkName
     });
+  };
+
+  alertChangedWeights = () => {
+    this.setState({ countForRendering: this.state.countForRendering + 1 });
   };
 
   onChangeNumEpochs = newNumEpochs => {
@@ -138,6 +143,7 @@ class App extends Component {
             <AnalyzeNeuron
               analyzeInfo={this.state.analyzeInfo}
               trainedModel={this.state.trainedModel}
+              alertChangedWeights={this.alertChangedWeights}
             />
           </div>
         </div>
@@ -209,6 +215,7 @@ class App extends Component {
               trainedModel={this.state.trainedModel}
               getRandomTestImage={this.getRandomTestImage}
               datasetName={this.state.datasetName}
+              countForRendering={this.state.countForRendering}
             />
           </div>
         </div>
@@ -229,6 +236,7 @@ class App extends Component {
           <AnalyzeNeuron
             analyzeInfo={this.state.analyzeInfo}
             trainedModel={this.state.trainedModel}
+            alertChangedWeights={this.alertChangedWeights}
           />
 
           {/* <Info

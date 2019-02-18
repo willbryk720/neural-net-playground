@@ -57,6 +57,7 @@ class AnalyzeNeuron extends Component {
         const newTensor = reshapeArrayTo4DTensor(weightsData);
         inLayer.setWeights([newTensor, biasesTensor]);
       });
+      this.props.alertChangedWeights();
     } else if (weightsTensor.shape.length === 2) {
       weightsData = reshape2DTensorToArray(weightsTensor.dataSync(), ...weightsTensor.shape);
       weightsData.forEach((_, g) => {
@@ -71,6 +72,7 @@ class AnalyzeNeuron extends Component {
       const newWeightsTensor = reshapeArrayTo2DTensor(weightsData);
       const newBiasesTensor = tf.tensor(newBiasesData);
       inLayer.setWeights([newWeightsTensor, newBiasesTensor]);
+      this.props.alertChangedWeights();
     }
   };
 
