@@ -16,7 +16,7 @@ class LoadData extends Component {
     let data = new MnistData();
     await data.load();
     this.setState({ data });
-    this.props.onLoadedDataset("MNIST");
+    this.props.onLoadedDataset({ name: "MNIST", inputLength: 28 });
     return data;
   }
 
@@ -50,9 +50,9 @@ class LoadData extends Component {
         >
           Load Data
         </Button>
-        {this.props.datasetName && (
+        {this.props.datasetInfo.name && (
           <span>
-            <b>{this.props.datasetName}</b>
+            <b>{this.props.datasetInfo.name}</b>
             <Icon name="check" color="green" />
           </span>
         )}

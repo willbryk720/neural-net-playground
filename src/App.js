@@ -35,7 +35,7 @@ class App extends Component {
       drawing: [],
       trainedModel: {},
       isCurrentlyTraining: false,
-      datasetName: null,
+      datasetInfo: {},
       starterNetworkName: null,
       isFullScreenMode: false,
       analyzeInfo: {},
@@ -97,8 +97,8 @@ class App extends Component {
     return this.dataRef.current.getTestData();
   };
 
-  onLoadedDataset = datasetName => {
-    this.setState({ datasetName });
+  onLoadedDataset = datasetInfo => {
+    this.setState({ datasetInfo });
   };
 
   onDblClickNeuron = analyzeInfo => {
@@ -177,7 +177,7 @@ class App extends Component {
             <LoadData
               ref={this.dataRef}
               onLoadedDataset={this.onLoadedDataset}
-              datasetName={this.state.datasetName}
+              datasetInfo={this.state.datasetInfo}
             />
             <h1>2. Create Layers</h1>
             {/* <Left updateLayers={this.updateLayers} layers={this.state.layers} /> */}
@@ -204,7 +204,7 @@ class App extends Component {
               onFinishedTrainingModel={this.onFinishedTrainingModel}
               onStartTrainingModel={this.onStartTrainingModel}
               drawing={this.state.drawing}
-              datasetName={this.state.datasetName}
+              datasetInfo={this.state.datasetInfo}
               getTrainData={this.getTrainData}
               getTestData={this.getTestData}
             />
@@ -214,7 +214,7 @@ class App extends Component {
               onMakePrediction={this.onMakePrediction}
               trainedModel={this.state.trainedModel}
               getRandomTestImage={this.getRandomTestImage}
-              datasetName={this.state.datasetName}
+              datasetInfo={this.state.datasetInfo}
               countForRendering={this.state.countForRendering}
             />
           </div>
@@ -240,7 +240,7 @@ class App extends Component {
           />
 
           {/* <Info
-            datasetName={this.state.datasetName}
+            datasetInfo={this.state.datasetInfo}
             starterNetworkName={this.state.starterNetworkName}
             trainedModel={this.state.trainedModel}
           /> */}

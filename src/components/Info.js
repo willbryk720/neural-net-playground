@@ -9,12 +9,12 @@ class Info extends Component {
   }
 
   render() {
-    const { datasetName, starterNetworkName, trainedModel } = this.props;
+    const { datasetInfo, starterNetworkName, trainedModel } = this.props;
     return (
       <div>
         <h3>Info</h3>
         <ul>
-          <li>datasetName: {datasetName}</li>
+          <li>datasetInfo: {datasetInfo}</li>
           <li>starterNetworkName: {starterNetworkName}</li>
           <li>preTrainedModelName: {trainedModel.preTrainedModelName}</li>
         </ul>

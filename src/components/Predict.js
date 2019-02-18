@@ -28,30 +28,45 @@ class Predict extends Component {
   };
 
   makeDrawingPrediction = async () => {
+    const { datasetInfo } = this.props;
     // const drawing = this.getDrawing();
     const drawing = this.myRef.current.state.points;
-    const imageTensor = tf.tensor(drawing).reshape([1, 28, 28, 1]);
+    const imageTensor = tf
+      .tensor(drawing)
+      .reshape([1, datasetInfo.inputLength, datasetInfo.inputLength, 1]);
     const layerOutputs = await getLayerOutputs(imageTensor, this.props.trainedModel);
     this.props.onMakePrediction(layerOutputs, drawing);
   };
 
   makeTestImagePrediction = async () => {
+    const { datasetInfo } = this.props;
     const { xs, labels } = this.props.getRandomTestImage();
     const imageTensor = xs;
     const imageVector = await imageTensor.dataSync();
-    const image = reshape2DTensorToArray(imageVector, 28, 28);
+    const image = reshape2DTensorToArray(
+      imageVector,
+      datasetInfo.inputLength,
+      datasetInfo.inputLength
+    );
     const layerOutputs = await getLayerOutputs(imageTensor, this.props.trainedModel);
     this.props.onMakePrediction(layerOutputs, image);
   };
 
   render() {
-    const { trainedModel, datasetName } = this.props;
+    const { trainedModel, datasetInfo } = this.props;
+
+    const shouldShow = Object.keys(trainedModel).length !== 0 && datasetInfo.name;
+    if (!shouldShow) {
+      return <div />;
+    }
+
     return (
       <div>
         <CanvasComponent
           ref={this.myRef}
           canvasWidth={CANVAS_WIDTH}
           canvasHeight={CANVAS_HEIGHT}
+          datasetInfo={this.props.datasetInfo}
           drawing={this.props.drawing}
         />
         <Button size="mini" onClick={this.clearDrawing}>
@@ -61,7 +76,7 @@ class Predict extends Component {
           size="mini"
           color="blue"
           onClick={this.makeDrawingPrediction}
-          disabled={Object.keys(trainedModel).length === 0 || !datasetName}
+          disabled={Object.keys(trainedModel).length === 0 || !datasetInfo.name} // this might be unecessary
         >
           Predict Drawing
         </Button>
@@ -69,7 +84,7 @@ class Predict extends Component {
           size="mini"
           color="blue"
           onClick={this.makeTestImagePrediction}
-          disabled={Object.keys(trainedModel).length === 0 || !datasetName}
+          disabled={Object.keys(trainedModel).length === 0 || !datasetInfo.name} // this might be unecessary
         >
           Predict Test Image
         </Button>

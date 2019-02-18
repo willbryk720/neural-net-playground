@@ -3,24 +3,23 @@ import { Button } from "semantic-ui-react";
 
 import { getColorStyle } from "../utils/analyze";
 
-const NUM_SQUARES_PER_ROW = 28;
-const NUM_SQUARES_PER_COL = 28;
 const BORDER_WIDTH = 2;
-
-function getStartDrawing() {
-  return Array(NUM_SQUARES_PER_ROW)
-    .fill()
-    .map(() => Array(NUM_SQUARES_PER_ROW).fill(0));
-}
 
 class CanvasComponent extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      points: this.props.drawing.length > 0 ? this.props.drawing : getStartDrawing(),
+      points: this.props.drawing.length > 0 ? this.props.drawing : this.getStartDrawing(),
       lineWidth: 1
     };
   }
+
+  getStartDrawing = () => {
+    const inputLength = this.props.datasetInfo.inputLength;
+    return Array(inputLength)
+      .fill()
+      .map(() => Array(inputLength).fill(0));
+  };
 
   componentWillReceiveProps(nextProps) {
     console.log("Rendered Predict CanvasComponent");
@@ -36,7 +35,7 @@ class CanvasComponent extends React.Component {
 
     const { points } = this.state;
     const ctx = this.refs.canvas.getContext("2d");
-    const squareWidth = this.props.canvasWidth / NUM_SQUARES_PER_ROW;
+    const squareWidth = this.props.canvasWidth / this.props.datasetInfo.inputLength;
     points.forEach((row, r) => {
       row.forEach((col, c) => {
         const colorStyle = getColorStyle(points[r][c] * 0xffffff);
@@ -49,7 +48,7 @@ class CanvasComponent extends React.Component {
 
   updateCanvas(point) {
     const ctx = this.refs.canvas.getContext("2d");
-    const squareWidth = this.props.canvasWidth / NUM_SQUARES_PER_ROW;
+    const squareWidth = this.props.canvasWidth / this.props.datasetInfo.inputLength;
     ctx.fillRect(point[0] * squareWidth, point[1] * squareWidth, squareWidth, squareWidth);
   }
 
@@ -62,19 +61,20 @@ class CanvasComponent extends React.Component {
 
     this.setState({
       pen: "up",
-      points: getStartDrawing()
+      points: this.getStartDrawing()
     });
   };
 
   drawing(e) {
     if (this.state.pen === "down") {
+      const inputLength = this.props.datasetInfo.inputLength;
       let x = e.nativeEvent.offsetX;
       let y = e.nativeEvent.offsetY;
       if (x === this.props.canvasWidth) x -= 1;
       if (y === this.props.canvasHeight) y -= 1;
 
       const { lineWidth, points } = this.state;
-      const squareWidth = this.props.canvasWidth / NUM_SQUARES_PER_ROW;
+      const squareWidth = this.props.canvasWidth / inputLength;
 
       let copyPoints = points.slice();
       for (let i = -lineWidth; i <= lineWidth; i++) {
@@ -83,14 +83,14 @@ class CanvasComponent extends React.Component {
           const newY = y + (j * squareWidth) / 3;
 
           let point = [
-            Math.floor((NUM_SQUARES_PER_COL * newX) / this.props.canvasWidth),
-            Math.floor((NUM_SQUARES_PER_ROW * newY) / this.props.canvasHeight)
+            Math.floor((inputLength * newX) / this.props.canvasWidth),
+            Math.floor((inputLength * newY) / this.props.canvasHeight)
           ];
 
           const c = point[0];
           const r = point[1];
 
-          if (c >= 0 && c < NUM_SQUARES_PER_ROW && r >= 0 && r < NUM_SQUARES_PER_ROW) {
+          if (c >= 0 && c < inputLength && r >= 0 && r < inputLength) {
             copyPoints[r][c] = 1;
             this.updateCanvas([c, r]);
           }

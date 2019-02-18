@@ -47,10 +47,7 @@ class TfStuff extends Component {
     accuracyValues[0].push({ x: batch, y: accuracy });
 
     this.setState({
-      trainingAccuracyValues: [
-        ...this.state.trainingAccuracyValues,
-        { x: batch, y: accuracy }
-      ]
+      trainingAccuracyValues: [...this.state.trainingAccuracyValues, { x: batch, y: accuracy }]
     });
   }
 
@@ -75,8 +72,7 @@ class TfStuff extends Component {
     const testData = this.props.getTestData();
 
     const totalNumBatches =
-      Math.ceil((trainData.xs.shape[0] * (1 - validationSplit)) / batchSize) *
-      trainEpochs;
+      Math.ceil((trainData.xs.shape[0] * (1 - validationSplit)) / batchSize) * trainEpochs;
 
     let valAcc;
     await model.fit(trainData.xs, trainData.labels, {
@@ -216,7 +212,7 @@ class TfStuff extends Component {
         <Button
           disabled={
             this.state.currentlyTraining ||
-            !this.props.datasetName ||
+            !this.props.datasetInfo.name ||
             this.props.layers.length === 0
           }
           loading={this.state.currentlyTraining}
