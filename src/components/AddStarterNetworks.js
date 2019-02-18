@@ -79,6 +79,7 @@ let networks = [
         layerType: "conv2d",
         options: { kernelSize: 3, filters: 12, activation: "relu" }
       },
+      { layerType: "maxPooling2d", options: { poolSize: 2, strides: 2 } },
       { layerType: "flatten", options: {} },
       { layerType: "dense", options: { units: 2, activation: "softmax" } }
     ]
