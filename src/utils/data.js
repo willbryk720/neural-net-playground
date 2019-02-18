@@ -161,6 +161,8 @@ export class FacesOrNotData {
     this.IMAGE_H = 48;
     this.IMAGE_W = 48;
     this.IMAGE_SIZE = 48 * 48;
+
+    this.imageIndex = 0;
     this.datasetImages = facesOrNotData;
     this.testImages = this.datasetImages;
     console.log(this.datasetImages.length);
@@ -238,11 +240,17 @@ export class FacesOrNotData {
     let labels = null;
 
     const totalNumberExamples = this.testImages.length / this.IMAGE_SIZE;
-    const randIndex = Math.floor(Math.random() * totalNumberExamples);
+    // const randIndex = Math.floor(Math.random() * totalNumberExamples);
 
-    xs = xs.slice([randIndex, 0, 0, 0], [1, this.IMAGE_H, this.IMAGE_W, 1]);
+    xs = xs.slice([this.imageIndex, 0, 0, 0], [1, this.IMAGE_H, this.IMAGE_W, 1]);
     // labels = labels.slice([randIndex, 0], [1, NUM_CLASSES]);
     labels = null;
+
+    if (this.imageIndex === totalNumberExamples - 1) {
+      this.imageIndex = 0;
+    } else {
+      this.imageIndex += 1;
+    }
 
     return { xs, labels };
   }

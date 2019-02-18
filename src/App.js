@@ -126,6 +126,7 @@ class App extends Component {
               onBeginUpdateNetwork={this.onBeginUpdateNetwork}
               onEndUpdateNetwork={this.onEndUpdateNetwork}
               onDblClickNeuron={this.onDblClickNeuron}
+              datasetInfo={this.state.datasetInfo}
             />
           </div>
           <div
@@ -232,6 +233,7 @@ class App extends Component {
             onBeginUpdateNetwork={this.onBeginUpdateNetwork}
             onEndUpdateNetwork={this.onEndUpdateNetwork}
             onDblClickNeuron={this.onDblClickNeuron}
+            datasetInfo={this.state.datasetInfo}
           />
           <Button onClick={() => this.setState({ isFullScreenMode: true })}>FullScreen</Button>
           <AnalyzeNeuron

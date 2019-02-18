@@ -131,7 +131,7 @@ class NetworkScene extends Component {
   async updateNetworkSetup(nextProps) {
     // this.props.onBeginUpdateNetwork();
 
-    const { layers, drawing, layerOutputs, trainedModel } = nextProps;
+    const { layers, drawing, layerOutputs, trainedModel, datasetInfo } = nextProps;
 
     const layersMetadata = getLayersMetadataFromLayers(layers);
     this.layersMetadata = layersMetadata;
@@ -144,7 +144,9 @@ class NetworkScene extends Component {
     //   layersMetadata
     // );
 
-    this.allNeuronPositions = getAllNeuronPositions(layersMetadata);
+    const layerVerticalSpacing = datasetInfo.inputLength / 2;
+
+    this.allNeuronPositions = getAllNeuronPositions(layersMetadata, layerVerticalSpacing);
     this.allNeuronEdgesData = getAllNeuronEdgesData(trainedModel);
 
     this.drawAllNeuronPositions(this.allNeuronPositions, layerOutputs, layersMetadata, drawing);

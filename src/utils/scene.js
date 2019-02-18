@@ -1,5 +1,5 @@
 import {
-  LAYER_VERTICAL_SPACING,
+  // LAYER_VERTICAL_SPACING,
   DENSE_NEURON_SPACING,
   SQUARE_NEURON_SPACING,
   CONV_FILTERS_SPACING,
@@ -189,7 +189,7 @@ export const getLayersMetadataFromLayers = newLayers => {
   return layersMetadata;
 };
 
-export const getAllNeuronPositions = layersMetadata => {
+export const getAllNeuronPositions = (layersMetadata, layerVerticalSpacing) => {
   let allNeuronPositions = [];
 
   let layerHeight = 0;
@@ -257,7 +257,7 @@ export const getAllNeuronPositions = layersMetadata => {
       neuronPositions,
       squareCenters: previousSquareCenters
     });
-    layerHeight += LAYER_VERTICAL_SPACING;
+    layerHeight += layerVerticalSpacing;
   });
 
   return allNeuronPositions;
