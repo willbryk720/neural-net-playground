@@ -1,19 +1,4 @@
-/**
- * @license
- * Copyright 2018 Google LLC. All Rights Reserved.
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- * =============================================================================
- */
+import { facesOrNotData } from "./FacesOrNotData";
 
 import * as tf from "@tensorflow/tfjs";
 import { range } from "@tensorflow/tfjs";
@@ -50,9 +35,7 @@ export class MnistData {
         img.width = img.naturalWidth;
         img.height = img.naturalHeight;
 
-        const datasetBytesBuffer = new ArrayBuffer(
-          NUM_DATASET_ELEMENTS * IMAGE_SIZE * 4
-        );
+        const datasetBytesBuffer = new ArrayBuffer(NUM_DATASET_ELEMENTS * IMAGE_SIZE * 4);
 
         const chunkSize = 5000;
         canvas.width = img.width;
@@ -64,17 +47,7 @@ export class MnistData {
             i * IMAGE_SIZE * chunkSize * 4,
             IMAGE_SIZE * chunkSize
           );
-          ctx.drawImage(
-            img,
-            0,
-            i * chunkSize,
-            img.width,
-            chunkSize,
-            0,
-            0,
-            img.width,
-            chunkSize
-          );
+          ctx.drawImage(img, 0, i * chunkSize, img.width, chunkSize, 0, 0, img.width, chunkSize);
 
           const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
 
@@ -92,26 +65,15 @@ export class MnistData {
     });
 
     const labelsRequest = fetch(MNIST_LABELS_PATH);
-    const [imgResponse, labelsResponse] = await Promise.all([
-      imgRequest,
-      labelsRequest
-    ]);
+    const [imgResponse, labelsResponse] = await Promise.all([imgRequest, labelsRequest]);
 
     this.datasetLabels = new Uint8Array(await labelsResponse.arrayBuffer());
 
     // Slice the the images and labels into train and test sets.
-    this.trainImages = this.datasetImages.slice(
-      0,
-      IMAGE_SIZE * NUM_TRAIN_ELEMENTS
-    );
+    this.trainImages = this.datasetImages.slice(0, IMAGE_SIZE * NUM_TRAIN_ELEMENTS);
     this.testImages = this.datasetImages.slice(IMAGE_SIZE * NUM_TRAIN_ELEMENTS);
-    this.trainLabels = this.datasetLabels.slice(
-      0,
-      NUM_CLASSES * NUM_TRAIN_ELEMENTS
-    );
-    this.testLabels = this.datasetLabels.slice(
-      NUM_CLASSES * NUM_TRAIN_ELEMENTS
-    );
+    this.trainLabels = this.datasetLabels.slice(0, NUM_CLASSES * NUM_TRAIN_ELEMENTS);
+    this.testLabels = this.datasetLabels.slice(NUM_CLASSES * NUM_TRAIN_ELEMENTS);
   }
 
   /**
@@ -155,10 +117,7 @@ export class MnistData {
       IMAGE_W,
       1
     ]);
-    let labels = tf.tensor2d(this.testLabels, [
-      this.testLabels.length / NUM_CLASSES,
-      NUM_CLASSES
-    ]);
+    let labels = tf.tensor2d(this.testLabels, [this.testLabels.length / NUM_CLASSES, NUM_CLASSES]);
 
     if (numExamples != null) {
       xs = xs.slice([0, 0, 0, 0], [numExamples, IMAGE_H, IMAGE_W, 1]);
@@ -174,16 +133,116 @@ export class MnistData {
       IMAGE_W,
       1
     ]);
-    let labels = tf.tensor2d(this.testLabels, [
-      this.testLabels.length / NUM_CLASSES,
-      NUM_CLASSES
-    ]);
+    let labels = tf.tensor2d(this.testLabels, [this.testLabels.length / NUM_CLASSES, NUM_CLASSES]);
 
     const totalNumberExamples = this.testImages.length / IMAGE_SIZE;
     const randIndex = Math.floor(Math.random() * totalNumberExamples);
 
     xs = xs.slice([randIndex, 0, 0, 0], [1, IMAGE_H, IMAGE_W, 1]);
     labels = labels.slice([randIndex, 0], [1, NUM_CLASSES]);
+
+    return { xs, labels };
+  }
+}
+
+/**
+ * A class that fetches FacesOrNot dataset
+ */
+export class FacesOrNotData {
+  constructor() {}
+
+  async load() {
+    // // Slice the the images and labels into train and test sets.
+
+    // this.trainImages = this.datasetImages.slice(
+    //   0,
+    //   IMAGE_SIZE * NUM_TRAIN_ELEMENTS
+    // );
+    this.IMAGE_H = 48;
+    this.IMAGE_W = 48;
+    this.IMAGE_SIZE = 48 * 48;
+    this.datasetImages = facesOrNotData;
+    this.testImages = this.datasetImages;
+    console.log(this.datasetImages.length);
+    // this.trainLabels = this.datasetLabels.slice(
+    //   0,
+    //   NUM_CLASSES * NUM_TRAIN_ELEMENTS
+    // );
+    // this.testLabels = this.datasetLabels.slice(
+    //   NUM_CLASSES * NUM_TRAIN_ELEMENTS
+    // );
+  }
+
+  /**
+   * Get all training data as a data tensor and a labels tensor.
+   *
+   * @returns
+   *   xs: The data tensor, of shape `[numTrainExamples, 28, 28, 1]`.
+   *   labels: The one-hot encoded labels tensor, of shape
+   *     `[numTrainExamples, 10]`.
+   */
+  // getTrainData() {
+  //   const xs = tf.tensor4d(this.trainImages, [
+  //     this.trainImages.length / IMAGE_SIZE,
+  //     IMAGE_H,
+  //     IMAGE_W,
+  //     1
+  //   ]);
+  //   const labels = tf.tensor2d(this.trainLabels, [
+  //     this.trainLabels.length / NUM_CLASSES,
+  //     NUM_CLASSES
+  //   ]);
+
+  //   return { xs, labels };
+  // }
+
+  /**
+   * Get all test data as a data tensor a a labels tensor.
+   *
+   * @param {number} numExamples Optional number of examples to get. If not
+   *     provided,
+   *   all test examples will be returned.
+   * @returns
+   *   xs: The data tensor, of shape `[numTestExamples, 28, 28, 1]`.
+   *   labels: The one-hot encoded labels tensor, of shape
+   *     `[numTestExamples, 10]`.
+   */
+  // getTestData(numExamples) {
+  //   let xs = tf.tensor4d(this.testImages, [
+  //     this.testImages.length / IMAGE_SIZE,
+  //     IMAGE_H,
+  //     IMAGE_W,
+  //     1
+  //   ]);
+  //   let labels = tf.tensor2d(this.testLabels, [
+  //     this.testLabels.length / NUM_CLASSES,
+  //     NUM_CLASSES
+  //   ]);
+
+  //   if (numExamples != null) {
+  //     xs = xs.slice([0, 0, 0, 0], [numExamples, IMAGE_H, IMAGE_W, 1]);
+  //     labels = labels.slice([0, 0], [numExamples, NUM_CLASSES]);
+  //   }
+  //   return { xs, labels };
+  // }
+
+  getTestImage() {
+    let xs = tf.tensor4d(this.testImages, [
+      this.testImages.length / this.IMAGE_SIZE,
+      this.IMAGE_H,
+      this.IMAGE_W,
+      1
+    ]);
+    console.log(xs.shape);
+    // let labels = tf.tensor2d(this.testLabels, [this.testLabels.length / NUM_CLASSES, NUM_CLASSES]);
+    let labels = null;
+
+    const totalNumberExamples = this.testImages.length / this.IMAGE_SIZE;
+    const randIndex = Math.floor(Math.random() * totalNumberExamples);
+
+    xs = xs.slice([randIndex, 0, 0, 0], [1, this.IMAGE_H, this.IMAGE_W, 1]);
+    // labels = labels.slice([randIndex, 0], [1, NUM_CLASSES]);
+    labels = null;
 
     return { xs, labels };
   }

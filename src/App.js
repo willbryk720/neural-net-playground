@@ -21,7 +21,8 @@ const preTrainedModelOptions = [
   { name: "Dense-1epoch" },
   { name: "Dense-3epochs" },
   { name: "Conv-1epoch" },
-  { name: "Conv-3epochs" }
+  { name: "Conv-3epochs" },
+  { name: "FacesOrNot-1epoch" }
   // { name: "Conv-testweights" }
 ];
 

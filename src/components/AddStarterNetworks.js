@@ -61,6 +61,27 @@ let networks = [
       { layerType: "dense", options: { units: 64, activation: "relu" } },
       { layerType: "dense", options: { units: 10, activation: "softmax" } }
     ]
+  },
+  {
+    name: "FacesOrNot",
+    layers: [
+      {
+        layerType: "conv2d",
+        options: {
+          inputShape: [48, 48, 1],
+          kernelSize: 3,
+          filters: 8,
+          activation: "relu"
+        }
+      },
+      { layerType: "maxPooling2d", options: { poolSize: 2, strides: 2 } },
+      {
+        layerType: "conv2d",
+        options: { kernelSize: 3, filters: 12, activation: "relu" }
+      },
+      { layerType: "flatten", options: {} },
+      { layerType: "dense", options: { units: 2, activation: "softmax" } }
+    ]
   }
   // {
   //   name: "Conv",

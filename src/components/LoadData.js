@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 
-import { MnistData } from "../utils/data";
+import { MnistData, FacesOrNotData } from "../utils/data";
 import { Button, Icon } from "semantic-ui-react";
 
 class LoadData extends Component {
@@ -10,14 +10,6 @@ class LoadData extends Component {
       currentlyGettingData: false,
       data: {}
     };
-  }
-
-  async load() {
-    let data = new MnistData();
-    await data.load();
-    this.setState({ data });
-    this.props.onLoadedDataset({ name: "MNIST", inputLength: 28 });
-    return data;
   }
 
   getRandomTestImage = () => {
@@ -31,9 +23,19 @@ class LoadData extends Component {
     return this.state.data.getTestData();
   };
 
-  async getData() {
-    const data = await this.load();
-    this.setState({ currentlyGettingData: false });
+  async getData(datasetName) {
+    if (datasetName === "MNIST") {
+      let data = new MnistData();
+      await data.load();
+      this.setState({ data, currentlyGettingData: false });
+      this.props.onLoadedDataset({ name: "MNIST", inputLength: 28 });
+    } else if (datasetName === "FacesOrNot") {
+      let data = new FacesOrNotData();
+      await data.load();
+      console.log("FACEDATA", data.getTestImage());
+      this.setState({ data, currentlyGettingData: false });
+      this.props.onLoadedDataset({ name: "FacesOrNot", inputLength: 48 });
+    }
   }
 
   render() {
@@ -45,10 +47,21 @@ class LoadData extends Component {
           color="blue"
           onClick={() => {
             this.setState({ currentlyGettingData: true });
-            this.getData();
+            this.getData("MNIST");
           }}
         >
-          Load Data
+          Load MNIST Data
+        </Button>
+        <Button
+          disabled={this.state.currentlyGettingData}
+          loading={this.state.currentlyGettingData}
+          color="blue"
+          onClick={() => {
+            this.setState({ currentlyGettingData: true });
+            this.getData("FacesOrNot");
+          }}
+        >
+          Load FacesOrNot Data
         </Button>
         {this.props.datasetInfo.name && (
           <span>
