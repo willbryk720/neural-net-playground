@@ -6,7 +6,9 @@ import TfStuff from "./components/TfStuff";
 import Predict from "./components/Predict";
 
 import AddPreTrainedModel from "./components/AddPreTrainedModel";
+
 import LoadData from "./components/LoadData";
+import StoreData from "./components/StoreData";
 
 import ShowLoading from "./components/ShowLoading";
 import Info from "./components/Info";
@@ -37,6 +39,7 @@ class App extends Component {
       trainedModel: {},
       isCurrentlyTraining: false,
       datasetInfo: {},
+      requestedDatasetLoading: null,
       starterNetworkName: null,
       isFullScreenMode: false,
       analyzeInfo: {},
@@ -100,7 +103,11 @@ class App extends Component {
   };
 
   onLoadedDataset = datasetInfo => {
-    this.setState({ datasetInfo });
+    this.setState({ datasetInfo, requestedDatasetLoading: null });
+  };
+
+  onClickedLoadDataset = datasetName => {
+    this.setState({ requestedDatasetLoading: datasetName });
   };
 
   onDblClickNeuron = analyzeInfo => {
@@ -113,8 +120,18 @@ class App extends Component {
   // onEndUpdateNetwork = () => this.setState({ networkLoading: false });
 
   render() {
+    const storeDataComponent = (
+      <StoreData
+        ref={this.dataRef}
+        onLoadedDataset={this.onLoadedDataset}
+        requestedDatasetLoading={this.state.requestedDatasetLoading}
+      />
+    );
+
+    let wholeApp;
+
     if (this.state.isFullScreenMode) {
-      return (
+      wholeApp = (
         <div>
           <div style={{ width: "70%", display: "inline-block" }}>
             <NetworkScene
@@ -150,108 +167,115 @@ class App extends Component {
           </div>
         </div>
       );
-    }
-    return (
-      <div
-        className="App"
-        style={{
-          height: "100%"
-        }}
-      >
+    } else {
+      wholeApp = (
         <div
+          className="App"
           style={{
-            display: "inline-block",
-            width: "50%",
-            verticalAlign: "top",
-            height: "100%",
-            overflowY: "auto"
+            height: "100%"
           }}
         >
           <div
             style={{
-              marginLeft: "2%",
-              marginRight: "2%",
-              height: "100%"
+              display: "inline-block",
+              width: "50%",
+              verticalAlign: "top",
+              height: "100%",
+              overflowY: "auto"
             }}
           >
-            <ShowLoading isCurrentlyTraining={this.state.isCurrentlyTraining} />
-            <h1>1. Load Data</h1>
-            <LoadData
-              ref={this.dataRef}
-              onLoadedDataset={this.onLoadedDataset}
-              datasetInfo={this.state.datasetInfo}
-            />
-            <h1>2. Create Layers</h1>
-            {/* <Left updateLayers={this.updateLayers} layers={this.state.layers} /> */}
-            <SortableLayers updateLayers={this.updateLayers} layers={this.state.layers} />
+            <div
+              style={{
+                marginLeft: "2%",
+                marginRight: "2%",
+                height: "100%"
+              }}
+            >
+              <ShowLoading isCurrentlyTraining={this.state.isCurrentlyTraining} />
+              <h1>1. Load Data</h1>
+              <LoadData
+                onClickedLoadDataset={this.onClickedLoadDataset}
+                datasetInfo={this.state.datasetInfo}
+                requestedDatasetLoading={this.state.requestedDatasetLoading}
+              />
+              <h1>2. Create Layers</h1>
+              {/* <Left updateLayers={this.updateLayers} layers={this.state.layers} /> */}
+              <SortableLayers updateLayers={this.updateLayers} layers={this.state.layers} />
 
-            <h1>3. Create Weights</h1>
-            <AddPreTrainedModel
-              onLoadPreTrainedModel={this.onLoadPreTrainedModel}
-              starterNetworkName={this.state.starterNetworkName}
-              preTrainedModelOptions={preTrainedModelOptions}
-              preTrainedModelName={this.state.trainedModel.preTrainedModelName}
-            />
-            {preTrainedModelOptions.find(
-              pTM => pTM.name.split("-")[0] === this.state.starterNetworkName
-            ) ? (
-              <h5>Or train model from scratch:</h5>
-            ) : (
-              <h5>Train model from scratch:</h5>
-            )}
-            <TfStuff
-              layers={this.state.layers}
-              numEpochs={this.state.numEpochs}
-              onChangeNumEpochs={this.onChangeNumEpochs}
-              onFinishedTrainingModel={this.onFinishedTrainingModel}
-              onStartTrainingModel={this.onStartTrainingModel}
-              drawing={this.state.drawing}
-              datasetInfo={this.state.datasetInfo}
-              getTrainData={this.getTrainData}
-              getTestData={this.getTestData}
-            />
-            <h1>4. Predict</h1>
-            <Predict
-              drawing={this.state.drawing}
-              onMakePrediction={this.onMakePrediction}
-              trainedModel={this.state.trainedModel}
-              getRandomTestImage={this.getRandomTestImage}
-              datasetInfo={this.state.datasetInfo}
-              countForRendering={this.state.countForRendering}
-            />
+              <h1>3. Create Weights</h1>
+              <AddPreTrainedModel
+                onLoadPreTrainedModel={this.onLoadPreTrainedModel}
+                starterNetworkName={this.state.starterNetworkName}
+                preTrainedModelOptions={preTrainedModelOptions}
+                preTrainedModelName={this.state.trainedModel.preTrainedModelName}
+              />
+              {preTrainedModelOptions.find(
+                pTM => pTM.name.split("-")[0] === this.state.starterNetworkName
+              ) ? (
+                <h5>Or train model from scratch:</h5>
+              ) : (
+                <h5>Train model from scratch:</h5>
+              )}
+              <TfStuff
+                layers={this.state.layers}
+                numEpochs={this.state.numEpochs}
+                onChangeNumEpochs={this.onChangeNumEpochs}
+                onFinishedTrainingModel={this.onFinishedTrainingModel}
+                onStartTrainingModel={this.onStartTrainingModel}
+                drawing={this.state.drawing}
+                datasetInfo={this.state.datasetInfo}
+                getTrainData={this.getTrainData}
+                getTestData={this.getTestData}
+              />
+              <h1>4. Predict</h1>
+              <Predict
+                drawing={this.state.drawing}
+                onMakePrediction={this.onMakePrediction}
+                trainedModel={this.state.trainedModel}
+                getRandomTestImage={this.getRandomTestImage}
+                datasetInfo={this.state.datasetInfo}
+                countForRendering={this.state.countForRendering}
+              />
+            </div>
           </div>
-        </div>
 
-        <div style={{ display: "inline-block", width: "50%", height: "100%" }}>
-          <NetworkScene
-            windowHeightRatio={0.5}
-            windowWidthRatio={0.5}
-            layers={this.state.layers}
-            drawing={this.state.drawing}
-            layerOutputs={this.state.layerOutputs}
-            trainedModel={this.state.trainedModel}
-            onBeginUpdateNetwork={this.onBeginUpdateNetwork}
-            onEndUpdateNetwork={this.onEndUpdateNetwork}
-            onDblClickNeuron={this.onDblClickNeuron}
-            datasetInfo={this.state.datasetInfo}
-          />
-          <Icon
-            name="expand"
-            style={{ cursor: "pointer", float: "left" }}
-            onClick={() => this.setState({ isFullScreenMode: true })}
-          />
-          <AnalyzeNeuron
-            analyzeInfo={this.state.analyzeInfo}
-            trainedModel={this.state.trainedModel}
-            alertChangedWeights={this.alertChangedWeights}
-          />
+          <div style={{ display: "inline-block", width: "50%", height: "100%" }}>
+            <NetworkScene
+              windowHeightRatio={0.5}
+              windowWidthRatio={0.5}
+              layers={this.state.layers}
+              drawing={this.state.drawing}
+              layerOutputs={this.state.layerOutputs}
+              trainedModel={this.state.trainedModel}
+              onBeginUpdateNetwork={this.onBeginUpdateNetwork}
+              onEndUpdateNetwork={this.onEndUpdateNetwork}
+              onDblClickNeuron={this.onDblClickNeuron}
+              datasetInfo={this.state.datasetInfo}
+            />
+            <Icon
+              name="expand"
+              style={{ cursor: "pointer", float: "left" }}
+              onClick={() => this.setState({ isFullScreenMode: true })}
+            />
+            <AnalyzeNeuron
+              analyzeInfo={this.state.analyzeInfo}
+              trainedModel={this.state.trainedModel}
+              alertChangedWeights={this.alertChangedWeights}
+            />
 
-          {/* <Info
+            {/* <Info
             datasetInfo={this.state.datasetInfo}
             starterNetworkName={this.state.starterNetworkName}
             trainedModel={this.state.trainedModel}
           /> */}
+          </div>
         </div>
+      );
+    }
+    return (
+      <div style={{ height: "100%" }}>
+        {storeDataComponent}
+        {wholeApp}
       </div>
     );
   }

@@ -114,8 +114,8 @@ class AnalyzeNeuron extends Component {
         );
       } else if (inLayerMetadata.isSquare) {
         canvases = oneLayerOutputColors.map((colorSquare, i) => (
-          <React.Fragment>
-            <div style={{ display: "inline-block" }} key={"" + i + neuron.id}>
+          <React.Fragment key={"" + i + neuron.id}>
+            <div style={{ display: "inline-block" }}>
               <NeuronAnalyzeCanvas canvasWidth={100} canvasHeight={100} colorSquare={colorSquare} />
               {/* <Button color="green" size="mini">
                 Set weights to 0

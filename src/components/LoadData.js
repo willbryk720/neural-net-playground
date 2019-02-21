@@ -6,66 +6,43 @@ import { Button, Icon } from "semantic-ui-react";
 class LoadData extends Component {
   constructor(props) {
     super(props);
-    this.state = {
-      currentlyGettingData: false,
-      data: {}
-    };
+    this.state = {};
   }
 
-  getRandomTestImage = () => {
-    return this.state.data.getTestImage();
+  componentDidMount = () => {
+    console.log("REMOUNTED LOADDATA");
   };
-
-  getTrainData = () => {
-    return this.state.data.getTrainData();
-  };
-  getTestData = () => {
-    return this.state.data.getTestData();
-  };
-
-  async getData(datasetName) {
-    if (datasetName === "MNIST") {
-      let data = new MnistData();
-      await data.load();
-      this.setState({ data, currentlyGettingData: false });
-      this.props.onLoadedDataset({ name: "MNIST", inputLength: 28 });
-    } else if (datasetName === "FacesOrNot") {
-      let data = new FacesOrNotData();
-      await data.load();
-      console.log("FACEDATA", data.getTestImage());
-      this.setState({ data, currentlyGettingData: false });
-      this.props.onLoadedDataset({ name: "FacesOrNot", inputLength: 48 });
-    }
-  }
 
   render() {
+    const { onClickedLoadDataset, requestedDatasetLoading, datasetInfo } = this.props;
+
+    const isLoadingDataset = requestedDatasetLoading !== null;
+
     return (
       <div>
         <Button
-          disabled={this.state.currentlyGettingData}
-          loading={this.state.currentlyGettingData}
+          disabled={isLoadingDataset}
+          loading={isLoadingDataset}
           color="blue"
           onClick={() => {
-            this.setState({ currentlyGettingData: true });
-            this.getData("MNIST");
+            onClickedLoadDataset("MNIST");
           }}
         >
           Load MNIST Data
         </Button>
         <Button
-          disabled={this.state.currentlyGettingData}
-          loading={this.state.currentlyGettingData}
+          disabled={isLoadingDataset}
+          loading={isLoadingDataset}
           color="blue"
           onClick={() => {
-            this.setState({ currentlyGettingData: true });
-            this.getData("FacesOrNot");
+            onClickedLoadDataset("FacesOrNot");
           }}
         >
           Load FacesOrNot Data
         </Button>
-        {this.props.datasetInfo.name && (
+        {datasetInfo.name && (
           <span>
-            <b>{this.props.datasetInfo.name}</b>
+            <b>{datasetInfo.name}</b>
             <Icon name="check" color="green" />
           </span>
         )}
