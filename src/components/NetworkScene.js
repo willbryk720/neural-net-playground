@@ -19,7 +19,8 @@ import {
   KEY_W,
   KEY_S,
   SELECTED_NEURON_COLOR,
-  SELECTED_SQUARE_COLOR
+  SELECTED_SQUARE_COLOR,
+  LAYER_SPACING_TO_LENGTH_RATIO
 } from "../utils/constants";
 
 import { reshape3DTensorToArray } from "../utils/reshaping";
@@ -135,16 +136,23 @@ class NetworkScene extends Component {
 
     const layersMetadata = getLayersMetadataFromLayers(layers);
     this.layersMetadata = layersMetadata;
-    // console.log(
-    //   "IMPORTANT: drawing, layers, layerOutputs, layerOutputDataSync, layersMetadata ",
-    //   drawing,
-    //   layers,
-    //   layerOutputs,
-    //   layerOutputs.map(lO => lO.dataSync()),
-    //   layersMetadata
-    // );
+    console.log(
+      "IMPORTANT:",
+      "drawing:",
+      drawing,
+      "layers:",
+      layers,
+      "layerOutputs:",
+      layerOutputs,
+      "layerOutputDataSync:",
+      layerOutputs.map(lO => lO.dataSync()),
+      "layersMetadata:",
+      layersMetadata
+    );
 
-    const layerVerticalSpacing = datasetInfo.inputLength / 2;
+    const layerVerticalSpacing = datasetInfo.inputLength
+      ? datasetInfo.inputLength * LAYER_SPACING_TO_LENGTH_RATIO
+      : 28 * LAYER_SPACING_TO_LENGTH_RATIO;
 
     this.allNeuronPositions = getAllNeuronPositions(layersMetadata, layerVerticalSpacing);
     this.allNeuronEdgesData = getAllNeuronEdgesData(trainedModel);
@@ -216,13 +224,17 @@ class NetworkScene extends Component {
     this.allNeuronObjects = allNeuronObjects;
   };
 
-  drawEdges = neuron => {
-    const edgesData = this.allNeuronEdgesData;
-
+  removeEdges = () => {
     // remove previous edges
     this.neuronEdgeObjects.forEach(edge => {
       this.scene.remove(edge);
     });
+  };
+
+  drawEdges = neuron => {
+    const edgesData = this.allNeuronEdgesData;
+
+    this.removeEdges();
 
     const targetNeuronPos = [
       neuron.position.x,
@@ -402,22 +414,37 @@ class NetworkScene extends Component {
     // }
   };
 
-  renderScene = () => {
+  // Returns nearest mesh according to mouse, or null if there is none
+  getNearestMeshIntersect = () => {
     this.raycaster.setFromCamera(this.mouse, this.camera);
     const intersects = this.raycaster
       .intersectObjects(this.scene.children)
       .filter(o => o.object.type === "Mesh");
 
-    if (intersects.length > 0) {
-      if (this.hoverIntersectObject != intersects[0].object) {
+    return intersects.length > 0 ? intersects[0].object : null;
+  };
+
+  updateHoverIntersectObject = () => {
+    const intersectObject = this.getNearestMeshIntersect();
+
+    if (intersectObject) {
+      if (this.hoverIntersectObject != intersectObject) {
         if (this.hoverIntersectObject) {
           // set back to former color
           this.hoverIntersectObject.material.color.set(this.hoverIntersectObject.formerColorHex);
+
+          this.hoverIntersectObject.scale.x = 1;
+          this.hoverIntersectObject.scale.y = 1;
+          this.hoverIntersectObject.scale.z = 1;
         }
 
-        this.hoverIntersectObject = intersects[0].object;
+        this.hoverIntersectObject = intersectObject;
         this.hoverIntersectObject.formerColorHex = this.hoverIntersectObject.material.color.getHex();
         this.hoverIntersectObject.material.color.set(0x00ff00);
+
+        this.hoverIntersectObject.scale.x = 1.5;
+        this.hoverIntersectObject.scale.y = 1.5;
+        this.hoverIntersectObject.scale.z = 1.5;
 
         if (
           this.hoverIntersectObject.isNeuron &&
@@ -430,10 +457,20 @@ class NetworkScene extends Component {
       if (this.hoverIntersectObject) {
         // set back to former color
         this.hoverIntersectObject.material.color.set(this.hoverIntersectObject.formerColorHex);
+
+        this.hoverIntersectObject.scale.x = 1;
+        this.hoverIntersectObject.scale.y = 1;
+        this.hoverIntersectObject.scale.z = 1;
+
+        // remove past edges
+        this.removeEdges();
       }
       this.hoverIntersectObject = null;
     }
+  };
 
+  renderScene = () => {
+    this.updateHoverIntersectObject();
     this.renderer.render(this.scene, this.camera);
   };
 
@@ -486,12 +523,9 @@ class NetworkScene extends Component {
       // update mouse
       this.updateMouse(event, canvasBounds);
 
-      this.raycaster.setFromCamera(this.mouse, this.camera);
-      const intersects = this.raycaster
-        .intersectObjects(this.scene.children)
-        .filter(o => o.object.type === "Mesh");
-      if (intersects.length > 0) {
-        const clickedObj = intersects[0].object;
+      const intersectObject = this.getNearestMeshIntersect();
+      if (intersectObject) {
+        const clickedObj = intersectObject;
         if (clickedObj.isNeuron) {
           this.onClickNode(clickedObj);
         }

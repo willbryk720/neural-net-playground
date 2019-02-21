@@ -52,6 +52,7 @@ class App extends Component {
       trainedModel: {},
       starterNetworkName
     });
+    console.log(this.state);
   };
 
   alertChangedWeights = () => {
