@@ -77,6 +77,7 @@ class AnalyzeNeuron extends Component {
   };
 
   render() {
+    console.log("RERENDERED ANALYZE INFO");
     const { analyzeInfo, trainedModel } = this.props;
 
     if (Object.keys(analyzeInfo).length === 0) {
@@ -86,8 +87,6 @@ class AnalyzeNeuron extends Component {
     const { edges, inLayerOutput, inLayerMetadata, drawing, neuron, hasOutputs } = analyzeInfo;
     const { position, indexInfo, layerType, color, layerIsSquare } = neuron;
     const { layerIndex, group, row, col } = indexInfo;
-
-    console.log("analyzeInfo, trainedModel", analyzeInfo, trainedModel);
 
     let canvases;
     if (layerIndex == 1 && hasOutputs) {
@@ -107,6 +106,8 @@ class AnalyzeNeuron extends Component {
 
       if (layerType === "maxPooling2d") {
         const colorSquare = oneLayerOutputColors[group];
+        console.log("YOO", colorSquare);
+
         canvases = (
           <div key={neuron.id}>
             <NeuronAnalyzeCanvas canvasWidth={100} canvasHeight={100} colorSquare={colorSquare} />

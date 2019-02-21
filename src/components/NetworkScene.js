@@ -7,7 +7,7 @@ import * as OrbitControls from "three-orbitcontrols";
 import {
   getAllNeuronPositions,
   getLayersMetadataFromLayers,
-  isObjectsEquivalent,
+  diffPropBetweenObjects,
   getAllNeuronEdgesData,
   getOutputColors
 } from "../utils/scene";
@@ -114,7 +114,11 @@ class NetworkScene extends Component {
     // if (nextProps.layers !== this.props.numLayers) {
     //   //Perform some operation here
 
-    if (!isObjectsEquivalent(this.props, nextProps)) {
+    const propDiffs = diffPropBetweenObjects(this.props, nextProps);
+
+    if (propDiffs.length === 1 && propDiffs.includes("selectedNeuron")) {
+      // dont do anything
+    } else if (propDiffs.length > 0) {
       console.log("Rendered Whole Scene Again");
       // Clear all objects (check that this doesnt have memory leaks TODO)
       this.scene.remove.apply(this.scene, this.scene.children);
@@ -136,19 +140,19 @@ class NetworkScene extends Component {
 
     const layersMetadata = getLayersMetadataFromLayers(layers);
     this.layersMetadata = layersMetadata;
-    console.log(
-      "IMPORTANT:",
-      "drawing:",
-      drawing,
-      "layers:",
-      layers,
-      "layerOutputs:",
-      layerOutputs,
-      "layerOutputDataSync:",
-      layerOutputs.map(lO => lO.dataSync()),
-      "layersMetadata:",
-      layersMetadata
-    );
+    // console.log(
+    //   "IMPORTANT:",
+    //   "drawing:",
+    //   drawing,
+    //   "layers:",
+    //   layers,
+    //   "layerOutputs:",
+    //   layerOutputs,
+    //   "layerOutputDataSync:",
+    //   layerOutputs.map(lO => lO.dataSync()),
+    //   "layersMetadata:",
+    //   layersMetadata
+    // );
 
     const layerVerticalSpacing = datasetInfo.inputLength
       ? datasetInfo.inputLength * LAYER_SPACING_TO_LENGTH_RATIO
@@ -161,7 +165,20 @@ class NetworkScene extends Component {
 
     this.drawSquareSelects(this.allNeuronPositions);
 
-    // this.props.onEndUpdateNetwork();
+    if (nextProps.selectedNeuron) {
+      const { position, indexInfo, layerType, color, layerIsSquare } = nextProps.selectedNeuron;
+      const { layerIndex, group, row, col } = indexInfo;
+      const newNeuronAtLocation = group
+        ? this.allNeuronObjects[layerIndex][group][row][col]
+        : this.allNeuronObjects[layerIndex][0][0][col];
+
+      if (nextProps.selectedNeuron !== newNeuronAtLocation) {
+        this.selectedNeuron = newNeuronAtLocation;
+        this.selectedNeuron.formerColorHex = 0x000000;
+        this.modifyObject(this.selectedNeuron, SELECTED_NEURON_COLOR, 1.5);
+        this.onDblClickNode(newNeuronAtLocation, nextProps);
+      }
+    }
   }
 
   drawNeuron = (pos, color, layerType, indexInfo, layerIsSquare) => {
@@ -562,8 +579,8 @@ class NetworkScene extends Component {
     }
   };
 
-  onDblClickNode = neuron => {
-    const { layerOutputs, trainedModel } = this.props;
+  onDblClickNode = (neuron, myProps) => {
+    const { layerOutputs, trainedModel } = myProps;
     const { position, indexInfo, layerType } = neuron;
     const layerIndex = indexInfo.layerIndex;
 
@@ -624,7 +641,7 @@ class NetworkScene extends Component {
           this.selectedNeuron = intersectObject;
           this.selectedNeuron.formerColorHex = 0x000000;
           this.selectedNeuron.material.color.set(SELECTED_NEURON_COLOR);
-          this.onDblClickNode(intersectObject);
+          this.onDblClickNode(intersectObject, this.props);
         } else if (intersectObject.isSquareSelect) {
           this.selectedSquare = intersectObject;
           this.selectedSquare.formerColorHex = 0x000000;

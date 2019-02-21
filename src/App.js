@@ -53,6 +53,7 @@ class App extends Component {
       layers: newLayers,
       layerOutputs: [],
       trainedModel: {},
+      analyzeInfo: {},
       starterNetworkName
     });
     console.log(this.state);
@@ -111,6 +112,7 @@ class App extends Component {
   };
 
   onDblClickNeuron = analyzeInfo => {
+    console.log("STATE NEURON", analyzeInfo);
     this.setState({ analyzeInfo });
   };
 
@@ -145,6 +147,7 @@ class App extends Component {
               onEndUpdateNetwork={this.onEndUpdateNetwork}
               onDblClickNeuron={this.onDblClickNeuron}
               datasetInfo={this.state.datasetInfo}
+              selectedNeuron={this.state.analyzeInfo.neuron}
             />
           </div>
           <div
@@ -164,7 +167,6 @@ class App extends Component {
               trainedModel={this.state.trainedModel}
               alertChangedWeights={this.alertChangedWeights}
             />
-
             <div>
               <Predict
                 drawing={this.state.drawing}
@@ -262,6 +264,7 @@ class App extends Component {
               onEndUpdateNetwork={this.onEndUpdateNetwork}
               onDblClickNeuron={this.onDblClickNeuron}
               datasetInfo={this.state.datasetInfo}
+              selectedNeuron={this.state.analyzeInfo.neuron}
             />
             <Icon
               name="expand"
