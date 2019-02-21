@@ -106,7 +106,7 @@
   },
   "weightsManifest": [
     {
-      "paths": ["./FacesOrNot-1epoch-shard"],
+      "paths": ["./FacesOrNot-3epochs-shard"],
       "weights": [
         { "name": "conv2d_1/kernel", "shape": [3, 3, 1, 8], "dtype": "float32" },
         { "name": "conv2d_1/bias", "shape": [8], "dtype": "float32" },

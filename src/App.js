@@ -1,5 +1,4 @@
 import React, { Component } from "react";
-// import "./App.css";
 import NetworkScene from "./components/NetworkScene";
 import SortableLayers from "./components/SortableLayers";
 
@@ -22,7 +21,8 @@ const preTrainedModelOptions = [
   { name: "Dense-3epochs" },
   { name: "Conv-1epoch" },
   { name: "Conv-3epochs" },
-  { name: "FacesOrNot-1epoch" }
+  { name: "FacesOrNot-1epoch" },
+  { name: "FacesOrNot-3epochs" }
   // { name: "Conv-testweights" }
 ];
 
