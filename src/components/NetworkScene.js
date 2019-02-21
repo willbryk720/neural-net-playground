@@ -424,46 +424,64 @@ class NetworkScene extends Component {
     return intersects.length > 0 ? intersects[0].object : null;
   };
 
+  modifyObject = (object, newHex, newScale) => {
+    object.material.color.set(newHex);
+
+    object.scale.x = newScale;
+    object.scale.y = newScale;
+    object.scale.z = newScale;
+  };
+
+  resetObjectToPrevious = object => {
+    object.material.color.set(object.formerColorHex);
+    object.scale.x = 1;
+    object.scale.y = 1;
+    object.scale.z = 1;
+  };
+
   updateHoverIntersectObject = () => {
     const intersectObject = this.getNearestMeshIntersect();
 
     if (intersectObject) {
       if (this.hoverIntersectObject != intersectObject) {
-        if (this.hoverIntersectObject) {
-          // set back to former color
-          this.hoverIntersectObject.material.color.set(this.hoverIntersectObject.formerColorHex);
-
-          this.hoverIntersectObject.scale.x = 1;
-          this.hoverIntersectObject.scale.y = 1;
-          this.hoverIntersectObject.scale.z = 1;
+        // only do things if its a new object
+        if (
+          this.hoverIntersectObject &&
+          this.hoverIntersectObject != this.selectedNeuron &&
+          this.hoverIntersectObject != this.selectedSquare
+        ) {
+          // set object back to former color
+          this.modifyObject(this.hoverIntersectObject, this.hoverIntersectObject.formerColorHex, 1);
         }
 
         this.hoverIntersectObject = intersectObject;
-        this.hoverIntersectObject.formerColorHex = this.hoverIntersectObject.material.color.getHex();
-        this.hoverIntersectObject.material.color.set(0x00ff00);
 
-        this.hoverIntersectObject.scale.x = 1.5;
-        this.hoverIntersectObject.scale.y = 1.5;
-        this.hoverIntersectObject.scale.z = 1.5;
-
+        // change object color only if not selected
         if (
-          this.hoverIntersectObject.isNeuron &&
-          Object.keys(this.props.trainedModel).length !== 0
+          this.hoverIntersectObject != this.selectedNeuron &&
+          this.hoverIntersectObject != this.selectedSquare
         ) {
+          this.hoverIntersectObject.formerColorHex = this.hoverIntersectObject.material.color.getHex();
+          this.modifyObject(this.hoverIntersectObject, 0x00ff00, 1.5);
+        }
+
+        if (this.hoverIntersectObject.isNeuron && this.isNetworkTrained() && !this.selectedNeuron) {
           this.drawEdges(this.hoverIntersectObject);
         }
       }
     } else {
-      if (this.hoverIntersectObject) {
+      if (
+        this.hoverIntersectObject &&
+        this.hoverIntersectObject != this.selectedNeuron &&
+        this.hoverIntersectObject != this.selectedSquare
+      ) {
         // set back to former color
-        this.hoverIntersectObject.material.color.set(this.hoverIntersectObject.formerColorHex);
+        this.modifyObject(this.hoverIntersectObject, this.hoverIntersectObject.formerColorHex, 1);
 
-        this.hoverIntersectObject.scale.x = 1;
-        this.hoverIntersectObject.scale.y = 1;
-        this.hoverIntersectObject.scale.z = 1;
-
-        // remove past edges
-        this.removeEdges();
+        if (!this.selectedNeuron) {
+          // remove edges from previous hoverNode (if there are any)
+          this.removeEdges();
+        }
       }
       this.hoverIntersectObject = null;
     }
@@ -529,27 +547,36 @@ class NetworkScene extends Component {
         if (clickedObj.isNeuron) {
           this.onClickNode(clickedObj);
         }
-
-        // dont want this to trigger for a Line
-        // intersectObject.material.color.set(0x00ffff);
-        // TODO use this.clickIntersectObject
-        // intersectObject.formerColorHex = 0xffff00;
       }
     }
   };
 
+  isNetworkTrained = () => {
+    return Object.keys(this.props.trainedModel).length !== 0;
+  };
+
   onClickNode = neuron => {
-    if (Object.keys(this.props.trainedModel).length !== 0) {
+    if (this.isNetworkTrained()) {
       // this.drawEdges(neuron);
     }
   };
 
   onDblClickNode = neuron => {
-    const { layerOutputs } = this.props;
+    const { layerOutputs, trainedModel } = this.props;
     const { position, indexInfo, layerType } = neuron;
     const layerIndex = indexInfo.layerIndex;
 
-    if (layerIndex === 0) return;
+    if (layerIndex === 0) {
+      // Tell parent not to show analysis
+      // Should change at some point bc want to analyze input too
+      this.props.onDblClickNeuron({});
+      return;
+    }
+
+    if (Object.keys(this.props.trainedModel).length === 0) return;
+
+    this.removeEdges();
+    this.drawEdges(neuron);
 
     const analyzeInfo = {
       layerIndex,
@@ -580,36 +607,36 @@ class NetworkScene extends Component {
       // update mouse
       this.updateMouse(event, canvasBounds);
 
-      this.raycaster.setFromCamera(this.mouse, this.camera);
-      const intersects = this.raycaster
-        .intersectObjects(this.scene.children)
-        .filter(o => o.object.type === "Mesh");
-      if (intersects.length > 0) {
-        const clickedObj = intersects[0].object;
+      const intersectObject = this.getNearestMeshIntersect();
 
+      if (intersectObject) {
         // remove color from previously selected objects
         if (this.selectedSquare) {
-          this.selectedSquare.material.color.set(0x000000);
-          this.selectedSquare.formerColorHex = 0x000000;
+          this.resetObjectToPrevious(this.selectedSquare);
+          this.selectedSquare = null;
         }
-        this.selectedSquare = null;
-        if (clickedObj.isNeuron) {
+
+        if (intersectObject.isNeuron) {
           if (this.selectedNeuron) {
-            // this.selectedNeuron.material.color.set(this.selectedNeuron.beforeSelectedHex);
-            // this.selectedNeuron.formerColorHex = 0x000000;
+            this.resetObjectToPrevious(this.selectedNeuron);
           }
-          this.selectedNeuron = null;
-        }
-        if (clickedObj.isNeuron) {
-          this.selectedNeuron = clickedObj;
-          // this.selectedNeuron.beforeSelectedHex = this.selectedNeuron.formerColorHex;
-          // this.selectedNeuron.material.color.set(SELECTED_NEURON_COLOR);
-          this.onDblClickNode(clickedObj);
-        } else if (clickedObj.isSquareSelect) {
-          this.selectedSquare = clickedObj;
-          this.selectedSquare.formerColorHex = SELECTED_SQUARE_COLOR;
+          this.selectedNeuron = intersectObject;
+          this.selectedNeuron.formerColorHex = 0x000000;
+          this.selectedNeuron.material.color.set(SELECTED_NEURON_COLOR);
+          this.onDblClickNode(intersectObject);
+        } else if (intersectObject.isSquareSelect) {
+          this.selectedSquare = intersectObject;
+          this.selectedSquare.formerColorHex = 0x000000;
           this.selectedSquare.material.color.set(SELECTED_SQUARE_COLOR);
         }
+      } else {
+        if (this.selectedNeuron) {
+          this.resetObjectToPrevious(this.selectedNeuron);
+          this.selectedNeuron = null;
+          this.props.onDblClickNeuron({}); // tell parent that no more neuron clicked
+        }
+
+        this.removeEdges();
       }
     }
   };
