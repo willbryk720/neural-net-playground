@@ -22,7 +22,7 @@ class LoadData extends Component {
       <div>
         <Button
           disabled={isLoadingDataset}
-          loading={isLoadingDataset}
+          loading={requestedDatasetLoading === "MNIST"}
           color="blue"
           onClick={() => {
             onClickedLoadDataset("MNIST");
@@ -32,7 +32,7 @@ class LoadData extends Component {
         </Button>
         <Button
           disabled={isLoadingDataset}
-          loading={isLoadingDataset}
+          loading={requestedDatasetLoading === "FacesOrNot"}
           color="blue"
           onClick={() => {
             onClickedLoadDataset("FacesOrNot");
