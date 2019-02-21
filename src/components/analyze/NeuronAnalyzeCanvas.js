@@ -3,14 +3,6 @@ import { Button } from "semantic-ui-react";
 
 import { getColorStyle } from "../../utils/analyze";
 
-const BORDER_WIDTH = 2;
-
-// function getStartDrawing() {
-//   return Array(NUM_SQUARES_PER_ROW)
-//     .fill()
-//     .map(() => Array(NUM_SQUARES_PER_ROW).fill(0));
-// }
-
 class NeuronAnalyzeCanvas extends React.Component {
   constructor(props) {
     super(props);
@@ -114,13 +106,13 @@ class NeuronAnalyzeCanvas extends React.Component {
   render() {
     return (
       <div>
-        <div
-          style={{
-            border: BORDER_WIDTH + "px blue solid",
-            width: this.props.canvasWidth + 2 * BORDER_WIDTH + "px"
-          }}
-        >
-          <canvas ref="canvas" width={this.props.canvasWidth} height={this.props.canvasHeight} />
+        <div>
+          <canvas
+            ref="canvas"
+            width={this.props.canvasWidth}
+            height={this.props.canvasHeight}
+            style={{ verticalAlign: "bottom" }}
+          />
           {/* <canvas
             ref="canvas"
             width={this.props.canvasWidth}

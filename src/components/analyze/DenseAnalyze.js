@@ -113,6 +113,7 @@ class DenseAnalyze extends React.Component {
             onMouseMove={e => this.drawing(e)}
             onMouseDown={e => this.penDown(e)}
             onMouseUp={e => this.penUp(e)}
+            style={{ verticalAlign: "bottom" }}
           />
         </div>
       </div>

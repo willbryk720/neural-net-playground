@@ -3,8 +3,6 @@ import { Button } from "semantic-ui-react";
 
 import { getColorStyle } from "../utils/analyze";
 
-const BORDER_WIDTH = 2;
-
 class CanvasComponent extends React.Component {
   constructor(props) {
     super(props);
@@ -120,12 +118,7 @@ class CanvasComponent extends React.Component {
 
     return (
       <div>
-        <div
-          style={{
-            border: BORDER_WIDTH + "px blue solid",
-            width: this.props.canvasWidth + 2 * BORDER_WIDTH + "px"
-          }}
-        >
+        <div>
           <canvas
             ref="canvas"
             width={this.props.canvasWidth}
@@ -133,6 +126,7 @@ class CanvasComponent extends React.Component {
             onMouseMove={e => this.drawing(e)}
             onMouseDown={e => this.penDown(e)}
             onMouseUp={e => this.penUp(e)}
+            style={{ verticalAlign: "bottom" }}
           />
         </div>
       </div>

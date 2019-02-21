@@ -105,7 +105,14 @@ class AnalyzeNeuron extends Component {
         inLayerMetadata.dimensions
       );
 
-      if (inLayerMetadata.isSquare) {
+      if (layerType === "maxPooling2d") {
+        const colorSquare = oneLayerOutputColors[group];
+        canvases = (
+          <div key={neuron.id}>
+            <NeuronAnalyzeCanvas canvasWidth={100} canvasHeight={100} colorSquare={colorSquare} />
+          </div>
+        );
+      } else if (inLayerMetadata.isSquare) {
         canvases = oneLayerOutputColors.map((colorSquare, i) => (
           <React.Fragment>
             <div style={{ display: "inline-block" }} key={"" + i + neuron.id}>
@@ -139,16 +146,19 @@ class AnalyzeNeuron extends Component {
 
     return (
       <div>
-        <div style={{ float: "left" }}>
-          <div> {locationString}</div>
-          {/* <div>{`LayerType: ${layerType}`}</div>
-          <div>{`Color: ${color}`}</div> */}
+        <div>
+          {layerType !== "maxPooling2d" && (
+            <div style={{ float: "right" }}>
+              <Button color="green" size="small" onClick={this.onChangeWeightsToZero}>
+                Set All Weights to 0
+              </Button>
+            </div>
+          )}
+          <div style={{ float: "left" }}>
+            <div> {locationString}</div>
+          </div>
         </div>
-        <div style={{ float: "right" }}>
-          <Button color="green" size="small" onClick={this.onChangeWeightsToZero}>
-            Set All Weights to 0
-          </Button>
-        </div>
+        <br />
         <br />
         <br />
         <hr />
