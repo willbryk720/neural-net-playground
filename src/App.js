@@ -164,6 +164,7 @@ class App extends Component {
               trainedModel={this.state.trainedModel}
               alertChangedWeights={this.alertChangedWeights}
             />
+
             <div>
               <Predict
                 drawing={this.state.drawing}
