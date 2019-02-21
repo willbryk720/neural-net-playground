@@ -80,15 +80,11 @@ class AnalyzeNeuron extends Component {
     const { analyzeInfo, trainedModel } = this.props;
 
     if (Object.keys(analyzeInfo).length === 0) {
-      return (
-        <div>
-          <h1>Analyze Neurons</h1>
-        </div>
-      );
+      return <div />;
     }
 
     const { edges, inLayerOutput, inLayerMetadata, drawing, neuron, hasOutputs } = analyzeInfo;
-    const { position, indexInfo, layerType, color } = neuron;
+    const { position, indexInfo, layerType, color, layerIsSquare } = neuron;
     const { layerIndex, group, row, col } = indexInfo;
 
     console.log("analyzeInfo, trainedModel", analyzeInfo, trainedModel);
@@ -99,7 +95,6 @@ class AnalyzeNeuron extends Component {
       const newDrawing = drawing.map(row => row.map(color => color * 0xffffff));
       canvases = (
         <div key={neuron.id}>
-          <hr />
           <NeuronAnalyzeCanvas canvasWidth={200} canvasHeight={200} colorSquare={newDrawing} />
         </div>
       );
@@ -112,13 +107,17 @@ class AnalyzeNeuron extends Component {
 
       if (inLayerMetadata.isSquare) {
         canvases = oneLayerOutputColors.map((colorSquare, i) => (
-          <div key={"" + i + neuron.id}>
-            <hr />
-            <NeuronAnalyzeCanvas canvasWidth={200} canvasHeight={200} colorSquare={colorSquare} />
-            <Button color="green" size="mini">
-              Set weights to 0
-            </Button>
-          </div>
+          <React.Fragment>
+            <div style={{ display: "inline-block" }} key={"" + i + neuron.id}>
+              <NeuronAnalyzeCanvas canvasWidth={100} canvasHeight={100} colorSquare={colorSquare} />
+              {/* <Button color="green" size="mini">
+                Set weights to 0
+              </Button> */}
+              <button type="button">Set to 0</button>
+              <div style={{ height: "7px" }} />
+            </div>
+            <div style={{ width: "5px", display: "inline-block" }} />
+          </React.Fragment>
         ));
       } else {
         canvases = (
@@ -132,26 +131,27 @@ class AnalyzeNeuron extends Component {
     } else {
     }
 
-    const inIsSquare = inLayerMetadata.isSquare;
+    const locationString =
+      `Neuron:  ` +
+      (layerIsSquare ? `row ${row}, col ${col}, filter ${group}` : `index ${col}`) +
+      ` in layer ${layerIndex + 1} (${layerType})` +
+      `    |   Color: ${color}`;
 
     return (
       <div>
-        <h1>Analyze Neuron</h1>
-        <h3>LayerType: {layerType}</h3>
-        <h3>
-          Layer: {layerIndex} <br />
-          {inIsSquare ? (
-            <div>
-              Square: {group}, Row: {row}, Col: {col}
-            </div>
-          ) : (
-            <div>index: {col}</div>
-          )}
-          <div>Color: {color}</div>
-        </h3>
-        <Button color="green" size="small" onClick={this.onChangeWeightsToZero}>
-          Set All Weights to 0
-        </Button>
+        <div style={{ float: "left" }}>
+          <div> {locationString}</div>
+          {/* <div>{`LayerType: ${layerType}`}</div>
+          <div>{`Color: ${color}`}</div> */}
+        </div>
+        <div style={{ float: "right" }}>
+          <Button color="green" size="small" onClick={this.onChangeWeightsToZero}>
+            Set All Weights to 0
+          </Button>
+        </div>
+        <br />
+        <br />
+        <hr />
         {canvases}
       </div>
     );

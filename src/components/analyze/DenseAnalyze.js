@@ -20,7 +20,7 @@ class DenseAnalyze extends React.Component {
       const colorStyle = getColorStyle(color);
       ctx.fillStyle = colorStyle;
 
-      ctx.fillRect(0, i * DENSE_NEURON_WIDTH, DENSE_NEURON_WIDTH, DENSE_NEURON_WIDTH);
+      ctx.fillRect(i * DENSE_NEURON_WIDTH, 0, DENSE_NEURON_WIDTH, DENSE_NEURON_WIDTH);
     });
   };
   componentDidMount() {
@@ -101,14 +101,15 @@ class DenseAnalyze extends React.Component {
       <div>
         <div
           style={{
-            border: BORDER_WIDTH + "px blue solid",
-            width: this.props.canvasWidth + 2 * BORDER_WIDTH + "px"
+            width: "100%",
+            overflowX: "scroll"
           }}
         >
+          {/* DENSE_NEURON_WIDTH * this.props.oneLayerOutputColors.length + 2 * BORDER_WIDTH + "px", */}
           <canvas
             ref="canvas"
-            width={this.props.canvasWidth}
-            height={DENSE_NEURON_WIDTH * this.props.oneLayerOutputColors.length}
+            width={DENSE_NEURON_WIDTH * this.props.oneLayerOutputColors.length}
+            height={DENSE_NEURON_WIDTH}
             onMouseMove={e => this.drawing(e)}
             onMouseDown={e => this.penDown(e)}
             onMouseUp={e => this.penUp(e)}

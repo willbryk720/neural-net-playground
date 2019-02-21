@@ -164,7 +164,7 @@ class NetworkScene extends Component {
     // this.props.onEndUpdateNetwork();
   }
 
-  drawNeuron = (pos, color, layerType, indexInfo) => {
+  drawNeuron = (pos, color, layerType, indexInfo, layerIsSquare) => {
     const material = new THREE.MeshBasicMaterial({ color: color });
     let neuronObj = new THREE.Mesh(NEURON_GEOMETRY, material);
     neuronObj.position.x = pos[0];
@@ -174,6 +174,7 @@ class NetworkScene extends Component {
     neuronObj.indexInfo = indexInfo;
     neuronObj.isNeuron = true;
     neuronObj.color = color;
+    neuronObj.layerIsSquare = layerIsSquare;
     this.scene.add(neuronObj);
     return neuronObj;
   };
@@ -200,7 +201,7 @@ class NetworkScene extends Component {
             row.forEach((pos, c) => {
               const color = hasLayerOutputs ? layerOutputColors[layerIndex][g][r][c] : 0x000000;
               const indexInfo = { group: g, row: r, col: c, layerIndex };
-              const neuronObj = this.drawNeuron(pos, color, layerType, indexInfo);
+              const neuronObj = this.drawNeuron(pos, color, layerType, indexInfo, isSquare);
               rowOfObjects.push(neuronObj);
             });
             groupOfRows.push(rowOfObjects);
@@ -211,7 +212,7 @@ class NetworkScene extends Component {
           neuronGrouping.forEach((pos, i) => {
             const color = hasLayerOutputs ? layerOutputColors[layerIndex][i] : 0x000000;
             const indexInfo = { col: i, layerIndex };
-            const neuronObj = this.drawNeuron(pos, color, layerType, indexInfo);
+            const neuronObj = this.drawNeuron(pos, color, layerType, indexInfo, isSquare);
             rowOfObjects.push(neuronObj);
           });
           groupOfRows.push(rowOfObjects);
