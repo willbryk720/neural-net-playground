@@ -164,6 +164,16 @@ class App extends Component {
               trainedModel={this.state.trainedModel}
               alertChangedWeights={this.alertChangedWeights}
             />
+            <div>
+              <Predict
+                drawing={this.state.drawing}
+                onMakePrediction={this.onMakePrediction}
+                trainedModel={this.state.trainedModel}
+                getRandomTestImage={this.getRandomTestImage}
+                datasetInfo={this.state.datasetInfo}
+                countForRendering={this.state.countForRendering}
+              />
+            </div>
           </div>
         </div>
       );
