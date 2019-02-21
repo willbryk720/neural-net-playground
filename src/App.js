@@ -14,7 +14,7 @@ import AnalyzeNeuron from "./components/AnalyzeNeuron";
 
 import CircularLoading from "./components/common/CircularLoading";
 
-import { Input, Button } from "semantic-ui-react";
+import { Input, Button, Icon } from "semantic-ui-react";
 
 const preTrainedModelOptions = [
   { name: "Dense-1epoch" },
@@ -137,12 +137,11 @@ class App extends Component {
               verticalAlign: "top"
             }}
           >
-            <Button
+            <Icon
+              name="compress"
+              style={{ cursor: "pointer", float: "left" }}
               onClick={() => this.setState({ isFullScreenMode: false })}
-              style={{ float: "right" }}
-            >
-              Back
-            </Button>
+            />
             <AnalyzeNeuron
               analyzeInfo={this.state.analyzeInfo}
               trainedModel={this.state.trainedModel}
@@ -236,7 +235,11 @@ class App extends Component {
             onDblClickNeuron={this.onDblClickNeuron}
             datasetInfo={this.state.datasetInfo}
           />
-          <Button onClick={() => this.setState({ isFullScreenMode: true })}>FullScreen</Button>
+          <Icon
+            name="expand"
+            style={{ cursor: "pointer", float: "left" }}
+            onClick={() => this.setState({ isFullScreenMode: true })}
+          />
           <AnalyzeNeuron
             analyzeInfo={this.state.analyzeInfo}
             trainedModel={this.state.trainedModel}
