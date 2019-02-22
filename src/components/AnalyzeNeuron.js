@@ -24,18 +24,15 @@ class AnalyzeNeuron extends Component {
     // this.myRefs = [];
   }
 
-  onChangeWeightsToZero = () => {
+  onChangeWeightsToZero = groupTargetIndex => {
     const { analyzeInfo, trainedModel } = this.props;
-    const {
-      layerIndex,
-      group: groupIndex,
-      row: rowIndex,
-      col: colIndex
-    } = analyzeInfo.neuron.indexInfo;
+    const { neuron, inLayerMetadata } = analyzeInfo;
+    const { layerIndex, group: groupIndex, row: rowIndex, col: colIndex } = neuron.indexInfo;
 
     const inLayer = trainedModel.layers.filter(
       l => getLayerTypeFromLayerName(l.name) !== "flatten"
     )[layerIndex - 1];
+
     const weightsAndBiases = inLayer.getWeights();
     if (weightsAndBiases.length != 2) {
       console.log("Shouldnt be able to zero pooling layer");
@@ -47,28 +44,51 @@ class AnalyzeNeuron extends Component {
     let weightsData = [];
     if (weightsTensor.shape.length === 4) {
       weightsData = reshape4DTensorToArray(weightsTensor.dataSync(), ...weightsTensor.shape);
-      weightsData[groupIndex].forEach((neuronGroup, g) => {
-        weightsData[groupIndex][g].forEach((row, r) => {
-          row.forEach((_c, c) => {
-            weightsData[groupIndex][g][r][c] = 0;
+
+      if (groupTargetIndex === -1) {
+        weightsData[groupIndex].forEach((neuronGroup, g) => {
+          weightsData[groupIndex][g].forEach((row, r) => {
+            row.forEach((_c, c) => {
+              weightsData[groupIndex][g][r][c] = 0;
+            });
           });
         });
+      } else {
+        weightsData[groupIndex][groupTargetIndex].forEach((row, r) => {
+          row.forEach((_c, c) => {
+            weightsData[groupIndex][groupTargetIndex][r][c] = 0;
+          });
+        });
+      }
 
-        const newTensor = reshapeArrayTo4DTensor(weightsData);
-        inLayer.setWeights([newTensor, biasesTensor]);
-      });
+      const newTensor = reshapeArrayTo4DTensor(weightsData);
+      inLayer.setWeights([newTensor, biasesTensor]);
+
       this.props.alertChangedWeights();
     } else if (weightsTensor.shape.length === 2) {
       weightsData = reshape2DTensorToArray(weightsTensor.dataSync(), ...weightsTensor.shape);
-      weightsData.forEach((_, g) => {
-        weightsData[g][colIndex] = 0;
-      });
       let newBiasesData = biasesTensor.dataSync();
-      if (groupIndex) {
-        newBiasesData[groupIndex] = -1000;
+
+      if (groupTargetIndex === -1) {
+        weightsData.forEach((_, g) => {
+          weightsData[g][colIndex] = 0;
+        });
+        if (groupIndex) {
+          newBiasesData[groupIndex] = -1000;
+        } else {
+          newBiasesData[colIndex] = -1000;
+        }
       } else {
-        newBiasesData[colIndex] = -1000;
+        const inSquareSize = inLayerMetadata.dimensions[0] * inLayerMetadata.dimensions[0];
+        for (
+          let i = groupTargetIndex * inSquareSize;
+          i < (groupTargetIndex + 1) * inSquareSize;
+          i++
+        ) {
+          weightsData[i][colIndex] = 0;
+        }
       }
+
       const newWeightsTensor = reshapeArrayTo2DTensor(weightsData);
       const newBiasesTensor = tf.tensor(newBiasesData);
       inLayer.setWeights([newWeightsTensor, newBiasesTensor]);
@@ -121,7 +141,9 @@ class AnalyzeNeuron extends Component {
               {/* <Button color="green" size="mini">
                 Set weights to 0
               </Button> */}
-              <button type="button">Set to 0</button>
+              <button type="button" onClick={() => this.onChangeWeightsToZero(i)}>
+                Set to 0
+              </button>
               <div style={{ height: "7px" }} />
             </div>
             <div style={{ width: "5px", display: "inline-block" }} />
@@ -150,7 +172,7 @@ class AnalyzeNeuron extends Component {
         <div>
           {layerType !== "maxPooling2d" && (
             <div style={{ float: "right" }}>
-              <Button color="green" size="small" onClick={this.onChangeWeightsToZero}>
+              <Button color="green" size="small" onClick={() => this.onChangeWeightsToZero(-1)}>
                 Set All Weights to 0
               </Button>
             </div>
