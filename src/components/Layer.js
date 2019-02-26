@@ -64,9 +64,7 @@ class Layer extends Component {
             />
           </div>
         </div>
-        <div
-          style={{ display: "inline-block", width: "5%", cursor: "pointer" }}
-        >
+        <div style={{ display: "inline-block", width: "5%", cursor: "pointer" }}>
           <Icon name="delete" onClick={() => onClickDelete(indexOfItem)} />
         </div>
       </Segment>

@@ -1,31 +1,25 @@
 import React, { Component } from "react";
 import { render } from "react-dom";
-import {
-  sortableContainer,
-  SortableElement,
-  arrayMove
-} from "react-sortable-hoc";
+import { sortableContainer, SortableElement, arrayMove } from "react-sortable-hoc";
 
 import { Button, Icon, Segment, Input } from "semantic-ui-react";
 import Layer from "./Layer";
 import AddStarterNetworks from "./AddStarterNetworks";
 
 const SortableContainer = sortableContainer(({ children }) => {
-  return <ul>{children}</ul>;
+  return <div>{children}</div>;
 });
 
-const SortableItem = SortableElement(
-  ({ layer, indexOfItem, onChangeLayer, onClickDelete }) => {
-    return (
-      <Layer
-        layer={layer}
-        indexOfItem={indexOfItem}
-        onChangeLayer={onChangeLayer}
-        onClickDelete={onClickDelete}
-      />
-    );
-  }
-);
+const SortableItem = SortableElement(({ layer, indexOfItem, onChangeLayer, onClickDelete }) => {
+  return (
+    <Layer
+      layer={layer}
+      indexOfItem={indexOfItem}
+      onChangeLayer={onChangeLayer}
+      onClickDelete={onClickDelete}
+    />
+  );
+});
 
 class SortableLayers extends Component {
   state = {
@@ -39,9 +33,7 @@ class SortableLayers extends Component {
 
   onChangeLayer = (index, newLayer) => {
     this.setState({
-      layers: this.state.layers.map((item, i) =>
-        i === index ? newLayer : item
-      )
+      layers: this.state.layers.map((item, i) => (i === index ? newLayer : item))
     });
   };
   onClickDelete = index => {
@@ -69,26 +61,18 @@ class SortableLayers extends Component {
         <h5>Or build your own:</h5>
         <Button
           color="blue"
-          size="large"
+          size="small"
           onClick={() => {
             this.props.updateLayers(this.state.layers, null);
           }}
         >
           Update
         </Button>
-        <Button
-          color="blue"
-          size="small"
-          onClick={this.onClickAdd}
-          style={{ float: "right" }}
-        >
+        <Button color="blue" size="small" onClick={this.onClickAdd} style={{ float: "right" }}>
           Add New Layer
         </Button>
-        <SortableContainer
-          onSortEnd={this.onSortEnd}
-          useDragHandle
-          distance={1}
-        >
+        <div style={{ height: "5px" }} />
+        <SortableContainer onSortEnd={this.onSortEnd} useDragHandle distance={1}>
           {this.state.layers.map((layer, index) => (
             <SortableItem
               key={`item-${index}`}

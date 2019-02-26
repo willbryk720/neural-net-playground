@@ -191,7 +191,7 @@ class App extends Component {
           <div
             style={{
               display: "inline-block",
-              width: "50%",
+              width: "40%",
               verticalAlign: "top",
               height: "100%",
               overflowY: "auto"
@@ -252,10 +252,16 @@ class App extends Component {
             </div>
           </div>
 
-          <div style={{ display: "inline-block", width: "50%", height: "100%" }}>
+          <div
+            style={{
+              display: "inline-block",
+              width: "60%",
+              height: "100%"
+            }}
+          >
             <NetworkScene
               windowHeightRatio={0.5}
-              windowWidthRatio={0.5}
+              windowWidthRatio={0.6}
               layers={this.state.layers}
               drawing={this.state.drawing}
               layerOutputs={this.state.layerOutputs}
