@@ -268,7 +268,7 @@ class App extends Component {
             />
             <Icon
               name="expand"
-              style={{ cursor: "pointer", float: "left" }}
+              style={{ cursor: "pointer", float: "right" }}
               onClick={() => this.setState({ isFullScreenMode: true })}
             />
             <AnalyzeNeuron
