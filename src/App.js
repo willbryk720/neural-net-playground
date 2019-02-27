@@ -5,14 +5,14 @@ import SortableLayers from "./components/SortableLayers";
 import TfStuff from "./components/TfStuff";
 import Predict from "./components/Predict";
 
-import AddPreTrainedModel from "./components/AddPreTrainedModel";
+import AddPreTrainedModel from "./components/addFromExisting/AddPreTrainedModel";
 
 import LoadData from "./components/LoadData";
 import StoreData from "./components/StoreData";
 
 import ShowLoading from "./components/ShowLoading";
 import Info from "./components/Info";
-import AnalyzeNeuron from "./components/AnalyzeNeuron";
+import AnalyzeNeuron from "./components/analyze/AnalyzeNeuron";
 
 import CircularLoading from "./components/common/CircularLoading";
 

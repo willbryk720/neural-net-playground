@@ -4,7 +4,7 @@ import { sortableContainer, SortableElement, arrayMove } from "react-sortable-ho
 
 import { Button, Icon, Segment, Input } from "semantic-ui-react";
 import Layer from "./Layer";
-import AddStarterNetworks from "./AddStarterNetworks";
+import AddStarterNetworks from "./addFromExisting/AddStarterNetworks";
 
 const SortableContainer = sortableContainer(({ children }) => {
   return <div>{children}</div>;

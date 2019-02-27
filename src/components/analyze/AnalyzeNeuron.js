@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { Input, Menu, Segment } from "semantic-ui-react";
 
-import ModifyWeights from "./analyze/ModifyWeights";
+import ModifyWeights from "./ModifyWeights";
 
 class AnalyzeNeuron extends Component {
   state = { activeItem: "weights" };
