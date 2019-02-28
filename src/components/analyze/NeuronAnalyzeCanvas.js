@@ -18,7 +18,7 @@ class NeuronAnalyzeCanvas extends React.Component {
 
     colorSquare.forEach((row, r) => {
       row.forEach((col, c) => {
-        const colorStyle = getColorStyle(colorSquare[r][c]);
+        const colorStyle = getColorStyle(colorSquare[r][c], 0xffffff);
         ctx.fillStyle = colorStyle;
 
         ctx.fillRect(c * squareWidth, r * squareWidth, squareWidth, squareWidth);
@@ -113,14 +113,6 @@ class NeuronAnalyzeCanvas extends React.Component {
             height={this.props.canvasHeight}
             style={{ verticalAlign: "bottom" }}
           />
-          {/* <canvas
-            ref="canvas"
-            width={this.props.canvasWidth}
-            height={this.props.canvasHeight}
-            onMouseMove={e => this.drawing(e)}
-            onMouseDown={e => this.penDown(e)}
-            onMouseUp={e => this.penUp(e)}
-          /> */}
         </div>
       </div>
     );

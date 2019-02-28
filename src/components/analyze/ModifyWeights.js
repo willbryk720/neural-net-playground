@@ -19,11 +19,10 @@ class ModifyWeights extends Component {
   constructor(props) {
     super(props);
     this.state = {};
-
-    // this.myRefs = [1, 2, 3, 4, 5, 6, 7, 8, 9].map(i => React.createRef());
-    // this.myRefs = [];
   }
 
+  // change a particular filter (group) weights into neuron to zero
+  // if groupTargetIndex is -1, set whole layer inputs to neuron to zero
   onChangeWeightsToZero = groupTargetIndex => {
     const { analyzeInfo, trainedModel } = this.props;
     const { neuron, inLayerMetadata } = analyzeInfo;
@@ -111,10 +110,10 @@ class ModifyWeights extends Component {
     let canvases;
     if (layerIndex == 1 && hasOutputs) {
       // drawing is in fraction, but need hex
-      const newDrawing = drawing.map(row => row.map(color => color * 0xffffff));
+      const drawingInHex = drawing.map(row => row.map(color => color * 0xffffff));
       canvases = (
         <div key={neuron.id}>
-          <NeuronAnalyzeCanvas canvasWidth={200} canvasHeight={200} colorSquare={newDrawing} />
+          <NeuronAnalyzeCanvas canvasWidth={200} canvasHeight={200} colorSquare={drawingInHex} />
         </div>
       );
     } else if (inLayerOutput) {
@@ -138,9 +137,6 @@ class ModifyWeights extends Component {
           <React.Fragment key={"" + i + neuron.id}>
             <div style={{ display: "inline-block" }}>
               <NeuronAnalyzeCanvas canvasWidth={100} canvasHeight={100} colorSquare={colorSquare} />
-              {/* <Button color="green" size="mini">
-                Set weights to 0
-              </Button> */}
               <button type="button" onClick={() => this.onChangeWeightsToZero(i)}>
                 Set to 0
               </button>
@@ -172,17 +168,13 @@ class ModifyWeights extends Component {
         <div>
           {layerType !== "maxPooling2d" && (
             <div style={{ float: "right" }}>
-              <Button color="green" size="small" onClick={() => this.onChangeWeightsToZero(-1)}>
-                Set All Weights to 0
-              </Button>
+              <button onClick={() => this.onChangeWeightsToZero(-1)}>Set All Weights to 0</button>
             </div>
           )}
           <div style={{ float: "left" }}>
             <div> {locationString}</div>
           </div>
         </div>
-        <br />
-        <br />
         <br />
         <hr />
         {canvases}

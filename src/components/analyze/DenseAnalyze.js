@@ -17,7 +17,7 @@ class DenseAnalyze extends React.Component {
     const colorArray = Array.prototype.slice.call(oneLayerOutputColors);
 
     colorArray.forEach((color, i) => {
-      const colorStyle = getColorStyle(color);
+      const colorStyle = getColorStyle(color, 0xffffff);
       ctx.fillStyle = colorStyle;
 
       ctx.fillRect(i * DENSE_NEURON_WIDTH, 0, DENSE_NEURON_WIDTH, DENSE_NEURON_WIDTH);

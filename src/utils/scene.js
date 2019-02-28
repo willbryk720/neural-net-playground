@@ -311,10 +311,19 @@ export function getOneLayerOutputColors(layerOutput, isSquare, dimensions) {
   }
 }
 
+export function fracToHex(value) {
+  return Math.round(value * 255) * 65793;
+}
+
 export function valueToHex(value, maxValue) {
-  if (value <= 0) return 0;
-  const frac = value / maxValue;
-  return Math.round(frac * 255) * 65793;
+  if (value <= 0) {
+    return 0;
+  } else if (maxValue <= 1) {
+    return fracToHex(value);
+  } else {
+    const frac = value / maxValue;
+    return fracToHex(frac);
+  }
 }
 
 export function diffPropBetweenObjects(a, b) {

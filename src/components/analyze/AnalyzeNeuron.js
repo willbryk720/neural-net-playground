@@ -6,8 +6,8 @@ import ModifyWeights from "./ModifyWeights";
 class AnalyzeNeuron extends Component {
   state = { activeItem: "weights" };
 
-  handleItemClick = (e, { idName }) => {
-    this.setState({ activeItem: idName });
+  handleItemClick = (e, { idname }) => {
+    this.setState({ activeItem: idname });
   };
 
   render() {
@@ -28,19 +28,19 @@ class AnalyzeNeuron extends Component {
         <Menu attached="top" tabular>
           <Menu.Item
             name="Weights"
-            idName="weights"
+            idname="weights"
             active={activeItem === "weights"}
             onClick={this.handleItemClick}
           />
           <Menu.Item
             name="Adversarial"
-            idName="adversarial"
+            idname="adversarial"
             active={activeItem === "adversarial"}
             onClick={this.handleItemClick}
           />
           <Menu.Item
             name="Filter Visualization"
-            idName="filterviz"
+            idname="filterviz"
             active={activeItem === "filterviz"}
             onClick={this.handleItemClick}
           />

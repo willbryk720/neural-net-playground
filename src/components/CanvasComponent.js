@@ -36,12 +36,13 @@ class CanvasComponent extends React.Component {
     const squareWidth = this.props.canvasWidth / this.props.datasetInfo.inputLength;
     points.forEach((row, r) => {
       row.forEach((col, c) => {
-        const colorStyle = getColorStyle(points[r][c] * 0xffffff);
+        const colorStyle = getColorStyle(points[r][c], 1);
         ctx.fillStyle = colorStyle;
         ctx.fillRect(c * squareWidth, r * squareWidth, squareWidth, squareWidth);
       });
     });
     // this.setState({ points: drawing });
+    console.log(points);
   };
 
   updateCanvas(point) {
