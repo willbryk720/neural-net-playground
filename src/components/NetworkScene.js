@@ -628,7 +628,7 @@ class NetworkScene extends Component {
       const intersectObject = this.getNearestMeshIntersect();
 
       if (intersectObject) {
-        // remove color from previously selected objects
+        // remove color from previously selected object in all situations
         if (this.selectedSquare) {
           this.resetObjectToPrevious(this.selectedSquare);
           this.selectedSquare = null;
@@ -639,7 +639,6 @@ class NetworkScene extends Component {
             this.resetObjectToPrevious(this.selectedNeuron);
           }
           this.selectedNeuron = intersectObject;
-          this.selectedNeuron.formerColorHex = 0x000000;
           this.selectedNeuron.material.color.set(SELECTED_NEURON_COLOR);
           this.onDblClickNode(intersectObject, this.props);
         } else if (intersectObject.isSquareSelect) {
