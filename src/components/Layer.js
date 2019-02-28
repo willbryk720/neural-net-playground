@@ -32,10 +32,10 @@ class Layer extends Component {
     const { onChangeLayer, onClickDelete, layer, indexOfItem } = this.props;
     const { layerType, options } = layer;
     return (
-      <Segment>
+      <div>
         <DragHandle />
 
-        <div style={{ display: "inline-block", width: "25%" }}>
+        <div style={{ display: "inline-block", width: "30%" }}>
           <Dropdown
             placeholder="Layer Type"
             fluid
@@ -51,7 +51,7 @@ class Layer extends Component {
           />
         </div>
         <div style={{ display: "inline-block", width: "5%" }} />
-        <div style={{ display: "inline-block", width: "60%" }}>
+        <div style={{ display: "inline-block", width: "50%" }}>
           <div>
             <Input
               value={options}
@@ -67,7 +67,7 @@ class Layer extends Component {
         <div style={{ display: "inline-block", width: "5%", cursor: "pointer" }}>
           <Icon name="delete" onClick={() => onClickDelete(indexOfItem)} />
         </div>
-      </Segment>
+      </div>
     );
   }
 }

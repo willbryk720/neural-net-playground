@@ -30,6 +30,7 @@ class LoadData extends Component {
         >
           Load MNIST Data
         </Button>
+        <br />
         <Button
           disabled={isLoadingDataset}
           loading={requestedDatasetLoading === "FacesOrNot"}
@@ -39,7 +40,8 @@ class LoadData extends Component {
           }}
         >
           Load FacesOrNot Data
-        </Button>
+        </Button>{" "}
+        <br />
         {datasetInfo.name && (
           <span>
             <b>{datasetInfo.name}</b>

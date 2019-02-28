@@ -24,8 +24,8 @@ class AnalyzeNeuron extends Component {
     }
 
     return (
-      <div>
-        <Menu attached="top" tabular>
+      <div style={{ height: "100%" }}>
+        <Menu attached="top" tabular size="small" fluid>
           <Menu.Item
             name="Weights"
             idname="weights"
@@ -54,8 +54,7 @@ class AnalyzeNeuron extends Component {
             </Menu.Item>
           </Menu.Menu> */}
         </Menu>
-
-        <div>{content}</div>
+        <div style={{ height: "100%", overflowY: "auto" }}>{content}</div>
       </div>
     );
   }

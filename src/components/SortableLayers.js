@@ -71,7 +71,7 @@ class SortableLayers extends Component {
         <Button color="blue" size="small" onClick={this.onClickAdd} style={{ float: "right" }}>
           Add New Layer
         </Button>
-        <div style={{ height: "5px" }} />
+        <div style={{ height: "8px" }} />
         <SortableContainer onSortEnd={this.onSortEnd} useDragHandle distance={1}>
           {this.state.layers.map((layer, index) => (
             <SortableItem

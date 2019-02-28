@@ -101,7 +101,7 @@ class NetworkScene extends Component {
     var light = new THREE.AmbientLight(0x222222);
     this.scene.add(light);
 
-    window.addEventListener("resize", this.onWindowResize, false);
+    window.addEventListener("resize", () => this.onWindowResize(this.props), false);
     window.addEventListener("mousemove", this.onDocumentMouseMove, false);
     window.addEventListener("mousedown", this.onDocumentMouseDown, false);
     window.addEventListener("dblclick", this.onDocumentDblClick, false);
@@ -111,11 +111,11 @@ class NetworkScene extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    // if (nextProps.layers !== this.props.numLayers) {
-    //   //Perform some operation here
-
     const propDiffs = diffPropBetweenObjects(this.props, nextProps);
-
+    console.log(propDiffs);
+    if (propDiffs.includes("windowWidthRatio") || propDiffs.includes("windowHeightRatio")) {
+      this.onWindowResize(nextProps);
+    }
     if (propDiffs.length === 1 && propDiffs.includes("selectedNeuron")) {
       // dont do anything
     } else if (propDiffs.length > 0) {
@@ -517,15 +517,15 @@ class NetworkScene extends Component {
     }
   };
 
-  onWindowResize = () => {
+  onWindowResize = myProps => {
     this.camera.aspect =
-      (window.innerWidth * this.props.windowWidthRatio) /
-      (window.innerHeight * this.props.windowHeightRatio);
+      (window.innerWidth * myProps.windowWidthRatio) /
+      (window.innerHeight * myProps.windowHeightRatio);
     this.camera.updateProjectionMatrix();
 
     this.renderer.setSize(
-      window.innerWidth * this.props.windowWidthRatio,
-      window.innerHeight * this.props.windowHeightRatio
+      window.innerWidth * myProps.windowWidthRatio,
+      window.innerHeight * myProps.windowHeightRatio
     );
   };
 
@@ -539,10 +539,11 @@ class NetworkScene extends Component {
     ) {
       event.preventDefault();
       this.markLastChange();
-    }
+      console.log("moved", canvasBounds);
 
-    // update mouse x and y for raycaster
-    this.updateMouse(event, canvasBounds);
+      // update mouse x and y for raycaster
+      this.updateMouse(event, canvasBounds);
+    }
   };
 
   onDocumentMouseDown = event => {

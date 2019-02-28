@@ -1,0 +1,57 @@
+#sidenavLeft {
+  height: 100%;
+  width: 0%;
+  position: fixed;
+  z-index: 6;
+  top: 0;
+  left: 0;
+  overflow-x: hidden;
+  transition: 0.5s;
+}
+
+#sidenavLeft a:hover {
+  color: #f1f1f1;
+}
+
+#sidenavLeft .closebtn {
+  position: absolute;
+  top: 0;
+  right: 3px;
+  font-size: 28px;
+  /* margin-left: 50px; */
+}
+
+#openbtn-left {
+  position: fixed;
+  z-index: 6;
+  top: 0;
+  left: 0;
+  font-size: 28px;
+}
+
+#sidenavBottom {
+  position: fixed;
+  z-index: 6;
+  /* height: 100%; */
+
+  /* width: 100%;  */
+  /* bottom: 0;
+  right: 0; */
+
+  transition: 0.5s;
+}
+
+#sidenavBottom .closebtn {
+  position: absolute;
+  top: 0px;
+  right: 3px;
+  font-size: 28px;
+}
+
+#openbtn-bottom {
+  position: fixed;
+  z-index: 6;
+  bottom: 0;
+  right: 5%;
+  font-size: 28px;
+}
