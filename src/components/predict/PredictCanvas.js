@@ -1,9 +1,9 @@
 import React, { Component } from "react";
 import { Button } from "semantic-ui-react";
 
-import { getColorStyle } from "../utils/analyze";
+import { getColorStyle } from "../../utils/analyze";
 
-class CanvasComponent extends React.Component {
+class PredictCanvas extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -20,7 +20,7 @@ class CanvasComponent extends React.Component {
   };
 
   componentWillReceiveProps(nextProps) {
-    console.log("Rendered Predict CanvasComponent");
+    console.log("Rendered Predict PredictCanvas");
     if (nextProps.drawing.length > 0) this.setState({ points: nextProps.drawing });
   }
   componentDidMount() {
@@ -135,4 +135,4 @@ class CanvasComponent extends React.Component {
   }
 }
 
-export default CanvasComponent;
+export default PredictCanvas;

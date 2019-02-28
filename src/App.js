@@ -3,7 +3,7 @@ import NetworkScene from "./components/NetworkScene";
 import SortableLayers from "./components/SortableLayers";
 
 import TfStuff from "./components/TfStuff";
-import Predict from "./components/Predict";
+import Predict from "./components/predict/Predict";
 
 import AddPreTrainedModel from "./components/addFromExisting/AddPreTrainedModel";
 

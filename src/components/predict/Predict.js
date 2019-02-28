@@ -1,11 +1,11 @@
 import React, { Component } from "react";
 import { Button } from "semantic-ui-react";
-import CanvasComponent from "./CanvasComponent";
+import PredictCanvas from "./PredictCanvas";
 
 import * as tf from "@tensorflow/tfjs";
 
-import { reshape2DTensorToArray } from "../utils/reshaping";
-import { getLayerOutputs, getGradient } from "../utils/prediction";
+import { reshape2DTensorToArray } from "../../utils/reshaping";
+import { getLayerOutputs, getGradient } from "../../utils/prediction";
 
 const CANVAS_WIDTH = 200;
 const CANVAS_HEIGHT = 200;
@@ -93,7 +93,7 @@ class Predict extends Component {
 
     return (
       <div>
-        <CanvasComponent
+        <PredictCanvas
           ref={this.myRef}
           canvasWidth={CANVAS_WIDTH}
           canvasHeight={CANVAS_HEIGHT}
