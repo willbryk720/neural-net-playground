@@ -15,7 +15,7 @@ let networks = [
       },
       {
         layerType: "dense",
-        options: { units: 10, activation: "relu" }
+        options: { units: 10, activation: "softmax" }
       }
     ]
   },

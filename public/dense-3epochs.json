@@ -19,12 +19,7 @@
           "use_bias": true,
           "kernel_initializer": {
             "class_name": "VarianceScaling",
-            "config": {
-              "scale": 1,
-              "mode": "fan_avg",
-              "distribution": "normal",
-              "seed": null
-            }
+            "config": { "scale": 1, "mode": "fan_avg", "distribution": "normal", "seed": null }
           },
           "bias_initializer": { "class_name": "Zeros", "config": {} },
           "kernel_regularizer": null,
@@ -40,16 +35,11 @@
         "class_name": "Dense",
         "config": {
           "units": 10,
-          "activation": "relu",
+          "activation": "softmax",
           "use_bias": true,
           "kernel_initializer": {
             "class_name": "VarianceScaling",
-            "config": {
-              "scale": 1,
-              "mode": "fan_avg",
-              "distribution": "normal",
-              "seed": null
-            }
+            "config": { "scale": 1, "mode": "fan_avg", "distribution": "normal", "seed": null }
           },
           "bias_initializer": { "class_name": "Zeros", "config": {} },
           "kernel_regularizer": null,
@@ -69,17 +59,9 @@
     {
       "paths": ["./Dense-3epochs.weights.bin"],
       "weights": [
-        {
-          "name": "dense_Dense1/kernel",
-          "shape": [784, 42],
-          "dtype": "float32"
-        },
+        { "name": "dense_Dense1/kernel", "shape": [784, 42], "dtype": "float32" },
         { "name": "dense_Dense1/bias", "shape": [42], "dtype": "float32" },
-        {
-          "name": "dense_Dense2/kernel",
-          "shape": [42, 10],
-          "dtype": "float32"
-        },
+        { "name": "dense_Dense2/kernel", "shape": [42, 10], "dtype": "float32" },
         { "name": "dense_Dense2/bias", "shape": [10], "dtype": "float32" }
       ]
     }
