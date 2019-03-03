@@ -322,6 +322,9 @@ class App extends Component {
               analyzeInfo={this.state.analyzeInfo}
               trainedModel={this.state.trainedModel}
               alertChangedWeights={this.alertChangedWeights}
+              onMakePrediction={this.onMakePrediction}
+              datasetInfo={this.state.datasetInfo}
+              drawing={this.state.drawing}
             />
           </div>
         </div>

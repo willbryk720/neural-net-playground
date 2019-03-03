@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import { Input, Menu, Segment } from "semantic-ui-react";
 
 import ModifyWeights from "./ModifyWeights";
+import MaximizeNeuron from "./MaximizeNeuron";
 
 class AnalyzeNeuron extends Component {
   state = { activeItem: "weights" };
@@ -17,8 +18,8 @@ class AnalyzeNeuron extends Component {
 
     if (activeItem === "weights") {
       content = <ModifyWeights {...this.props} />;
-    } else if (activeItem === "adversarial") {
-      content = <h2>Adversarial</h2>;
+    } else if (activeItem === "maximizeNeuron") {
+      content = <MaximizeNeuron {...this.props} />;
     } else if (activeItem === "filterviz") {
       content = <h2>Filter Visualization</h2>;
     }
@@ -33,9 +34,9 @@ class AnalyzeNeuron extends Component {
             onClick={this.handleItemClick}
           />
           <Menu.Item
-            name="Adversarial"
-            idname="adversarial"
-            active={activeItem === "adversarial"}
+            name="Maximize"
+            idname="maximizeNeuron"
+            active={activeItem === "maximizeNeuron"}
             onClick={this.handleItemClick}
           />
           <Menu.Item

@@ -539,7 +539,6 @@ class NetworkScene extends Component {
     ) {
       event.preventDefault();
       this.markLastChange();
-      console.log("moved", canvasBounds);
 
       // update mouse x and y for raycaster
       this.updateMouse(event, canvasBounds);

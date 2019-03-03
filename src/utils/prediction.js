@@ -52,23 +52,29 @@ export async function getGradient(inputTensor, trainedModel, targetIndex) {
     return loss;
   };
 
-  // const f_sync = () => await f()
-
   // const { value, grads } = tf.grad(f); // gradient of f as respect of each variable
-  // console.log("YOOOO", value, grads);
   // Object.keys(grads).forEach(varName => grads[varName].print());
 
   const g = tf.grad(f);
 
-  const epsilon = 5;
-  const grads = g(inputTensor);
+  let grads = g(inputTensor);
   console.log(
     "GRAD SUM:",
     grads.dataSync().reduce(function(a, b) {
       return a + b;
     }, 0)
   );
-  return inputTensor.sub(grads.mul(tf.scalar(epsilon)));
+
+  grads = grads.div(tf.add(tf.sqrt(tf.mean(tf.square(grads))), tf.scalar(0.00001)));
+
+  console.log(
+    "GRAD SUM:",
+    grads.dataSync().reduce(function(a, b) {
+      return a + b;
+    }, 0)
+  );
+  return grads;
+  // return inputTensor.sub(grads.mul(tf.scalar(epsilon)));
 }
 
 export function getLayerTypeFromLayerName(layerName) {

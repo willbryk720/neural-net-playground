@@ -53,36 +53,6 @@ class Predict extends Component {
     this.props.onMakePrediction(layerOutputs, image);
   };
 
-  makeAdversarialPrediction = async () => {
-    const { datasetInfo } = this.props;
-
-    const drawing = this.myRef.current.state.points;
-    const imageTensor = tf
-      .tensor(drawing)
-      .reshape([1, datasetInfo.inputLength, datasetInfo.inputLength, 1]);
-    let newImage = await getGradient(imageTensor, this.props.trainedModel, 0);
-    // newImage = newImage.reshape([1, datasetInfo.inputLength, datasetInfo.inputLength, 1]);
-    console.log("NEWIMAGE", newImage);
-    const imageVector = await newImage.dataSync();
-    const image = reshape2DTensorToArray(
-      imageVector,
-      datasetInfo.inputLength,
-      datasetInfo.inputLength
-    );
-    image.forEach((row, r) => {
-      row.forEach((col, c) => {
-        if (image[r][c] < 0) {
-          image[r][c] = 0;
-        } else if (image[r][c] > 1) {
-          image[r][c] = 1;
-        }
-      });
-    });
-    console.log("IMAGE", image);
-    const layerOutputs = await getLayerOutputs(newImage, this.props.trainedModel);
-    this.props.onMakePrediction(layerOutputs, image);
-  };
-
   render() {
     const { trainedModel, datasetInfo } = this.props;
 
@@ -118,14 +88,6 @@ class Predict extends Component {
           disabled={Object.keys(trainedModel).length === 0 || !datasetInfo.name} // this might be unecessary
         >
           Predict Test Image
-        </Button>
-        <Button
-          size="mini"
-          color="blue"
-          onClick={this.makeAdversarialPrediction}
-          disabled={Object.keys(trainedModel).length === 0 || !datasetInfo.name} // this might be unecessary
-        >
-          Adverary
         </Button>
       </div>
     );
