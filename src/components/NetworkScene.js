@@ -180,8 +180,8 @@ class NetworkScene extends Component {
     }
   }
 
-  drawNeuron = (pos, color, layerType, indexInfo, layerIsSquare) => {
-    const material = new THREE.MeshBasicMaterial({ color: color });
+  drawNeuron = (pos, colorObj, layerType, indexInfo, layerIsSquare) => {
+    const material = new THREE.MeshBasicMaterial({ color: colorObj.colorHex });
     let neuronObj = new THREE.Mesh(NEURON_GEOMETRY, material);
     neuronObj.position.x = pos[0];
     neuronObj.position.y = pos[1];
@@ -189,7 +189,7 @@ class NetworkScene extends Component {
     neuronObj.layerType = layerType;
     neuronObj.indexInfo = indexInfo;
     neuronObj.isNeuron = true;
-    neuronObj.color = color;
+    neuronObj.colorObj = colorObj;
     neuronObj.layerIsSquare = layerIsSquare;
     this.scene.add(neuronObj);
     return neuronObj;
@@ -215,9 +215,11 @@ class NetworkScene extends Component {
           neuronGrouping.forEach((row, r) => {
             let rowOfObjects = []; // row of neuron objects
             row.forEach((pos, c) => {
-              const color = hasLayerOutputs ? layerOutputColors[layerIndex][g][r][c] : 0x000000;
+              const colorObj = hasLayerOutputs
+                ? layerOutputColors[layerIndex][g][r][c]
+                : { colorHex: 0x000000, maxVal: 0, val: 0 };
               const indexInfo = { group: g, row: r, col: c, layerIndex };
-              const neuronObj = this.drawNeuron(pos, color, layerType, indexInfo, isSquare);
+              const neuronObj = this.drawNeuron(pos, colorObj, layerType, indexInfo, isSquare);
               rowOfObjects.push(neuronObj);
             });
             groupOfRows.push(rowOfObjects);
@@ -226,9 +228,11 @@ class NetworkScene extends Component {
           let rowOfObjects = [];
           // draw line
           neuronGrouping.forEach((pos, i) => {
-            const color = hasLayerOutputs ? layerOutputColors[layerIndex][i] : 0x000000;
+            const colorObj = hasLayerOutputs
+              ? layerOutputColors[layerIndex][i]
+              : { colorHex: 0x000000, maxVal: 0, val: 0 };
             const indexInfo = { col: i, layerIndex };
-            const neuronObj = this.drawNeuron(pos, color, layerType, indexInfo, isSquare);
+            const neuronObj = this.drawNeuron(pos, colorObj, layerType, indexInfo, isSquare);
             rowOfObjects.push(neuronObj);
           });
           groupOfRows.push(rowOfObjects);

@@ -271,7 +271,7 @@ export function getOutputColors(layerOutputs, layersMetadata, input2DArray) {
   let input2DArrayColors = [];
   input2DArray.forEach(r => {
     let rArr = [];
-    r.forEach(c => rArr.push(valueToHex(c, maxValue)));
+    r.forEach(c => rArr.push({ colorHex: valueToHex(c, maxValue), maxVal: maxValue, val: c }));
     input2DArrayColors.push(rArr);
   });
   layerOutputColors.push([input2DArrayColors]); // push input as 3d array
@@ -303,11 +303,16 @@ export function getOneLayerOutputColors(layerOutput, isSquare, dimensions) {
   const values = layerOutput.dataSync();
   const maxValue = getArrayMax(values);
 
-  const colors = values.map(v => valueToHex(v, maxValue));
+  const colorArray = Array.prototype.slice.call(values);
+  const colorObjs = colorArray.map(v => ({
+    colorHex: valueToHex(v, maxValue),
+    maxVal: maxValue,
+    val: v
+  }));
   if (isSquare) {
-    return reshape3DTensorToArray(colors, ...dimensions);
+    return reshape3DTensorToArray(colorObjs, ...dimensions);
   } else {
-    return colors;
+    return colorObjs;
   }
 }
 

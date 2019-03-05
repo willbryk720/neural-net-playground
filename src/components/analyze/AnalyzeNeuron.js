@@ -4,6 +4,15 @@ import { Input, Menu, Segment } from "semantic-ui-react";
 import ModifyWeights from "./ModifyWeights";
 import MaximizeNeuron from "./MaximizeNeuron";
 
+function expo(x) {
+  if (x < 100 && x > 0.01) {
+    return x.toPrecision(3);
+  } else if (x === 0) {
+    return 0;
+  }
+  return Number.parseFloat(x).toExponential(2);
+}
+
 class AnalyzeNeuron extends Component {
   state = { activeItem: "weights" };
 
@@ -28,13 +37,13 @@ class AnalyzeNeuron extends Component {
     if (Object.keys(this.props.analyzeInfo).length > 0) {
       const { neuron } = this.props.analyzeInfo;
       const { layerIndex, group, row, col } = neuron.indexInfo;
-      const { layerIsSquare, layerType, color } = neuron;
+      const { layerIsSquare, layerType, colorObj } = neuron;
 
       locationString =
         `Selected Neuron:  ` +
         (layerIsSquare ? `row ${row}, col ${col}, filter ${group}` : `index ${col}`) +
         ` in layer ${layerIndex + 1} (${layerType})` +
-        `    |   Color: ${color}`;
+        `    |   Output: ${expo(colorObj.val)}  Max-in-layer: ${expo(colorObj.maxVal)}`;
     }
 
     return (

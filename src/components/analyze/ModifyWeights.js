@@ -104,16 +104,16 @@ class ModifyWeights extends Component {
     }
 
     const { edges, inLayerOutput, inLayerMetadata, drawing, neuron, hasOutputs } = analyzeInfo;
-    const { position, indexInfo, layerType, color, layerIsSquare } = neuron;
+    const { position, indexInfo, layerType, colorObj, layerIsSquare } = neuron;
     const { layerIndex, group, row, col } = indexInfo;
 
     let canvases;
     if (layerIndex == 1 && hasOutputs) {
       // drawing is in fraction, but need hex
-      const drawingInHex = drawing.map(row => row.map(color => color * 0xffffff));
+      const drawingInHex = drawing.map(row => row.map(color => ({ colorHex: color * 0xffffff })));
       canvases = (
         <div key={neuron.id}>
-          <NeuronAnalyzeCanvas canvasWidth={200} canvasHeight={200} colorSquare={drawingInHex} />
+          <NeuronAnalyzeCanvas canvasWidth={100} canvasHeight={100} colorSquare={drawingInHex} />
         </div>
       );
     } else if (inLayerOutput) {
