@@ -21,7 +21,7 @@ class MaximizeNeuron extends Component {
 
     for (let i = 0; i < numSteps; i++) {
       const gradient = await getGradient(imageTensor, trainedModel, analyzeInfo);
-      const newImage = imageTensor.sub(gradient.mul(tf.scalar(this.state.epsilon)));
+      const newImage = imageTensor.sub(gradient.mul(tf.scalar(Number(this.state.epsilon))));
       imageTensor = newImage;
     }
 
@@ -70,7 +70,7 @@ class MaximizeNeuron extends Component {
               onChange={(e, { value }) => {
                 console.log(value);
                 console.log(typeof value);
-                this.setState({ epsilon: Number(value) });
+                this.setState({ epsilon: value });
               }}
             />
           </Form.Field>
