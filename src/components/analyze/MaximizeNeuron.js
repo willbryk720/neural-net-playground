@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Button, Input } from "semantic-ui-react";
+import { Button, Input, Form } from "semantic-ui-react";
 
 import * as tf from "@tensorflow/tfjs";
 
@@ -13,17 +13,14 @@ class MaximizeNeuron extends Component {
   }
 
   maximizeNeuron = async numSteps => {
-    console.log(numSteps, typeof numSteps);
     const { datasetInfo, drawing, trainedModel, analyzeInfo } = this.props;
-
-    console.log(analyzeInfo);
 
     let imageTensor = tf
       .tensor(drawing)
       .reshape([1, datasetInfo.inputLength, datasetInfo.inputLength, 1]);
 
     for (let i = 0; i < numSteps; i++) {
-      const gradient = await getGradient(imageTensor, trainedModel, 0);
+      const gradient = await getGradient(imageTensor, trainedModel, analyzeInfo);
       const newImage = imageTensor.sub(gradient.mul(tf.scalar(this.state.epsilon)));
       imageTensor = newImage;
     }
@@ -52,42 +49,58 @@ class MaximizeNeuron extends Component {
   };
 
   render() {
-    const { trainedModel, datasetInfo } = this.props;
+    const { trainedModel, datasetInfo, analyzeInfo, drawing } = this.props;
+
+    if (Object.keys(analyzeInfo).length === 0) {
+      return <p>No neuron selected yet</p>;
+    } else if (drawing.length === 0) {
+      return <p>No image predicted yet</p>;
+    }
 
     return (
       <div>
-        <Input
-          width={1}
-          type={"Number"}
-          value={this.state.epsilon}
-          onChange={(e, { value }) => {
-            console.log(value);
-            console.log(typeof value);
-            this.setState({ epsilon: Number(value) });
-          }}
-        />
-        <Button
-          size="mini"
-          color="blue"
-          onClick={() => this.maximizeNeuron(1)}
-          disabled={Object.keys(trainedModel).length === 0 || !datasetInfo.name} // this might be unecessary
-        >
-          One Step
-        </Button>
-        <Input
-          width={1}
-          type={"Number"}
-          value={this.state.numIterations}
-          onChange={(e, { value }) => this.setState({ numIterations: Number(value) })}
-        />
-        <Button
-          size="mini"
-          color="blue"
-          onClick={() => this.maximizeNeuron(this.state.numIterations)}
-          disabled={Object.keys(trainedModel).length === 0 || !datasetInfo.name} // this might be unecessary
-        >
-          Multiple Steps
-        </Button>
+        <p>Maximize the output of the selected Neuron</p>
+        <Form>
+          <Form.Field inline>
+            <label>Epsilon</label>
+            <Input
+              width={1}
+              type={"Number"}
+              value={this.state.epsilon}
+              onChange={(e, { value }) => {
+                console.log(value);
+                console.log(typeof value);
+                this.setState({ epsilon: Number(value) });
+              }}
+            />
+          </Form.Field>
+          <Button
+            size="mini"
+            color="blue"
+            onClick={() => this.maximizeNeuron(1)}
+            disabled={Object.keys(trainedModel).length === 0 || !datasetInfo.name} // this might be unecessary
+          >
+            One Step
+          </Button>
+
+          <Form.Field inline>
+            <label>Take Multiple Steps</label>
+            <Input
+              width={1}
+              type={"Number"}
+              value={this.state.numIterations}
+              onChange={(e, { value }) => this.setState({ numIterations: Number(value) })}
+            />
+          </Form.Field>
+          <Button
+            size="mini"
+            color="blue"
+            onClick={() => this.maximizeNeuron(this.state.numIterations)}
+            disabled={Object.keys(trainedModel).length === 0 || !datasetInfo.name} // this might be unecessary
+          >
+            Multiple Steps
+          </Button>
+        </Form>
       </div>
     );
   }

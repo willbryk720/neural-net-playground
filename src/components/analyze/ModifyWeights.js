@@ -100,7 +100,7 @@ class ModifyWeights extends Component {
     const { analyzeInfo, trainedModel } = this.props;
 
     if (Object.keys(analyzeInfo).length === 0) {
-      return <div />;
+      return <p>No neuron selected yet</p>;
     }
 
     const { edges, inLayerOutput, inLayerMetadata, drawing, neuron, hasOutputs } = analyzeInfo;
@@ -157,26 +157,16 @@ class ModifyWeights extends Component {
     } else {
     }
 
-    const locationString =
-      `Neuron:  ` +
-      (layerIsSquare ? `row ${row}, col ${col}, filter ${group}` : `index ${col}`) +
-      ` in layer ${layerIndex + 1} (${layerType})` +
-      `    |   Color: ${color}`;
-
     return (
       <div>
+        <br />
         <div>
           {layerType !== "maxPooling2d" && (
             <div style={{ float: "right" }}>
               <button onClick={() => this.onChangeWeightsToZero(-1)}>Set All Weights to 0</button>
             </div>
           )}
-          <div style={{ float: "left" }}>
-            <div> {locationString}</div>
-          </div>
         </div>
-        <br />
-        <hr />
         {canvases}
       </div>
     );

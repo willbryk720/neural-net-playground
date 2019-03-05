@@ -6,6 +6,14 @@ import { ones } from "@tensorflow/tfjs-layers/dist/exports_initializers";
 
 import * as tf from "@tensorflow/tfjs";
 
+function createArray(dimensions, fillVal) {
+  const numDim = dimensions.length;
+
+  if (numDim === 1) {
+    return Array(dimensions[0]).fill(fillVal);
+  }
+}
+
 export async function getLayerOutputs(inputTensor, trainedModel) {
   let layerOutputs = [];
 
@@ -21,7 +29,10 @@ export async function getLayerOutputs(inputTensor, trainedModel) {
   return layerOutputs;
 }
 
-export async function getGradient(inputTensor, trainedModel, targetIndex) {
+export async function getGradient(inputTensor, trainedModel, analyzeInfo) {
+  const { group, row, col, layerIndex } = analyzeInfo.neuron.indexInfo;
+  const { inLayerMetadata, curLayerMetadata } = analyzeInfo;
+
   let layerOutputs = [];
 
   const f = inputTensor => {
@@ -40,20 +51,26 @@ export async function getGradient(inputTensor, trainedModel, targetIndex) {
       console.log("LAYEROUTPUT", output.dataSync());
     }
 
-    const target = tf.tensor1d([1, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
+    console.log("LAYERMETADATA", inLayerMetadata, curLayerMetadata);
+    let targetArr = createArray(curLayerMetadata.dimensions, 0);
+    targetArr[col] = 1;
+    const targetTensor = tf.tensor(targetArr);
 
-    // output = tf.reshape(output, [-1]);
     console.log(output.dataSync());
 
     // output.exp().dot(tf.tensor1d([1, 1, 1, 1, 1, 1, 1, 1, 1, 1]))
     // return output.dot(c);
 
-    const loss = tf.metrics.categoricalCrossentropy(tf.reshape(output, [-1]), target);
+    console.log(
+      "reshaped",
+      tf.reshape(output, [-1]).dataSync(),
+      "targetTensor",
+      targetTensor.dataSync()
+    );
+    const loss = tf.metrics.categoricalCrossentropy(tf.reshape(output, [-1]), targetTensor);
+    console.log("LOSS", loss.dataSync());
     return loss;
   };
-
-  // const { value, grads } = tf.grad(f); // gradient of f as respect of each variable
-  // Object.keys(grads).forEach(varName => grads[varName].print());
 
   const g = tf.grad(f);
 

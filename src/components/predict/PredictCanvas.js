@@ -20,7 +20,6 @@ class PredictCanvas extends React.Component {
   };
 
   componentWillReceiveProps(nextProps) {
-    console.log("Rendered Predict PredictCanvas");
     if (nextProps.drawing.length > 0) this.setState({ points: nextProps.drawing });
   }
   componentDidMount() {
@@ -42,7 +41,6 @@ class PredictCanvas extends React.Component {
       });
     });
     // this.setState({ points: drawing });
-    console.log(points);
   };
 
   updateCanvas(point) {

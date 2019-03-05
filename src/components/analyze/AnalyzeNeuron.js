@@ -24,23 +24,36 @@ class AnalyzeNeuron extends Component {
       content = <h2>Filter Visualization</h2>;
     }
 
+    let locationString;
+    if (Object.keys(this.props.analyzeInfo).length > 0) {
+      const { neuron } = this.props.analyzeInfo;
+      const { layerIndex, group, row, col } = neuron.indexInfo;
+      const { layerIsSquare, layerType, color } = neuron;
+
+      locationString =
+        `Selected Neuron:  ` +
+        (layerIsSquare ? `row ${row}, col ${col}, filter ${group}` : `index ${col}`) +
+        ` in layer ${layerIndex + 1} (${layerType})` +
+        `    |   Color: ${color}`;
+    }
+
     return (
       <div style={{ height: "100%" }}>
         <Menu attached="top" tabular size="small" fluid>
           <Menu.Item
-            name="Weights"
+            name="Modify Weights"
             idname="weights"
             active={activeItem === "weights"}
             onClick={this.handleItemClick}
           />
           <Menu.Item
-            name="Maximize"
+            name="Maximize Output"
             idname="maximizeNeuron"
             active={activeItem === "maximizeNeuron"}
             onClick={this.handleItemClick}
           />
           <Menu.Item
-            name="Filter Visualization"
+            name="Visualize Filters"
             idname="filterviz"
             active={activeItem === "filterviz"}
             onClick={this.handleItemClick}
@@ -55,7 +68,12 @@ class AnalyzeNeuron extends Component {
             </Menu.Item>
           </Menu.Menu> */}
         </Menu>
-        <div style={{ height: "100%", overflowY: "auto" }}>{content}</div>
+        <div style={{ height: "100%", marginLeft: "2%", marginRight: "2%", overflowY: "auto" }}>
+          <div style={{ textAlign: "center" }}>
+            <b>{locationString}</b>
+          </div>
+          {content}
+        </div>
       </div>
     );
   }

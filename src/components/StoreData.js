@@ -16,7 +16,7 @@ class StoreData extends Component {
   };
 
   componentWillReceiveProps(nextProps) {
-    console.log("STORE DATA RECEIVED NEW PROPS");
+    // console.log("STORE DATA RECEIVED NEW PROPS");
     // If requestedDataLoading is not null and its different from the previous props
     // Then the user wants to fetch new data
     // It might be different but nonNull if the user requests a new dataset

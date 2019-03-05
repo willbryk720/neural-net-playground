@@ -112,7 +112,6 @@ class NetworkScene extends Component {
 
   componentWillReceiveProps(nextProps) {
     const propDiffs = diffPropBetweenObjects(this.props, nextProps);
-    console.log(propDiffs);
     if (propDiffs.includes("windowWidthRatio") || propDiffs.includes("windowHeightRatio")) {
       this.onWindowResize(nextProps);
     }
@@ -600,6 +599,7 @@ class NetworkScene extends Component {
       layerIndex,
       neuron,
       inLayerMetadata: this.layersMetadata.filter(lM => lM.layerType !== "flatten")[layerIndex - 1],
+      curLayerMetadata: this.layersMetadata.filter(lM => lM.layerType !== "flatten")[layerIndex],
       edges: this.allNeuronEdgesData.length > 0 ? this.allNeuronEdgesData[layerIndex - 1] : null,
       inLayerOutput:
         layerOutputs.length > 0 && layerIndex >= 2
