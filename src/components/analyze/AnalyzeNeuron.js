@@ -43,7 +43,7 @@ class AnalyzeNeuron extends Component {
         `Selected Neuron:  ` +
         (layerIsSquare ? `row ${row}, col ${col}, filter ${group}` : `index ${col}`) +
         ` in layer ${layerIndex + 1} (${layerType})` +
-        `    |   Output: ${expo(colorObj.val)}  Max-in-layer: ${expo(colorObj.maxVal)}`;
+        `    |   Output: ${expo(colorObj.val)},  Max-in-layer: ${expo(colorObj.maxVal)}`;
     }
 
     return (

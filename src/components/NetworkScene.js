@@ -173,7 +173,7 @@ class NetworkScene extends Component {
 
       if (nextProps.selectedNeuron !== newNeuronAtLocation) {
         this.selectedNeuron = newNeuronAtLocation;
-        this.selectedNeuron.formerColorHex = 0x000000;
+        this.selectedNeuron.formerColorHex = newNeuronAtLocation.colorObj.colorHex;
         this.modifyObject(this.selectedNeuron, SELECTED_NEURON_COLOR, 1.5);
         this.onDblClickNode(newNeuronAtLocation, nextProps);
       }
