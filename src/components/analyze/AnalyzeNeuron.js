@@ -3,6 +3,7 @@ import { Input, Menu, Segment } from "semantic-ui-react";
 
 import ModifyWeights from "./ModifyWeights";
 import MaximizeNeuron from "./MaximizeNeuron";
+import FilterViz from "./FilterViz";
 
 function expo(x) {
   if (x < 100 && x > 0.01) {
@@ -30,7 +31,7 @@ class AnalyzeNeuron extends Component {
     } else if (activeItem === "maximizeNeuron") {
       content = <MaximizeNeuron {...this.props} />;
     } else if (activeItem === "filterviz") {
-      content = <h2>Filter Visualization</h2>;
+      content = <FilterViz {...this.props} />;
     }
 
     let locationString;

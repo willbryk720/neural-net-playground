@@ -4,15 +4,15 @@ import { Button, Input, Form } from "semantic-ui-react";
 import * as tf from "@tensorflow/tfjs";
 
 import { reshape2DTensorToArray } from "../../utils/reshaping";
-import { getLayerOutputs, getGradient } from "../../utils/prediction";
+import { getLayerOutputs, getGradient, getFilterGradient } from "../../utils/prediction";
 
-class MaximizeNeuron extends Component {
+class FilterViz extends Component {
   constructor(props) {
     super(props);
     this.state = { numIterations: 3, epsilon: 0.5 };
   }
 
-  maximizeNeuron = async numSteps => {
+  maximizeFilter = async numSteps => {
     const { datasetInfo, drawing, trainedModel, analyzeInfo } = this.props;
 
     let imageTensor = tf
@@ -20,8 +20,8 @@ class MaximizeNeuron extends Component {
       .reshape([1, datasetInfo.inputLength, datasetInfo.inputLength, 1]);
 
     for (let i = 0; i < numSteps; i++) {
-      const gradient = await getGradient(imageTensor, trainedModel, analyzeInfo);
-      const newImage = imageTensor.sub(gradient.mul(tf.scalar(Number(this.state.epsilon))));
+      const gradient = await getFilterGradient(imageTensor, trainedModel, analyzeInfo);
+      const newImage = imageTensor.add(gradient.mul(tf.scalar(Number(this.state.epsilon))));
       imageTensor = newImage;
     }
 
@@ -49,15 +49,19 @@ class MaximizeNeuron extends Component {
   render() {
     const { trainedModel, datasetInfo, analyzeInfo, drawing } = this.props;
 
+    const { inLayerMetadata, curLayerMetadata } = analyzeInfo;
+
     if (Object.keys(analyzeInfo).length === 0) {
-      return <p>No neuron selected yet</p>;
+      return <p>No filter selected yet</p>;
     } else if (drawing.length === 0) {
       return <p>No image predicted yet</p>;
+    } else if (!curLayerMetadata.isSquare) {
+      return <p>You must select a neuron inside a square filter</p>;
     }
 
     return (
       <div>
-        <p>Maximize the output of the selected Neuron</p>
+        <p>Maximize the filter of the selected Neuron</p>
         <Form>
           <Form.Field inline>
             <label>Epsilon</label>
@@ -75,7 +79,7 @@ class MaximizeNeuron extends Component {
           <Button
             size="mini"
             color="blue"
-            onClick={() => this.maximizeNeuron(1)}
+            onClick={() => this.maximizeFilter(1)}
             disabled={Object.keys(trainedModel).length === 0 || !datasetInfo.name} // this might be unecessary
           >
             One Step
@@ -93,7 +97,7 @@ class MaximizeNeuron extends Component {
           <Button
             size="mini"
             color="blue"
-            onClick={() => this.maximizeNeuron(this.state.numIterations)}
+            onClick={() => this.maximizeFilter(this.state.numIterations)}
             disabled={Object.keys(trainedModel).length === 0 || !datasetInfo.name} // this might be unecessary
           >
             Multiple Steps
@@ -104,4 +108,4 @@ class MaximizeNeuron extends Component {
   }
 }
 
-export default MaximizeNeuron;
+export default FilterViz;

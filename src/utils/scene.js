@@ -112,7 +112,7 @@ export const getLayersMetadataFromLayers = newLayers => {
   };
   layersMetadata.push(previousLayerMetadata);
 
-  layers.forEach(layer => {
+  layers.forEach((layer, layersArrIndex) => {
     const { layerType, options } = layer;
     switch (layerType) {
       case "dense": {
@@ -122,7 +122,8 @@ export const getLayersMetadataFromLayers = newLayers => {
           isSquare: false,
           directlyAbovePrevious: false,
           layerType,
-          options: options
+          options: options,
+          layersArrIndex
         };
         layersMetadata.push(previousLayerMetadata);
         break;
@@ -145,7 +146,8 @@ export const getLayersMetadataFromLayers = newLayers => {
           isSquare: true,
           directlyAbovePrevious: false,
           layerType,
-          options: options
+          options: options,
+          layersArrIndex
         };
         layersMetadata.push(previousLayerMetadata);
         break;
@@ -172,13 +174,14 @@ export const getLayersMetadataFromLayers = newLayers => {
           isSquare: true,
           directlyAbovePrevious: true,
           layerType,
-          options: options
+          options: options,
+          layersArrIndex
         };
         layersMetadata.push(previousLayerMetadata);
         break;
       }
       case "flatten": {
-        layersMetadata.push({ layerType }); // add only layerType
+        layersMetadata.push({ layerType, layersArrIndex }); // add only layerType
         break;
       }
       default:
