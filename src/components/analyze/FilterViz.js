@@ -9,7 +9,7 @@ import { getLayerOutputs, getGradient, getFilterGradient } from "../../utils/pre
 class FilterViz extends Component {
   constructor(props) {
     super(props);
-    this.state = { numIterations: 3, epsilon: 0.5 };
+    this.state = { numIterations: 3, epsilon: 0.5, loadingOneStep: false, loadingMultSteps: false };
   }
 
   maximizeFilter = async numSteps => {
@@ -44,6 +44,9 @@ class FilterViz extends Component {
 
     const layerOutputs = await getLayerOutputs(imageTensor, trainedModel);
     this.props.onMakePrediction(layerOutputs, image);
+
+    console.log("SETTING FALSE");
+    this.setState({ loadingOneStep: false, loadingMultSteps: false });
   };
 
   render() {
@@ -77,9 +80,13 @@ class FilterViz extends Component {
             />
           </Form.Field>
           <Button
+            loading={this.state.loadingOneStep}
             size="mini"
             color="blue"
-            onClick={() => this.maximizeFilter(1)}
+            onClick={() => {
+              this.setState({ loadingOneStep: true });
+              this.maximizeFilter(1);
+            }}
             disabled={Object.keys(trainedModel).length === 0 || !datasetInfo.name} // this might be unecessary
           >
             One Step
@@ -95,9 +102,13 @@ class FilterViz extends Component {
             />
           </Form.Field>
           <Button
+            loading={this.state.loadingMultSteps}
             size="mini"
             color="blue"
-            onClick={() => this.maximizeFilter(this.state.numIterations)}
+            onClick={() => {
+              this.setState({ loadingMultSteps: true });
+              this.maximizeFilter(this.state.numIterations);
+            }}
             disabled={Object.keys(trainedModel).length === 0 || !datasetInfo.name} // this might be unecessary
           >
             Multiple Steps

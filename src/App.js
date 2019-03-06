@@ -46,7 +46,8 @@ class App extends Component {
       analyzeInfo: {},
       countForRendering: 0,
       navLeftOpen: true,
-      navBottomOpen: true
+      navBottomOpen: true,
+      networkLoading: false
     };
     this.dataRef = React.createRef();
   }
@@ -118,10 +119,14 @@ class App extends Component {
     this.setState({ analyzeInfo });
   };
 
-  // onBeginUpdateNetwork = () => {
-  //   this.setState({ networkLoading: true });
-  // };
-  // onEndUpdateNetwork = () => this.setState({ networkLoading: false });
+  onBeginUpdateNetwork = () => {
+    console.log("begin");
+    this.setState({ networkLoading: true });
+  };
+  onEndUpdateNetwork = () => {
+    console.log("end");
+    this.setState({ networkLoading: false });
+  };
 
   render() {
     const storeDataComponent = (
@@ -216,7 +221,6 @@ class App extends Component {
               height: "100%"
             }}
           >
-            <ShowLoading isCurrentlyTraining={this.state.isCurrentlyTraining} />
             <div className="closebtn">
               <a
                 href=""
@@ -274,6 +278,8 @@ class App extends Component {
               datasetInfo={this.state.datasetInfo}
               countForRendering={this.state.countForRendering}
             />
+            <ShowLoading loading={this.state.networkLoading} />
+            {this.state.networkLoading && <CircularLoading />}
           </div>
         </div>
 
@@ -297,6 +303,7 @@ class App extends Component {
             onDblClickNeuron={this.onDblClickNeuron}
             datasetInfo={this.state.datasetInfo}
             selectedNeuron={this.state.analyzeInfo.neuron}
+            networkLoading={this.state.networkLoading}
           />
 
           <div
@@ -329,6 +336,8 @@ class App extends Component {
         </div>
       </div>
     );
+
+    console.log("RELOADED WHOLE APP BRO", this.state.networkLoading);
 
     return (
       <div style={{ height: "100%" }}>

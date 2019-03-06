@@ -117,8 +117,12 @@ class NetworkScene extends Component {
     }
     if (propDiffs.length === 1 && propDiffs.includes("selectedNeuron")) {
       // dont do anything
+    } else if (propDiffs.length === 1 && propDiffs.includes("networkLoading")) {
+      // dont do anything
     } else if (propDiffs.length > 0) {
       console.log("Rendered Whole Scene Again");
+      this.props.onBeginUpdateNetwork();
+
       // Clear all objects (check that this doesnt have memory leaks TODO)
       this.scene.remove.apply(this.scene, this.scene.children);
       this.updateNetworkSetup(nextProps);
@@ -133,8 +137,6 @@ class NetworkScene extends Component {
   }
 
   async updateNetworkSetup(nextProps) {
-    // this.props.onBeginUpdateNetwork();
-
     const { layers, drawing, layerOutputs, trainedModel, datasetInfo } = nextProps;
 
     const layersMetadata = getLayersMetadataFromLayers(layers);
@@ -178,6 +180,9 @@ class NetworkScene extends Component {
         this.onDblClickNode(newNeuronAtLocation, nextProps);
       }
     }
+
+    console.log("end NETWORK SCENE");
+    this.props.onEndUpdateNetwork();
   }
 
   drawNeuron = (pos, colorObj, layerType, indexInfo, layerIsSquare) => {

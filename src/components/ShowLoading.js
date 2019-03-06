@@ -4,8 +4,8 @@ import { Button } from "semantic-ui-react";
 import CircularLoading from "./common/CircularLoading";
 
 function ShowLoading(props) {
-  const { isCurrentlyTraining } = props;
-  return <div>{isCurrentlyTraining && <CircularLoading />}</div>;
+  const { loading } = props;
+  return <div>{loading && <CircularLoading />}</div>;
 }
 
 export default ShowLoading;
