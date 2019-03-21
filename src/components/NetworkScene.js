@@ -7,10 +7,11 @@ import * as OrbitControls from "three-orbitcontrols";
 import {
   getAllNeuronPositions,
   getLayersMetadataFromLayers,
-  diffPropBetweenObjects,
   getAllNeuronEdgesData,
   getOutputColors
 } from "../utils/scene";
+
+import { diffPropBetweenObjects } from "../utils/general";
 
 import {
   NEURON_WIDTH,

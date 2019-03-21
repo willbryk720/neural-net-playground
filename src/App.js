@@ -233,7 +233,7 @@ class App extends Component {
               </a>
             </div>
 
-            <h1 style={{ marginTop: "3px" }}>1. Load Data</h1>
+            <h1 style={{ marginTop: "3px" }}>1. Load Dataset</h1>
             <LoadData
               onClickedLoadDataset={this.onClickedLoadDataset}
               datasetInfo={this.state.datasetInfo}

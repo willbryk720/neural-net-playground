@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import { Button } from "semantic-ui-react";
 
 import { getColorStyle } from "../../utils/analyze";
+import { diffPropBetweenObjects } from "../../utils/general";
 
 class PredictCanvas extends React.Component {
   constructor(props) {
@@ -20,8 +21,14 @@ class PredictCanvas extends React.Component {
   };
 
   componentWillReceiveProps(nextProps) {
-    if (nextProps.drawing.length > 0) this.setState({ points: nextProps.drawing });
+    const propDiffs = diffPropBetweenObjects(this.props, nextProps);
+    if (propDiffs.length === 1 && propDiffs.includes("drawColorFrac")) {
+      // dont do anything
+    } else if (nextProps.drawing.length > 0) {
+      this.setState({ points: nextProps.drawing });
+    }
   }
+
   componentDidMount() {
     this.setCanvasToDrawing();
   }
@@ -73,11 +80,16 @@ class PredictCanvas extends React.Component {
       const { lineWidth, points } = this.state;
       const squareWidth = this.props.canvasWidth / inputLength;
 
+      const pointerSizeValue =
+        this.props.pointerSize === "big" ? 1.0 : this.props.pointerSize === "medium" ? 0.5 : 0.0;
+
       let copyPoints = points.slice();
       for (let i = -lineWidth; i <= lineWidth; i++) {
-        const newX = x + (i * squareWidth) / 3;
+        // const newX = x + (i * squareWidth) / 3;
+        const newX = x + i * squareWidth * pointerSizeValue;
         for (let j = -lineWidth; j <= lineWidth; j++) {
-          const newY = y + (j * squareWidth) / 3;
+          // const newY = y + (j * squareWidth) / 3;
+          const newY = y + j * squareWidth * pointerSizeValue;
 
           let point = [
             Math.floor((inputLength * newX) / this.props.canvasWidth),
@@ -88,7 +100,7 @@ class PredictCanvas extends React.Component {
           const r = point[1];
 
           if (c >= 0 && c < inputLength && r >= 0 && r < inputLength) {
-            copyPoints[r][c] = 1;
+            copyPoints[r][c] = Number(this.props.drawColorFrac);
             this.updateCanvas([c, r]);
           }
         }
