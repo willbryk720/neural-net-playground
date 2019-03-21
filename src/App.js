@@ -62,7 +62,7 @@ class App extends Component {
       starterNetworkName
     });
     this.setState({
-      stepsCompleted: this.state.stepsCompleted === 1 ? 2 : this.state.stepsCompleted
+      stepsCompleted: 2
     });
   };
 
@@ -121,10 +121,21 @@ class App extends Component {
   };
 
   onLoadedDataset = datasetInfo => {
+    // this.setState({
+    //   datasetInfo,
+    //   requestedDatasetLoading: null,
+    //   stepsCompleted: this.state.stepsCompleted === 0 ? 1 : this.state.stepsCompleted
+    // });
     this.setState({
       datasetInfo,
       requestedDatasetLoading: null,
-      stepsCompleted: this.state.stepsCompleted === 0 ? 1 : this.state.stepsCompleted
+      stepsCompleted: 1
+
+      // layers: [],
+      // layerOutputs: [],
+      // drawing: [],
+      // trainedModel: {},
+      // analyzeInfo: {}
     });
   };
 

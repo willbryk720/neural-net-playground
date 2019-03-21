@@ -227,8 +227,8 @@ class TfStuff extends Component {
         <p>{this.state.status} </p>
         {this.state.showChart && (
           <LineChart
-            width={600}
-            height={400}
+            width={300}
+            height={250}
             data={data}
             xLabel={"Batch"}
             yLabel={"Accuracy"}

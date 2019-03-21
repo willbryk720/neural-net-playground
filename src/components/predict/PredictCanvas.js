@@ -22,7 +22,10 @@ class PredictCanvas extends React.Component {
 
   componentWillReceiveProps(nextProps) {
     const propDiffs = diffPropBetweenObjects(this.props, nextProps);
-    if (propDiffs.length === 1 && propDiffs.includes("drawColorFrac")) {
+    if (
+      propDiffs.length === 1 &&
+      (propDiffs.includes("drawColorFrac") || propDiffs.includes("pointerSize"))
+    ) {
       // dont do anything
     } else if (nextProps.drawing.length > 0) {
       this.setState({ points: nextProps.drawing });
