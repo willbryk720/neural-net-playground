@@ -47,7 +47,8 @@ class App extends Component {
       countForRendering: 0,
       navLeftOpen: true,
       navBottomOpen: true,
-      networkLoading: false
+      networkLoading: false,
+      stepsCompleted: 0
     };
     this.dataRef = React.createRef();
   }
@@ -60,24 +61,35 @@ class App extends Component {
       analyzeInfo: {},
       starterNetworkName
     });
-    console.log(this.state);
+    this.setState({
+      stepsCompleted: this.state.stepsCompleted === 1 ? 2 : this.state.stepsCompleted
+    });
   };
 
   alertChangedWeights = () => {
-    this.setState({ countForRendering: this.state.countForRendering + 1 });
+    this.setState({
+      countForRendering: this.state.countForRendering + 1
+    });
   };
 
   onChangeNumEpochs = newNumEpochs => {
     this.setState({ numEpochs: newNumEpochs });
   };
 
+  // onChangeStepsCompleted = newStepsCompleted => {
+  //   this.setState({ stepsCompleted: newStepsCompleted });
+  // };
+
   onMakePrediction = (layerOutputs, drawing) => {
     this.setState({ drawing, layerOutputs });
   };
 
   onFinishedTrainingModel = model => {
-    this.setState({ trainedModel: model, isCurrentlyTraining: false });
-    console.log("NEWMODEL", model);
+    this.setState({
+      trainedModel: model,
+      isCurrentlyTraining: false,
+      stepsCompleted: this.state.stepsCompleted === 2 ? 3 : this.state.stepsCompleted
+    });
   };
 
   onStartTrainingModel = () => {
@@ -91,7 +103,8 @@ class App extends Component {
     // isLoadingPreTrainedModel
     this.setState({
       trainedModel: preTrainedModel,
-      layerOutputs: []
+      layerOutputs: [],
+      stepsCompleted: this.state.stepsCompleted === 2 ? 3 : this.state.stepsCompleted
     });
   };
 
@@ -108,7 +121,11 @@ class App extends Component {
   };
 
   onLoadedDataset = datasetInfo => {
-    this.setState({ datasetInfo, requestedDatasetLoading: null });
+    this.setState({
+      datasetInfo,
+      requestedDatasetLoading: null,
+      stepsCompleted: this.state.stepsCompleted === 0 ? 1 : this.state.stepsCompleted
+    });
   };
 
   onClickedLoadDataset = datasetName => {
@@ -233,51 +250,65 @@ class App extends Component {
               </a>
             </div>
 
-            <h1 style={{ marginTop: "3px" }}>1. Load Dataset</h1>
-            <LoadData
-              onClickedLoadDataset={this.onClickedLoadDataset}
-              datasetInfo={this.state.datasetInfo}
-              requestedDatasetLoading={this.state.requestedDatasetLoading}
-            />
-            <hr />
-            <h1>2. Create Layers</h1>
-            <SortableLayers updateLayers={this.updateLayers} layers={this.state.layers} />
-            <hr />
-            <h1>3. Create Weights</h1>
-            <AddPreTrainedModel
-              onLoadPreTrainedModel={this.onLoadPreTrainedModel}
-              starterNetworkName={this.state.starterNetworkName}
-              preTrainedModelOptions={preTrainedModelOptions}
-              preTrainedModelName={this.state.trainedModel.preTrainedModelName}
-            />
-            {preTrainedModelOptions.find(
-              pTM => pTM.name.split("-")[0] === this.state.starterNetworkName
-            ) ? (
-              <h5>Or train model from scratch:</h5>
-            ) : (
-              <h5>Train model from scratch:</h5>
+            <div>
+              <h1 style={{ marginTop: "3px" }}>1. Load Dataset</h1>
+              <LoadData
+                onClickedLoadDataset={this.onClickedLoadDataset}
+                datasetInfo={this.state.datasetInfo}
+                requestedDatasetLoading={this.state.requestedDatasetLoading}
+              />
+            </div>
+            {this.state.stepsCompleted >= 1 && (
+              <div>
+                <hr />
+                <h1>2. Create Layers</h1>
+                <SortableLayers updateLayers={this.updateLayers} layers={this.state.layers} />
+              </div>
             )}
-            <TfStuff
-              layers={this.state.layers}
-              numEpochs={this.state.numEpochs}
-              onChangeNumEpochs={this.onChangeNumEpochs}
-              onFinishedTrainingModel={this.onFinishedTrainingModel}
-              onStartTrainingModel={this.onStartTrainingModel}
-              drawing={this.state.drawing}
-              datasetInfo={this.state.datasetInfo}
-              getTrainData={this.getTrainData}
-              getTestData={this.getTestData}
-            />
-            <hr />
-            <h1>4. Predict</h1>
-            <Predict
-              drawing={this.state.drawing}
-              onMakePrediction={this.onMakePrediction}
-              trainedModel={this.state.trainedModel}
-              getRandomTestImage={this.getRandomTestImage}
-              datasetInfo={this.state.datasetInfo}
-              countForRendering={this.state.countForRendering}
-            />
+            {this.state.stepsCompleted >= 2 && (
+              <React.Fragment>
+                <hr />
+                <h1>3. Create Weights</h1>
+                <AddPreTrainedModel
+                  onLoadPreTrainedModel={this.onLoadPreTrainedModel}
+                  starterNetworkName={this.state.starterNetworkName}
+                  preTrainedModelOptions={preTrainedModelOptions}
+                  preTrainedModelName={this.state.trainedModel.preTrainedModelName}
+                />
+                {preTrainedModelOptions.find(
+                  pTM => pTM.name.split("-")[0] === this.state.starterNetworkName
+                ) ? (
+                  <h5>Or train model from scratch:</h5>
+                ) : (
+                  <h5>Train model from scratch:</h5>
+                )}
+                <TfStuff
+                  layers={this.state.layers}
+                  numEpochs={this.state.numEpochs}
+                  onChangeNumEpochs={this.onChangeNumEpochs}
+                  onFinishedTrainingModel={this.onFinishedTrainingModel}
+                  onStartTrainingModel={this.onStartTrainingModel}
+                  drawing={this.state.drawing}
+                  datasetInfo={this.state.datasetInfo}
+                  getTrainData={this.getTrainData}
+                  getTestData={this.getTestData}
+                />
+              </React.Fragment>
+            )}
+            {this.state.stepsCompleted >= 3 && (
+              <React.Fragment>
+                <hr />
+                <h1>4. Predict</h1>
+                <Predict
+                  drawing={this.state.drawing}
+                  onMakePrediction={this.onMakePrediction}
+                  trainedModel={this.state.trainedModel}
+                  getRandomTestImage={this.getRandomTestImage}
+                  datasetInfo={this.state.datasetInfo}
+                  countForRendering={this.state.countForRendering}
+                />
+              </React.Fragment>
+            )}
             <ShowLoading loading={this.state.networkLoading} />
             {this.state.networkLoading && <CircularLoading />}
           </div>

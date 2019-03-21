@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 
 import { MnistData, FacesOrNotData } from "../utils/data";
-import { Button, Icon } from "semantic-ui-react";
+import { Button, Icon, Dropdown } from "semantic-ui-react";
 
 class LoadData extends Component {
   constructor(props) {
@@ -20,31 +20,27 @@ class LoadData extends Component {
 
     return (
       <div>
-        <Button
+        <Dropdown
           disabled={isLoadingDataset}
-          loading={requestedDatasetLoading === "MNIST"}
-          color="blue"
-          onClick={() => {
-            onClickedLoadDataset("MNIST");
+          loading={isLoadingDataset}
+          placeholder="Layer Type"
+          search
+          selection
+          options={[
+            { key: 1, text: "MNIST Dataset", value: "MNIST" },
+            { key: 2, text: "FacesOrNot Dataset", value: "FacesOrNot" }
+          ]}
+          onChange={(e, { value }) => {
+            onClickedLoadDataset(value);
           }}
-        >
-          Load MNIST Data
-        </Button>
+          selectOnNavigation={false}
+          selectOnBlur={false}
+        />
         <br />
-        <Button
-          disabled={isLoadingDataset}
-          loading={requestedDatasetLoading === "FacesOrNot"}
-          color="blue"
-          onClick={() => {
-            onClickedLoadDataset("FacesOrNot");
-          }}
-        >
-          Load FacesOrNot Data
-        </Button>{" "}
         <br />
         {datasetInfo.name && (
           <span>
-            <b>{datasetInfo.name}</b>
+            <b>Successfully Loaded {datasetInfo.name}</b>
             <Icon name="check" color="green" />
           </span>
         )}
