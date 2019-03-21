@@ -124,21 +124,29 @@ class AddStarterNetworks extends Component {
     this.state = {};
   }
 
+  onChooseStarterNetwork(value) {
+    const chosenNetwork = networks.find(network => network.name === value);
+    this.props.loadStarterNetwork(chosenNetwork.layers, value);
+  }
+
   render() {
-    const { loadStarterNetwork } = this.props;
+    const options = networks.map((network, i) => {
+      return { key: network.name, text: network.name, value: network.name };
+    });
+
     return (
       <div>
-        {networks.map(network => {
-          return (
-            <Button
-              color="green"
-              key={network.name}
-              onClick={() => loadStarterNetwork(network.layers, network.name)}
-            >
-              {network.name}
-            </Button>
-          );
-        })}
+        <Dropdown
+          placeholder="Starter Network"
+          search
+          selection
+          options={options}
+          onChange={(e, { value }) => {
+            this.onChooseStarterNetwork(value);
+          }}
+          selectOnNavigation={false}
+          selectOnBlur={false}
+        />
       </div>
     );
   }

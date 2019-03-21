@@ -85,10 +85,8 @@ class PredictCanvas extends React.Component {
 
       let copyPoints = points.slice();
       for (let i = -lineWidth; i <= lineWidth; i++) {
-        // const newX = x + (i * squareWidth) / 3;
         const newX = x + i * squareWidth * pointerSizeValue;
         for (let j = -lineWidth; j <= lineWidth; j++) {
-          // const newY = y + (j * squareWidth) / 3;
           const newY = y + j * squareWidth * pointerSizeValue;
 
           let point = [

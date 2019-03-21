@@ -251,7 +251,10 @@ class App extends Component {
             </div>
 
             <div>
-              <h1 style={{ marginTop: "3px" }}>1. Load Dataset</h1>
+              <h1 style={{ marginTop: "3px" }}>
+                Step 1: Load Dataset{" "}
+                {this.state.stepsCompleted >= 1 ? <Icon name="check" color="green" /> : ""}
+              </h1>
               <LoadData
                 onClickedLoadDataset={this.onClickedLoadDataset}
                 datasetInfo={this.state.datasetInfo}
@@ -261,14 +264,20 @@ class App extends Component {
             {this.state.stepsCompleted >= 1 && (
               <div>
                 <hr />
-                <h1>2. Create Layers</h1>
+                <h1>
+                  Step 2: Create Layers{" "}
+                  {this.state.stepsCompleted >= 2 ? <Icon name="check" color="green" /> : ""}
+                </h1>
                 <SortableLayers updateLayers={this.updateLayers} layers={this.state.layers} />
               </div>
             )}
             {this.state.stepsCompleted >= 2 && (
               <React.Fragment>
                 <hr />
-                <h1>3. Create Weights</h1>
+                <h1>
+                  Step 3: Create Weights{" "}
+                  {this.state.stepsCompleted >= 3 ? <Icon name="check" color="green" /> : ""}
+                </h1>
                 <AddPreTrainedModel
                   onLoadPreTrainedModel={this.onLoadPreTrainedModel}
                   starterNetworkName={this.state.starterNetworkName}
@@ -298,7 +307,7 @@ class App extends Component {
             {this.state.stepsCompleted >= 3 && (
               <React.Fragment>
                 <hr />
-                <h1>4. Predict</h1>
+                <h1>Step 4: Predict Images</h1>
                 <Predict
                   drawing={this.state.drawing}
                   onMakePrediction={this.onMakePrediction}

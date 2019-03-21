@@ -38,12 +38,12 @@ class LoadData extends Component {
         />
         <br />
         <br />
-        {datasetInfo.name && (
+        {/* {datasetInfo.name && (
           <span>
             <b>Successfully Loaded {datasetInfo.name}</b>
             <Icon name="check" color="green" />
           </span>
-        )}
+        )} */}
       </div>
     );
   }

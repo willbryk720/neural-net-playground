@@ -56,34 +56,39 @@ class SortableLayers extends Component {
   render() {
     return (
       <div>
-        <h5>Choose Defaults:</h5>
-        <AddStarterNetworks loadStarterNetwork={this.loadStarterNetwork} />
-        <h5>Or build your own:</h5>
-        <Button
-          color="blue"
-          size="small"
-          onClick={() => {
-            this.props.updateLayers(this.state.layers, null);
-          }}
-        >
-          Update
-        </Button>
-        <Button color="blue" size="small" onClick={this.onClickAdd} style={{ float: "right" }}>
-          Add New Layer
-        </Button>
-        <div style={{ height: "8px" }} />
-        <SortableContainer onSortEnd={this.onSortEnd} useDragHandle distance={1}>
-          {this.state.layers.map((layer, index) => (
-            <SortableItem
-              key={`item-${index}`}
-              index={index}
-              layer={layer}
-              indexOfItem={index}
-              onChangeLayer={this.onChangeLayer.bind(this)}
-              onClickDelete={this.onClickDelete}
-            />
-          ))}
-        </SortableContainer>
+        <div>
+          <h5>Add layers of your own:</h5>
+          <Button
+            color="blue"
+            size="small"
+            onClick={() => {
+              this.props.updateLayers(this.state.layers, null);
+            }}
+          >
+            Update
+          </Button>
+          <Button color="blue" size="small" onClick={this.onClickAdd} style={{ float: "right" }}>
+            Add New Layer
+          </Button>
+          <div style={{ height: "8px" }} />
+          <SortableContainer onSortEnd={this.onSortEnd} useDragHandle distance={1}>
+            {this.state.layers.map((layer, index) => (
+              <SortableItem
+                key={`item-${index}`}
+                index={index}
+                layer={layer}
+                indexOfItem={index}
+                onChangeLayer={this.onChangeLayer.bind(this)}
+                onClickDelete={this.onClickDelete}
+              />
+            ))}
+          </SortableContainer>
+        </div>
+        <br />
+        <div>
+          <h5>Or choose From Defaults:</h5>
+          <AddStarterNetworks loadStarterNetwork={this.loadStarterNetwork} />
+        </div>
       </div>
     );
   }
