@@ -1,9 +1,9 @@
 # neural-net-playground
 
 ## To run
-git clone 
+`git clone https://github.com/willbryk720/neural-net-playground.git`
 
-`cd into cloned folder`
+`cd neural-net-playground`
 
 `npm install`
 
