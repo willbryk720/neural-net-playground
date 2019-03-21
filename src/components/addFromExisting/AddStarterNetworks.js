@@ -130,7 +130,7 @@ class AddStarterNetworks extends Component {
   }
 
   render() {
-    const options = networks.map((network, i) => {
+    const options = networks.map(network => {
       return { key: network.name, text: network.name, value: network.name };
     });
 

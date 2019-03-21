@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Button, Icon } from "semantic-ui-react";
+import { Button, Icon, Dropdown } from "semantic-ui-react";
 
 import * as tf from "@tensorflow/tfjs";
 
@@ -40,24 +40,24 @@ class AddPreTrainedModel extends Component {
       return <div />;
     }
 
+    const options = preTrainedModelAllowedOptions.map(pTM => {
+      return { key: pTM.name, text: pTM.name, value: pTM.name };
+    });
+
     return (
       <div>
         <h5>Choose from Pre-trained options:</h5>
-        {preTrainedModelAllowedOptions.map(pTM => (
-          <Button
-            key={pTM.name}
-            size="small"
-            color="green"
-            onClick={() => this.downloadPreTrainedModel(pTM.name)}
-          >
-            {pTM.name}
-          </Button>
-        ))}
-        {this.props.preTrainedModelName && (
-          <span>
-            {this.props.preTrainedModelName} <Icon name="check" color="green" />
-          </span>
-        )}
+        <Dropdown
+          placeholder="Starter Weights"
+          search
+          selection
+          options={options}
+          onChange={(e, { value }) => {
+            this.downloadPreTrainedModel(value);
+          }}
+          selectOnNavigation={false}
+          selectOnBlur={false}
+        />
       </div>
     );
   }
