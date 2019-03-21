@@ -165,6 +165,10 @@ class App extends Component {
       />
     );
 
+    const thickSeparator = (
+      <hr style={{ border: "black solid 1px", marginTop: "40px", marginBottom: "30px" }} />
+    );
+
     let wholeApp = (
       <div
         className="App"
@@ -274,7 +278,7 @@ class App extends Component {
             </div>
             {this.state.stepsCompleted >= 1 && (
               <div>
-                <hr />
+                {thickSeparator}
                 <h1>
                   Step 2: Create Layers{" "}
                   {this.state.stepsCompleted >= 2 ? <Icon name="check" color="green" /> : ""}
@@ -284,7 +288,7 @@ class App extends Component {
             )}
             {this.state.stepsCompleted >= 2 && (
               <React.Fragment>
-                <hr />
+                {thickSeparator}
                 <h1>
                   Step 3: Create Weights{" "}
                   {this.state.stepsCompleted >= 3 ? <Icon name="check" color="green" /> : ""}
@@ -317,7 +321,7 @@ class App extends Component {
             )}
             {this.state.stepsCompleted >= 3 && (
               <React.Fragment>
-                <hr />
+                {thickSeparator}
                 <h1>Step 4: Predict Images</h1>
                 <Predict
                   drawing={this.state.drawing}
@@ -327,8 +331,11 @@ class App extends Component {
                   datasetInfo={this.state.datasetInfo}
                   countForRendering={this.state.countForRendering}
                 />
+                <br />
+                <br />
               </React.Fragment>
             )}
+
             <ShowLoading loading={this.state.networkLoading} />
             {this.state.networkLoading && <CircularLoading />}
           </div>
@@ -388,7 +395,7 @@ class App extends Component {
       </div>
     );
 
-    console.log("RELOADED WHOLE APP BRO", this.state.networkLoading);
+    console.log("RELOADED WHOLE APP", this.state.networkLoading);
 
     return (
       <div style={{ height: "100%" }}>

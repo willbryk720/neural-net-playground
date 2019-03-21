@@ -202,28 +202,31 @@ class TfStuff extends Component {
         <div>
           <label># Training Epochs:</label>
           <Input
-            width={1}
+            style={{ width: "80px" }}
             type={"Number"}
             value={this.props.numEpochs}
             onChange={(e, { value }) => this.props.onChangeNumEpochs(value)}
           />
+          <div style={{ width: "10px", display: "inline-block" }} />
+          <Button
+            disabled={
+              this.state.currentlyTraining ||
+              !this.props.datasetInfo.name ||
+              this.props.layers.length === 0
+            }
+            loading={this.state.currentlyTraining}
+            color="blue"
+            onClick={() => {
+              this.setState({ currentlyTraining: true, showChart: true });
+              this.runTF();
+            }}
+            size="small"
+          >
+            Train
+          </Button>
         </div>
         <br />
-        <Button
-          disabled={
-            this.state.currentlyTraining ||
-            !this.props.datasetInfo.name ||
-            this.props.layers.length === 0
-          }
-          loading={this.state.currentlyTraining}
-          color="blue"
-          onClick={() => {
-            this.setState({ currentlyTraining: true, showChart: true });
-            this.runTF();
-          }}
-        >
-          Train New Model
-        </Button>
+
         <p>{this.state.status} </p>
         {this.state.showChart && (
           <LineChart

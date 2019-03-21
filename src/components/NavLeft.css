@@ -18,7 +18,7 @@
   top: 0;
   right: 3px;
   font-size: 28px;
-  /* margin-left: 50px; */
+  /* margin-left: 50px */
 }
 
 #openbtn-left {
@@ -32,11 +32,6 @@
 #sidenavBottom {
   position: fixed;
   z-index: 6;
-  /* height: 100%; */
-
-  /* width: 100%;  */
-  /* bottom: 0;
-  right: 0; */
 
   transition: 0.5s;
 }

@@ -37,7 +37,6 @@ class LoadData extends Component {
           selectOnBlur={false}
         />
         <br />
-        <br />
         {/* {datasetInfo.name && (
           <span>
             <b>Successfully Loaded {datasetInfo.name}</b>

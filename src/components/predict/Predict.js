@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Button, Input, Form, Radio } from "semantic-ui-react";
+import { Button, Input, Form, Icon } from "semantic-ui-react";
 import PredictCanvas from "./PredictCanvas";
 
 import * as tf from "@tensorflow/tfjs";
@@ -7,13 +7,13 @@ import * as tf from "@tensorflow/tfjs";
 import { reshape2DTensorToArray } from "../../utils/reshaping";
 import { getLayerOutputs, getGradient } from "../../utils/prediction";
 
-const CANVAS_WIDTH = 200;
-const CANVAS_HEIGHT = 200;
+const CANVAS_WIDTH = 300;
+const CANVAS_HEIGHT = 300;
 
 class Predict extends Component {
   constructor(props) {
     super(props);
-    this.state = { drawColorFrac: 1.0, pointerSize: "big" };
+    this.state = { drawColorFrac: 1.0, pointerSize: "medium" };
     this.myRef = React.createRef();
   }
 
@@ -54,7 +54,6 @@ class Predict extends Component {
   };
 
   handleChange = (e, { name, value }) => this.setState({ [name]: value });
-  handleRadioChange = (e, { value }) => this.setState({ pointerSize: value });
 
   render() {
     const { trainedModel, datasetInfo } = this.props;
@@ -66,6 +65,17 @@ class Predict extends Component {
 
     return (
       <div>
+        <div>
+          <Button
+            size="small"
+            color="blue"
+            onClick={this.makeTestImagePrediction}
+            disabled={Object.keys(trainedModel).length === 0 || !datasetInfo.name} // this might be unecessary
+          >
+            New Test Image
+          </Button>
+        </div>
+        <div style={{ height: "4px" }} />
         <PredictCanvas
           ref={this.myRef}
           canvasWidth={CANVAS_WIDTH}
@@ -75,80 +85,82 @@ class Predict extends Component {
           drawColorFrac={this.state.drawColorFrac}
           pointerSize={this.state.pointerSize}
         />
-        <Button size="mini" onClick={this.clearDrawing}>
-          Clear
-        </Button>
-        <Button
-          size="mini"
-          color="blue"
-          onClick={this.makeDrawingPrediction}
-          disabled={Object.keys(trainedModel).length === 0 || !datasetInfo.name} // this might be unecessary
-        >
-          Predict Drawing
-        </Button>
-        <Button
-          size="mini"
-          color="blue"
-          onClick={this.makeTestImagePrediction}
-          disabled={Object.keys(trainedModel).length === 0 || !datasetInfo.name} // this might be unecessary
-        >
-          Predict Test Image
-        </Button>
-        <Input
-          min={0}
-          max={1}
-          name="drawColorFrac"
-          onChange={this.handleChange}
-          step={0.1}
-          type="range"
-          value={this.state.drawColorFrac}
-        />
-        {/* <Dropdown
-          closeOnChange
-          onChange={this.onChange}
-          options={[
-            { key: 1, text: "small", value: 0 },
-            { key: 2, text: "medium", value: 0.5 },
-            { key: 3, text: "big", value: 1 }
-          ]}
-          placeholder={"Size"}
-          clearable
-          fluid
-          selection
-          compact
-          selectOnNavigation={false}
-          selectOnBlur={false}
-        /> */}
-        <div style={{ float: "right" }}>
-          <Form>
-            <Form.Field>
-              <Radio
-                label="Small"
-                name="radioGroup"
-                value="small"
-                checked={this.state.pointerSize === "small"}
-                onChange={this.handleRadioChange}
-              />
-            </Form.Field>
-            <Form.Field>
-              <Radio
-                label="Medium"
-                name="radioGroup"
-                value="medium"
-                checked={this.state.pointerSize === "medium"}
-                onChange={this.handleRadioChange}
-              />
-            </Form.Field>
-            <Form.Field>
-              <Radio
-                label="Big"
-                name="radioGroup"
-                value="big"
-                checked={this.state.pointerSize === "big"}
-                onChange={this.handleRadioChange}
-              />
-            </Form.Field>
-          </Form>
+
+        <div>
+          <Icon name="circle" size="large" />
+          <Input
+            min={0}
+            max={1}
+            name="drawColorFrac"
+            onChange={this.handleChange}
+            step={0.1}
+            type="range"
+            value={this.state.drawColorFrac}
+          />
+          <Icon name="circle outline" size="large" />
+          <div
+            style={{
+              width: "20px",
+              display: "inline-block"
+            }}
+          />
+          <div style={{ display: "inline-block" }}>
+            <div style={{ height: "4px" }} />
+            <div
+              style={{
+                width: "12px",
+                height: "12px",
+                background: "grey",
+                display: "inline-block",
+                outline: this.state.pointerSize === "small" ? "3px solid lightblue" : ""
+              }}
+              onClick={() => this.setState({ pointerSize: "small" })}
+            />
+            <div
+              style={{
+                width: "10px",
+                display: "inline-block"
+              }}
+            />
+            <div
+              style={{
+                width: "20px",
+                height: "20px",
+                background: "grey",
+                display: "inline-block",
+                outline: this.state.pointerSize === "medium" ? "3px solid lightblue" : ""
+              }}
+              onClick={() => this.setState({ pointerSize: "medium" })}
+            />
+            <div
+              style={{
+                width: "10px",
+                display: "inline-block"
+              }}
+            />
+            <div
+              style={{
+                width: "30px",
+                height: "30px",
+                background: "grey",
+                display: "inline-block",
+                outline: this.state.pointerSize === "big" ? "3px solid lightblue" : ""
+              }}
+              onClick={() => this.setState({ pointerSize: "big" })}
+            />
+          </div>
+          <Button size="mini" onClick={this.clearDrawing} style={{ float: "right" }}>
+            Clear
+          </Button>
+
+          <Button
+            size="small"
+            color="blue"
+            onClick={this.makeDrawingPrediction}
+            disabled={Object.keys(trainedModel).length === 0 || !datasetInfo.name} // this might be unecessary
+          >
+            Predict Modified Image
+          </Button>
         </div>
       </div>
     );
