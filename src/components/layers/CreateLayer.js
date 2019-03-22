@@ -1,52 +1,7 @@
 import React, { Component } from "react";
 import { Button, Icon, Input, Dropdown, Modal, Header, Form } from "semantic-ui-react";
 
-const layerTypes = [
-  { key: "dense", value: "dense", text: "Dense" },
-  { key: "flatten", value: "flatten", text: "Flatten" },
-  { key: "maxPooling2d", value: "maxPooling2d", text: "maxPooling2d" },
-  { key: "conv2d", value: "conv2d", text: "conv2d" }
-];
-
-const d = {
-  dense: {
-    inputs: [
-      { optionName: "units", type: "Number", initialVal: 10, required: true },
-      {
-        optionName: "activation",
-        options: ["relu", "softmax"],
-        type: "Dropdown",
-        initialVal: "relu"
-      }
-    ],
-    message: "This is how a dense layer works"
-  },
-  conv2d: {
-    inputs: [
-      { optionName: "units", type: "Number", initialVal: 10, required: true },
-      { optionName: "kernelSize", type: "Number", initialVal: 3, required: true },
-      { optionName: "filters", type: "Number", initialVal: 6, required: true },
-      {
-        optionName: "activation",
-        options: ["relu", "softmax"],
-        type: "Dropdown",
-        initialVal: "relu"
-      }
-    ],
-    message: "This is how a Conv2D layer works"
-  },
-  maxPooling2d: {
-    inputs: [
-      { optionName: "poolSize", type: "Number", initialVal: 2, required: true },
-      { optionName: "strides", type: "Number", initialVal: 2, required: true }
-    ],
-    message: "This is how a maxPooling2d layer works"
-  },
-  flatten: {
-    inputs: [],
-    message: "This is how a flatten layer works"
-  }
-};
+import { layerTypes, d } from "../../utils/constants";
 
 class CreateLayer extends Component {
   constructor(props) {
@@ -75,15 +30,9 @@ class CreateLayer extends Component {
   };
 
   render() {
-    // const { onChangeLayer, layer, indexOfBeforeLayer } = this.props;
-    // const { layers } = this.props;
-    // const layer = layers[1];
-    // const { layerType, options } = layer;
-
     const { layerType } = this.state;
 
     let inputItems = [];
-    console.log("STATE", this.state);
     if (layerType !== "") {
       inputItems = d[layerType].inputs.map(input => {
         const { optionName, type, options, initialVal } = input;

@@ -14,6 +14,20 @@ const layerTypes = [
   { key: "upSampling2d", value: "upSampling2d", text: "upSampling2d" }
 ];
 
+function getstringFromOptions(options) {
+  let s = "";
+  const o = JSON.parse(options);
+  const keys = Object.keys(o);
+
+  if (keys.length === 0) {
+    return "No options"; // for flatten layer
+  }
+  for (const key of keys) {
+    s += `${key}: ${o[key]}, `;
+  }
+  return s.replace(/,\s*$/, "");
+}
+
 class Layer extends Component {
   constructor(props) {
     super(props);
@@ -25,26 +39,46 @@ class Layer extends Component {
     const { layerType, options } = layer;
 
     console.log("OPTIONS", options);
-    let deleteIcon;
+    let icons;
     if (!isLastLayer && !(indexOfLayer === 0)) {
-      deleteIcon = (
-        <div style={{ display: "inline-block", width: "5%", cursor: "pointer" }}>
+      icons = (
+        <div style={{ float: "right", cursor: "pointer" }}>
           <Icon name="delete" onClick={() => onClickDelete(indexOfLayer)} />
+          <div>
+            <Icon name="edit" />{" "}
+          </div>
+        </div>
+      );
+    } else {
+      icons = (
+        <div style={{ float: "right", cursor: "pointer" }}>
+          <Icon name="edit" />
         </div>
       );
     }
 
     return (
       <div>
-        <div style={{ display: "inline-block", width: "30%" }}>
+        {icons}
+        <div style={{}}>
           <b>
             {indexOfLayer + 1} {". "}
             {layerType}:
           </b>
         </div>
-        <div style={{ display: "inline-block", width: "50%" }}>
+        <div>{getstringFromOptions(options)}</div>
+        {/* <div style={{ display: "inline-block", width: "50%" }}>
           <div>
-            <Input
+            
+          </div>
+        </div> */}
+      </div>
+    );
+  }
+}
+
+{
+  /* <Input
               onDoubleClick={e => console.log(e)}
               value={options}
               fluid
@@ -53,13 +87,7 @@ class Layer extends Component {
                 newLayer.options = value;
                 onChangeLayer(indexOfLayer, newLayer);
               }}
-            />
-          </div>
-        </div>
-        {deleteIcon}
-      </div>
-    );
-  }
+            /> */
 }
 
 export default Layer;

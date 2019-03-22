@@ -27,6 +27,8 @@ class Layers extends Component {
   };
 
   onCreateLayer = (indexOfBeforeLayer, newLayerInfo) => {
+    // named them inputs, but here named them options
+    // (they are used differently in different contexts so they're named differently)
     const newLayer = {
       layerType: newLayerInfo.layerType,
       options: JSON.stringify(newLayerInfo.inputs)
