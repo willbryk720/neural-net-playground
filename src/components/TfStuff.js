@@ -5,7 +5,6 @@ import * as tf from "@tensorflow/tfjs";
 import { IMAGE_H, IMAGE_W, MnistData } from "../utils/data";
 import { Button, Input } from "semantic-ui-react";
 
-// import { Chart } from "react-google-charts";
 import LineChart from "react-linechart";
 
 import "../../node_modules/react-linechart/dist/styles.css";
