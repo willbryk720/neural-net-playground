@@ -12,6 +12,12 @@ class Layers extends Component {
     layers: this.props.layers
   };
 
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.datasetInfo.name !== this.props.datasetInfo.name) {
+      this.setState({ layers: [] });
+    }
+  }
+
   onClickDelete = index => {
     const newLayers = this.state.layers.filter((item, i) => i !== index);
     this.setState({
@@ -65,7 +71,11 @@ class Layers extends Component {
       <div>
         <div>
           <h5>Choose Default Network Architecture</h5>
-          <AddStarterNetworks loadStarterNetwork={this.loadStarterNetwork} />
+          <AddStarterNetworks
+            loadStarterNetwork={this.loadStarterNetwork}
+            datasetInfo={this.props.datasetInfo}
+            starterNetworkName={this.props.starterNetworkName}
+          />
         </div>
         <br />
         <div>

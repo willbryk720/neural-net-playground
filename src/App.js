@@ -26,7 +26,6 @@ const preTrainedModelOptions = [
   { name: "Conv-3epochs" },
   { name: "FacesOrNot-1epoch" },
   { name: "FacesOrNot-3epochs" }
-  // { name: "Conv-testweights" }
 ];
 
 class App extends Component {
@@ -38,11 +37,9 @@ class App extends Component {
       numEpochs: 2,
       drawing: [],
       trainedModel: {},
-      isCurrentlyTraining: false,
       datasetInfo: {},
       requestedDatasetLoading: null,
       starterNetworkName: null,
-      isFullScreenMode: false,
       analyzeInfo: {},
       countForRendering: 0,
       navLeftOpen: true,
@@ -83,14 +80,12 @@ class App extends Component {
   onFinishedTrainingModel = model => {
     this.setState({
       trainedModel: model,
-      isCurrentlyTraining: false,
       stepsCompleted: this.state.stepsCompleted === 2 ? 3 : this.state.stepsCompleted
     });
   };
 
   onStartTrainingModel = () => {
     this.setState({
-      isCurrentlyTraining: true,
       trainedModel: {}
     });
   };
@@ -125,7 +120,9 @@ class App extends Component {
     this.setState({
       datasetInfo,
       requestedDatasetLoading: null,
-      stepsCompleted: 1
+      stepsCompleted: 1,
+      layers: [],
+      starterNetworkName: null
 
       // layers: [],
       // layerOutputs: [],
@@ -284,7 +281,12 @@ class App extends Component {
                   Step 2: Create Layers{" "}
                   {this.state.stepsCompleted >= 2 ? <Icon name="check" color="green" /> : ""}
                 </h1>
-                <Layers updateLayers={this.updateLayers} layers={this.state.layers} />
+                <Layers
+                  updateLayers={this.updateLayers}
+                  layers={this.state.layers}
+                  datasetInfo={this.state.datasetInfo}
+                  starterNetworkName={this.state.starterNetworkName}
+                />
               </div>
             )}
             {this.state.stepsCompleted >= 2 && (

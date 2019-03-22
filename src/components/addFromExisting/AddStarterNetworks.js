@@ -4,6 +4,7 @@ import { Button, Icon, Segment, Input, Dropdown } from "semantic-ui-react";
 let networks = [
   {
     name: "Dense",
+    dataset: "MNIST",
     layers: [
       {
         layerType: "flatten",
@@ -42,6 +43,7 @@ let networks = [
   // }
   {
     name: "Conv",
+    dataset: "MNIST",
     layers: [
       {
         layerType: "conv2d",
@@ -64,6 +66,7 @@ let networks = [
   },
   {
     name: "FacesOrNot",
+    dataset: "FacesOrNot",
     layers: [
       {
         layerType: "conv2d",
@@ -130,9 +133,11 @@ class AddStarterNetworks extends Component {
   }
 
   render() {
-    const options = networks.map(network => {
-      return { key: network.name, text: network.name, value: network.name };
-    });
+    const options = networks
+      .filter(network => network.dataset === this.props.datasetInfo.name)
+      .map(network => {
+        return { key: network.name, text: network.name, value: network.name };
+      });
 
     return (
       <div>
@@ -141,6 +146,7 @@ class AddStarterNetworks extends Component {
           search
           selection
           options={options}
+          value={this.props.starterNetworkName}
           onChange={(e, { value }) => {
             this.onChooseStarterNetwork(value);
           }}
