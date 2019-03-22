@@ -5,17 +5,11 @@ import { Button, Icon, Segment, Input, Divider } from "semantic-ui-react";
 import Layer from "./Layer";
 import AddStarterNetworks from "../addFromExisting/AddStarterNetworks";
 
-import CreateLayer from "./CreateLayer";
+import CreateEditLayer from "./CreateEditLayer";
 
 class Layers extends Component {
   state = {
     layers: this.props.layers
-  };
-
-  onChangeLayer = (index, newLayer) => {
-    this.setState({
-      layers: this.state.layers.map((item, i) => (i === index ? newLayer : item))
-    });
   };
 
   onClickDelete = index => {
@@ -26,12 +20,12 @@ class Layers extends Component {
     this.props.updateLayers(newLayers, null);
   };
 
-  onCreateLayer = (indexOfBeforeLayer, newLayerInfo) => {
+  onCreateLayer = (indexOfBeforeLayer, layerType, inputs) => {
     // named them inputs, but here named them options
     // (they are used differently in different contexts so they're named differently)
     const newLayer = {
-      layerType: newLayerInfo.layerType,
-      options: JSON.stringify(newLayerInfo.inputs)
+      layerType,
+      options: JSON.stringify(inputs)
     };
     const newLayers = [
       ...this.state.layers.slice(0, indexOfBeforeLayer + 1),
@@ -44,12 +38,28 @@ class Layers extends Component {
     this.props.updateLayers(newLayers, null);
   };
 
+  onEditLayer = (indexOfLayer, layerType, inputs) => {
+    // named them inputs, but here named them options
+    // (they are used differently in different contexts so they're named differently)
+    const newLayer = {
+      layerType,
+      options: JSON.stringify(inputs)
+    };
+    const newLayers = this.state.layers.slice();
+    newLayers[indexOfLayer] = newLayer;
+    this.setState({
+      layers: newLayers
+    });
+    this.props.updateLayers(newLayers, null);
+  };
+
   loadStarterNetwork = (layers, starterNetworkName) => {
     this.setState({
       layers: layers
     });
     this.props.updateLayers(layers, starterNetworkName);
   };
+
   render() {
     return (
       <div>
@@ -59,16 +69,6 @@ class Layers extends Component {
         </div>
         <br />
         <div>
-          {/* <h5>Add layers of your own:</h5> */}
-          {/* <Button
-            color="blue"
-            size="small"
-            onClick={() => {
-              this.props.updateLayers(this.state.layers, null);
-            }}
-          >
-            Update
-          </Button> */}
           <div style={{ height: "8px" }} />
           {this.state.layers.map((layer, index) => {
             if (index === this.state.layers.length - 1) {
@@ -78,8 +78,8 @@ class Layers extends Component {
                     isLastLayer={index === this.state.layers.length - 1}
                     layer={layer}
                     indexOfLayer={index}
-                    onChangeLayer={this.onChangeLayer}
                     onClickDelete={this.onClickDelete}
+                    onEditLayer={this.onEditLayer}
                   />
                 </div>
               );
@@ -90,12 +90,16 @@ class Layers extends Component {
                     isLastLayer={index === this.state.layers.length - 1}
                     layer={layer}
                     indexOfLayer={index}
-                    onChangeLayer={this.onChangeLayer}
                     onClickDelete={this.onClickDelete}
+                    onEditLayer={this.onEditLayer}
                   />
 
                   <Divider horizontal style={{ marginTop: "5px", marginBottom: "5px" }}>
-                    <CreateLayer indexOfBeforeLayer={index} onCreateLayer={this.onCreateLayer} />
+                    <CreateEditLayer
+                      indexOfBeforeLayer={index}
+                      onCreateLayer={this.onCreateLayer}
+                      isCreatingLayer={true}
+                    />
                   </Divider>
                 </div>
               );

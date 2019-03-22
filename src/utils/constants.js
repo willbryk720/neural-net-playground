@@ -34,7 +34,6 @@ export const d = {
   },
   conv2d: {
     inputs: [
-      { optionName: "units", type: "Number", initialVal: 10, required: true },
       { optionName: "kernelSize", type: "Number", initialVal: 3, required: true },
       { optionName: "filters", type: "Number", initialVal: 6, required: true },
       {

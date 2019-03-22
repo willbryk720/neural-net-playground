@@ -3,7 +3,7 @@ import { Button, Icon, Input, Dropdown, Modal, Header, Form } from "semantic-ui-
 
 import { layerTypes, d } from "../../utils/constants";
 
-class CreateLayer extends Component {
+class CreateEditLayer extends Component {
   constructor(props) {
     super(props);
     this.state = { layerType: "", isModalOpen: false, inputs: {} };
@@ -29,11 +29,20 @@ class CreateLayer extends Component {
     this.setState({ layerType, inputs });
   };
 
+  setEditInputs = () => {
+    const inputs = {};
+    const layerInputs = this.props.layerInputs;
+    this.setState({ inputs: layerInputs });
+  };
+
   render() {
-    const { layerType } = this.state;
+    const { isCreatingLayer } = this.props;
+
+    const layerType = this.state.layerType ? this.state.layerType : this.props.layerType;
+    const layerTypeExists = layerType;
 
     let inputItems = [];
-    if (layerType !== "") {
+    if (layerTypeExists) {
       inputItems = d[layerType].inputs.map(input => {
         const { optionName, type, options, initialVal } = input;
 
@@ -81,51 +90,74 @@ class CreateLayer extends Component {
       <div>
         <Modal
           trigger={
-            <Icon
-              name="add"
-              color="blue"
-              style={{ cursor: "pointer" }}
-              onClick={() => this.setState({ isModalOpen: true })}
-            />
+            isCreatingLayer ? (
+              <Icon
+                name="add"
+                color="blue"
+                style={{ cursor: "pointer" }}
+                onClick={() => this.setState({ isModalOpen: true })}
+              />
+            ) : (
+              <Icon
+                name="edit"
+                onClick={() => {
+                  this.setEditInputs();
+                  this.setState({ isModalOpen: true });
+                }}
+              />
+            )
           }
           style={{ width: "40%" }}
           dimmer="inverted"
           closeOnDimmerClick={false}
           open={this.state.isModalOpen}
         >
-          <Modal.Header>Create Layer</Modal.Header>
+          <Modal.Header>{isCreatingLayer ? "Create Layer" : "Editing Layer"}</Modal.Header>
           <Modal.Content>
-            <div style={{ width: "100%" }}>
+            <div>
               <div style={{ display: "inline-block", width: "30%" }}>
-                <Dropdown
-                  placeholder="Layer Type"
-                  fluid
-                  search
-                  selection
-                  options={layerTypes}
-                  value={layerType}
-                  onChange={(e, { value }) => {
-                    this.setRequiredInputs(value);
-                  }}
-                />
+                {isCreatingLayer ? (
+                  <Dropdown
+                    placeholder="Layer Type"
+                    fluid
+                    search
+                    selection
+                    options={layerTypes}
+                    value={layerType}
+                    onChange={(e, { value }) => {
+                      this.setRequiredInputs(value);
+                    }}
+                  />
+                ) : (
+                  <b>{layerType}</b>
+                )}
               </div>
-              <div style={{ display: "inline-block", width: "5%" }} />
               <Form>
                 <Form.Group>{inputItems}</Form.Group>
               </Form>
 
-              {layerType && <p>{d[layerType].message}</p>}
+              {layerTypeExists && <p>{d[layerType].message}</p>}
 
-              <Button
-                size="small"
-                color="blue"
-                onClick={() => {
-                  this.props.onCreateLayer(this.props.indexOfBeforeLayer, this.state);
-                  this.setState({ isModalOpen: false });
-                }}
-              >
-                Add Layer
-              </Button>
+              {layerTypeExists && (
+                <Button
+                  size="small"
+                  color="blue"
+                  onClick={() => {
+                    if (isCreatingLayer) {
+                      this.props.onCreateLayer(
+                        this.props.indexOfBeforeLayer,
+                        layerType,
+                        this.state.inputs
+                      );
+                    } else {
+                      this.props.onEditLayer(this.props.indexOfLayer, layerType, this.state.inputs);
+                    }
+                    this.setState({ isModalOpen: false });
+                  }}
+                >
+                  {isCreatingLayer ? "Add Layer" : "Edit Layer"}
+                </Button>
+              )}
 
               <Button
                 size="mini"
@@ -144,4 +176,4 @@ class CreateLayer extends Component {
   }
 }
 
-export default CreateLayer;
+export default CreateEditLayer;
