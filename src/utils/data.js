@@ -69,8 +69,6 @@ export class MnistData {
 
     this.datasetLabels = new Uint8Array(await labelsResponse.arrayBuffer());
 
-    // console.log(this.datasetLabels);
-
     // Slice the the images and labels into train and test sets.
     this.trainImages = this.datasetImages.slice(0, IMAGE_SIZE * NUM_TRAIN_ELEMENTS);
     this.testImages = this.datasetImages.slice(IMAGE_SIZE * NUM_TRAIN_ELEMENTS);
@@ -167,7 +165,6 @@ export class FacesOrNotData {
     this.imageIndex = 0;
     this.datasetImages = facesOrNotData;
     this.testImages = this.datasetImages;
-    console.log(this.datasetImages.length);
     // this.trainLabels = this.datasetLabels.slice(
     //   0,
     //   NUM_CLASSES * NUM_TRAIN_ELEMENTS
@@ -237,7 +234,6 @@ export class FacesOrNotData {
       this.IMAGE_W,
       1
     ]);
-    console.log(xs.shape);
     // let labels = tf.tensor2d(this.testLabels, [this.testLabels.length / NUM_CLASSES, NUM_CLASSES]);
     let labels = null;
 

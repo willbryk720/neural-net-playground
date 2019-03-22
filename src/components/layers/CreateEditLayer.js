@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import { Button, Icon, Input, Dropdown, Modal, Header, Form } from "semantic-ui-react";
 
 import { layerTypes, d } from "../../utils/constants";
+import { capitalize } from "../../utils/general";
 
 class CreateEditLayer extends Component {
   constructor(props) {
@@ -129,7 +130,7 @@ class CreateEditLayer extends Component {
                     }}
                   />
                 ) : (
-                  <b>{layerType}</b>
+                  <h4>{capitalize(layerType)}</h4>
                 )}
               </div>
               <Form>

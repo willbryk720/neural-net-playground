@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import { Button, Icon, Segment, Input, Dropdown } from "semantic-ui-react";
 
 import CreateEditLayer from "./CreateEditLayer";
+import { capitalize } from "../../utils/general";
 
 function getstringFromOptions(options) {
   let s = "";
@@ -54,7 +55,7 @@ class Layer extends Component {
         <div style={{}}>
           <b>
             {indexOfLayer + 1} {". "}
-            {layerType.charAt(0).toUpperCase() + layerType.slice(1)}
+            {capitalize(layerType)}
           </b>
         </div>
         <div>{getstringFromOptions(options)}</div>
