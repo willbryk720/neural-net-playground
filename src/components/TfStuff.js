@@ -10,6 +10,7 @@ import LineChart from "react-linechart";
 
 import "../../node_modules/react-linechart/dist/styles.css";
 
+const CHART_COLORS = ["steelblue", "green", "red", "orange", "black"];
 let accuracyValues = [[], []];
 
 class TfStuff extends Component {
@@ -18,7 +19,8 @@ class TfStuff extends Component {
     this.state = {
       status: "",
       currentlyTraining: false,
-      trainingAccuracyValues: [],
+      trainingAccuracyValues: [[]],
+      trainingInstanceId: 0,
       showChart: false
     };
   }
@@ -46,8 +48,19 @@ class TfStuff extends Component {
     // const series = set === "train" ? 0 : 1;
     accuracyValues[0].push({ x: batch, y: accuracy });
 
+    const { trainingInstanceId } = this.state;
+    const trainingAccuracyArr = this.state.trainingAccuracyValues[trainingInstanceId];
+    // this.setState({
+    //   trainingAccuracyValues: [...this.state.trainingAccuracyValues, { x: batch, y: accuracy }]
+    // });
     this.setState({
-      trainingAccuracyValues: [...this.state.trainingAccuracyValues, { x: batch, y: accuracy }]
+      trainingAccuracyValues: this.state.trainingAccuracyValues.map((arr, i) => {
+        if (i === trainingInstanceId) {
+          return [...trainingAccuracyArr, { x: batch, y: accuracy }];
+        } else {
+          return arr;
+        }
+      })
     });
   }
 
@@ -187,16 +200,18 @@ class TfStuff extends Component {
     console.log("PRINT WEIGHTS AFTER TRAINING");
     this.printStuff(model);
 
-    this.setState({ currentlyTraining: false });
+    this.setState({
+      currentlyTraining: false,
+      trainingInstanceId: (this.state.trainingInstanceId += 1),
+      trainingAccuracyValues: [...this.state.trainingAccuracyValues, []] // add arr for next line in chart
+    });
   }
 
   render() {
-    const data = [
-      {
-        color: "steelblue",
-        points: this.state.trainingAccuracyValues
-      }
-    ];
+    const data = this.state.trainingAccuracyValues.map((arr, i) => ({
+      color: CHART_COLORS[i % CHART_COLORS.length],
+      points: this.state.trainingAccuracyValues[i]
+    }));
     return (
       <div className="tfjs-example-container">
         <div>
