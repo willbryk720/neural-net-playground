@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 
-import { MnistData, FacesOrNotData } from "../utils/data";
+import { MnistData, FacesOrNotData } from "../../utils/data";
 import { Button, Icon } from "semantic-ui-react";
 
 class StoreData extends Component {

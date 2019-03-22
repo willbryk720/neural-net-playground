@@ -1,14 +1,14 @@
 import React, { Component } from "react";
 import NetworkScene from "./components/NetworkScene";
-import SortableLayers from "./components/SortableLayers";
+import SortableLayers from "./components/layers/SortableLayers";
 
 import TfStuff from "./components/TfStuff";
 import Predict from "./components/predict/Predict";
 
 import AddPreTrainedModel from "./components/addFromExisting/AddPreTrainedModel";
 
-import LoadData from "./components/LoadData";
-import StoreData from "./components/StoreData";
+import LoadData from "./components/data/LoadData";
+import StoreData from "./components/data/StoreData";
 
 import ShowLoading from "./components/ShowLoading";
 import AnalyzeNeuron from "./components/analyze/AnalyzeNeuron";
