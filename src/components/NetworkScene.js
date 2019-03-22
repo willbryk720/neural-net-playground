@@ -8,7 +8,8 @@ import {
   getAllNeuronPositions,
   getLayersMetadataFromLayers,
   getAllNeuronEdgesData,
-  getOutputColors
+  getOutputColors,
+  fracToHex
 } from "../utils/scene";
 
 import { diffPropBetweenObjects } from "../utils/general";
@@ -28,8 +29,19 @@ import { reshape3DTensorToArray } from "../utils/reshaping";
 
 const NEURON_GEOMETRY = new THREE.BoxGeometry(NEURON_WIDTH, NEURON_WIDTH, NEURON_WIDTH);
 
-function getEdgeColor(edgeValue) {
-  return edgeValue;
+const RED_COLOR = 65536;
+const WHITE_COLOR = 65793;
+const GREEN_COLOR = 256;
+
+// very green if near maxWeight, very red if near minWeight, near black otherwise
+function getEdgeColor(edgeValue, maxWeight, minWeight) {
+  if (edgeValue <= 0) {
+    const frac = edgeValue / minWeight;
+    return Math.round(frac * 255) * RED_COLOR;
+  } else {
+    const frac = edgeValue / maxWeight;
+    return Math.round(frac * 255) * GREEN_COLOR;
+  }
 }
 
 class NetworkScene extends Component {
@@ -281,6 +293,7 @@ class NetworkScene extends Component {
     ];
     const edgesLayer = edgesData[previousLayerIndex];
     const edgesLayerWeights = edgesLayer.weights;
+    const { maxWeight, minWeight } = edgesLayer;
     const outLayerMetadata = this.layersMetadata.filter(lM => lM.layerType !== "flatten")[
       previousLayerIndex + 1
     ]; // layersMetadata has an extra input layer, and want to remove flatten layer
@@ -305,7 +318,9 @@ class NetworkScene extends Component {
                   axisGeometry,
                   new THREE.LineBasicMaterial({
                     color: getEdgeColor(
-                      edgesLayerWeights[g * neuronGroupingSize + r * rowSize + c][indexInfo["col"]]
+                      edgesLayerWeights[g * neuronGroupingSize + r * rowSize + c][indexInfo["col"]],
+                      maxWeight,
+                      minWeight
                     )
                   })
                 )
@@ -324,7 +339,7 @@ class NetworkScene extends Component {
               new THREE.Line(
                 axisGeometry,
                 new THREE.LineBasicMaterial({
-                  color: getEdgeColor(edgesLayerWeights[i][indexInfo["col"]])
+                  color: getEdgeColor(edgesLayerWeights[i][indexInfo["col"]], maxWeight, minWeight)
                 })
               )
             );
@@ -349,7 +364,7 @@ class NetworkScene extends Component {
               new THREE.Line(
                 axisGeometry,
                 new THREE.LineBasicMaterial({
-                  color: getEdgeColor(edgesLayerWeights[group][g][r][c])
+                  color: getEdgeColor(edgesLayerWeights[group][g][r][c], maxWeight, minWeight)
                 })
               )
             );
@@ -489,7 +504,7 @@ class NetworkScene extends Component {
           this.hoverIntersectObject != this.selectedSquare
         ) {
           this.hoverIntersectObject.formerColorHex = this.hoverIntersectObject.material.color.getHex();
-          this.modifyObject(this.hoverIntersectObject, 0x00ff00, 1.5);
+          this.modifyObject(this.hoverIntersectObject, 0xffff00, 1.5);
         }
 
         if (this.hoverIntersectObject.isNeuron && this.isNetworkTrained() && !this.selectedNeuron) {

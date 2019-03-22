@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import NetworkScene from "./components/NetworkScene";
-import SortableLayers from "./components/layers/SortableLayers";
+import CreateLayers from "./components/layers/CreateLayers";
 
 import TfStuff from "./components/TfStuff";
 import Predict from "./components/predict/Predict";
@@ -75,10 +75,6 @@ class App extends Component {
   onChangeNumEpochs = newNumEpochs => {
     this.setState({ numEpochs: newNumEpochs });
   };
-
-  // onChangeStepsCompleted = newStepsCompleted => {
-  //   this.setState({ stepsCompleted: newStepsCompleted });
-  // };
 
   onMakePrediction = (layerOutputs, drawing) => {
     this.setState({ drawing, layerOutputs });
@@ -288,7 +284,7 @@ class App extends Component {
                   Step 2: Create Layers{" "}
                   {this.state.stepsCompleted >= 2 ? <Icon name="check" color="green" /> : ""}
                 </h1>
-                <SortableLayers updateLayers={this.updateLayers} layers={this.state.layers} />
+                <CreateLayers updateLayers={this.updateLayers} layers={this.state.layers} />
               </div>
             )}
             {this.state.stepsCompleted >= 2 && (

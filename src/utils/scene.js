@@ -12,6 +12,8 @@ import {
   reshape4DTensorToArray
 } from "./reshaping";
 
+const WHITE_COLOR = 65793;
+
 const getArrayMax = array => array.reduce((a, b) => Math.max(a, b));
 const getArrayMax2d = array2d => getArrayMax(array2d.map(getArrayMax));
 
@@ -320,7 +322,7 @@ export function getOneLayerOutputColors(layerOutput, isSquare, dimensions) {
 }
 
 export function fracToHex(value) {
-  return Math.round(value * 255) * 65793;
+  return Math.round(value * 255) * WHITE_COLOR;
 }
 
 export function valueToHex(value, maxValue) {
@@ -354,15 +356,27 @@ export const getAllNeuronEdgesData = trainedModel => {
     const weightsObj = weightsAndBiases[0];
     const biasesObj = weightsAndBiases[1];
     let weightsData;
+
+    const weightsDataSyncValues = weightsObj.dataSync();
     if (weightsObj.shape.length === 4) {
-      weightsData = reshape4DTensorToArray(weightsObj.dataSync(), ...weightsObj.shape);
+      weightsData = reshape4DTensorToArray(weightsDataSyncValues, ...weightsObj.shape);
     } else if (weightsObj.shape.length === 2) {
-      weightsData = reshape2DTensorToArray(weightsObj.dataSync(), ...weightsObj.shape);
+      weightsData = reshape2DTensorToArray(weightsDataSyncValues, ...weightsObj.shape);
     }
+
+    // DataSync returns a Float32Array so normal Math.max returns NaN
+    const maxWeight = weightsDataSyncValues.reduce(function(p, v) {
+      return p > v ? p : v;
+    });
+    const minWeight = weightsDataSyncValues.reduce(function(p, v) {
+      return p < v ? p : v;
+    });
     edgesData.push({
       biases: biasesObj.dataSync(),
       weights: weightsData,
-      name: weightsObj.name
+      name: weightsObj.name,
+      maxWeight: maxWeight,
+      minWeight: minWeight
     });
   }
 

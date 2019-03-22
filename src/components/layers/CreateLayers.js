@@ -6,6 +6,8 @@ import { Button, Icon, Segment, Input } from "semantic-ui-react";
 import Layer from "./Layer";
 import AddStarterNetworks from "../addFromExisting/AddStarterNetworks";
 
+import LayerNav from "./LayerNav";
+
 const SortableContainer = sortableContainer(({ children }) => {
   return <div>{children}</div>;
 });
@@ -21,7 +23,7 @@ const SortableItem = SortableElement(({ layer, indexOfItem, onChangeLayer, onCli
   );
 });
 
-class SortableLayers extends Component {
+class CreateLayers extends Component {
   state = {
     layers: this.props.layers
   };
@@ -89,9 +91,11 @@ class SortableLayers extends Component {
           <h5>Or choose From Defaults:</h5>
           <AddStarterNetworks loadStarterNetwork={this.loadStarterNetwork} />
         </div>
+
+        {/* <LayerNav {...this.props} openLayerNav={true} /> */}
       </div>
     );
   }
 }
 
-export default SortableLayers;
+export default CreateLayers;
