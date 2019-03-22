@@ -23,7 +23,7 @@ const SortableItem = SortableElement(({ layer, indexOfItem, onChangeLayer, onCli
   );
 });
 
-class CreateLayers extends Component {
+class Layers extends Component {
   state = {
     layers: this.props.layers
   };
@@ -59,7 +59,7 @@ class CreateLayers extends Component {
     return (
       <div>
         <div>
-          <h5>Choose Default Network Architectures</h5>
+          <h5>Choose Default Network Architecture</h5>
           <AddStarterNetworks loadStarterNetwork={this.loadStarterNetwork} />
         </div>
         <br />
@@ -97,4 +97,4 @@ class CreateLayers extends Component {
   }
 }
 
-export default CreateLayers;
+export default Layers;

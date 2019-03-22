@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import NetworkScene from "./components/NetworkScene";
-import CreateLayers from "./components/layers/CreateLayers";
+import Layers from "./components/layers/Layers";
 
 import TfStuff from "./components/TfStuff";
 import Predict from "./components/predict/Predict";
@@ -284,7 +284,7 @@ class App extends Component {
                   Step 2: Create Layers{" "}
                   {this.state.stepsCompleted >= 2 ? <Icon name="check" color="green" /> : ""}
                 </h1>
-                <CreateLayers updateLayers={this.updateLayers} layers={this.state.layers} />
+                <Layers updateLayers={this.updateLayers} layers={this.state.layers} />
               </div>
             )}
             {this.state.stepsCompleted >= 2 && (

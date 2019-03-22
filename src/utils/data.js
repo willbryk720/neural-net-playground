@@ -69,7 +69,7 @@ export class MnistData {
 
     this.datasetLabels = new Uint8Array(await labelsResponse.arrayBuffer());
 
-    console.log(this.datasetLabels);
+    // console.log(this.datasetLabels);
 
     // Slice the the images and labels into train and test sets.
     this.trainImages = this.datasetImages.slice(0, IMAGE_SIZE * NUM_TRAIN_ELEMENTS);

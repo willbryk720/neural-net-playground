@@ -1,6 +1,14 @@
 import React, { Component } from "react";
 import { Button, Icon, Segment, Input, Dropdown } from "semantic-ui-react";
 
+import { sortableHandle } from "react-sortable-hoc";
+
+const DragHandle = sortableHandle(() => (
+  <span style={{ cursor: "pointer" }}>
+    <Icon name="bars" />
+  </span>
+));
+
 const layerTypes = [
   { key: "dense", value: "dense", text: "Dense" },
   { key: "flatten", value: "flatten", text: "Flatten" },
@@ -21,27 +29,28 @@ class Layer extends Component {
   }
 
   render() {
-    const { onChangeLayer, onClickDelete, layer, indexOfLayer, isLastLayer } = this.props;
+    const { onChangeLayer, onClickDelete, layer, indexOfItem } = this.props;
     const { layerType, options } = layer;
-
-    console.log("OPTIONS", options);
-    let deleteIcon;
-    if (!isLastLayer && !(indexOfLayer === 0)) {
-      deleteIcon = (
-        <div style={{ display: "inline-block", width: "5%", cursor: "pointer" }}>
-          <Icon name="delete" onClick={() => onClickDelete(indexOfLayer)} />
-        </div>
-      );
-    }
-
     return (
       <div>
+        <DragHandle />
+
         <div style={{ display: "inline-block", width: "30%" }}>
-          <b>
-            {indexOfLayer + 1} {". "}
-            {layerType}:
-          </b>
+          <Dropdown
+            placeholder="Layer Type"
+            fluid
+            search
+            selection
+            options={layerTypes}
+            value={layerType}
+            onChange={(e, { value }) => {
+              let newLayer = Object.assign({}, layer);
+              newLayer.layerType = value;
+              onChangeLayer(indexOfItem, newLayer);
+            }}
+          />
         </div>
+        <div style={{ display: "inline-block", width: "5%" }} />
         <div style={{ display: "inline-block", width: "50%" }}>
           <div>
             <Input
@@ -51,12 +60,14 @@ class Layer extends Component {
               onChange={(e, { value }) => {
                 let newLayer = Object.assign({}, layer);
                 newLayer.options = value;
-                onChangeLayer(indexOfLayer, newLayer);
+                onChangeLayer(indexOfItem, newLayer);
               }}
             />
           </div>
         </div>
-        {deleteIcon}
+        <div style={{ display: "inline-block", width: "5%", cursor: "pointer" }}>
+          <Icon name="delete" onClick={() => onClickDelete(indexOfItem)} />
+        </div>
       </div>
     );
   }
