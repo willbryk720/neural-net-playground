@@ -59,6 +59,11 @@ class CreateLayers extends Component {
     return (
       <div>
         <div>
+          <h5>Choose Default Network Architectures</h5>
+          <AddStarterNetworks loadStarterNetwork={this.loadStarterNetwork} />
+        </div>
+        <br />
+        <div>
           <h5>Add layers of your own:</h5>
           <Button
             color="blue"
@@ -86,13 +91,7 @@ class CreateLayers extends Component {
             ))}
           </SortableContainer>
         </div>
-        <br />
-        <div>
-          <h5>Or choose From Defaults:</h5>
-          <AddStarterNetworks loadStarterNetwork={this.loadStarterNetwork} />
-        </div>
-
-        {/* <LayerNav {...this.props} openLayerNav={true} /> */}
+        <LayerNav {...this.props} openLayerNav={true} />
       </div>
     );
   }

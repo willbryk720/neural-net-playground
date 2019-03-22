@@ -1,106 +1,140 @@
 import React, { Component } from "react";
-import { render } from "react-dom";
-import { sortableContainer, SortableElement, arrayMove } from "react-sortable-hoc";
+import { Button, Icon, Segment, Input, Dropdown, Modal, Header } from "semantic-ui-react";
 
-import { Button, Icon, Segment, Input } from "semantic-ui-react";
-import Layer from "./Layer";
-import AddStarterNetworks from "../addFromExisting/AddStarterNetworks";
+import { sortableHandle } from "react-sortable-hoc";
 
-import "./LayerNav.css";
+const DragHandle = sortableHandle(() => (
+  <span style={{ cursor: "pointer" }}>
+    <Icon name="bars" />
+  </span>
+));
 
-const SortableContainer = sortableContainer(({ children }) => {
-  return <div>{children}</div>;
-});
+const layerTypes = [
+  { key: "dense", value: "dense", text: "Dense" },
+  { key: "flatten", value: "flatten", text: "Flatten" },
+  { key: "maxPooling2d", value: "maxPooling2d", text: "maxPooling2d" },
+  { key: "conv2d", value: "conv2d", text: "conv2d" }
+];
 
-const SortableItem = SortableElement(({ layer, indexOfItem, onChangeLayer, onClickDelete }) => {
-  return (
-    <Layer
-      layer={layer}
-      indexOfItem={indexOfItem}
-      onChangeLayer={onChangeLayer}
-      onClickDelete={onClickDelete}
-    />
-  );
-});
+const d = {
+  dense: {
+    inputs: [
+      { optionName: "units", type: "Number" },
+      { optionName: "activation", options: ["relu", "softmax"], type: "Dropdown" }
+    ],
+    message: "This is how a dense layer works"
+  },
+  conv2d: {
+    inputs: [
+      { optionName: "units", type: "Number" },
+      { optionName: "kernelSize", type: "Number" },
+      { optionName: "filters", type: "Number" },
+      { optionName: "activation", options: ["relu", "softmax"], type: "Dropdown" }
+    ],
+    message: "This is how a Conv2D layer works"
+  },
+  maxPooling2d: {
+    inputs: [{ optionName: "poolSize", type: "Number" }, { optionName: "strides", type: "Number" }],
+    message: "This is how a maxPooling2d layer works"
+  },
+  flatten: {
+    inputs: [],
+    message: "This is how a flatten layer works"
+  }
+};
 
 class LayerNav extends Component {
-  state = {
-    layers: this.props.layers
-  };
-  onSortEnd = ({ oldIndex, newIndex }) => {
-    this.setState(({ layers }) => ({
-      layers: arrayMove(layers, oldIndex, newIndex)
-    }));
-  };
+  constructor(props) {
+    super(props);
+    this.state = { layerType: "", isModalOpen: false };
+  }
 
-  onChangeLayer = (index, newLayer) => {
-    this.setState({
-      layers: this.state.layers.map((item, i) => (i === index ? newLayer : item))
-    });
-  };
-  onClickDelete = index => {
-    this.setState({
-      layers: this.state.layers.filter((item, i) => i !== index)
-    });
-  };
-  onClickAdd = () => {
-    this.setState({
-      layers: [...this.state.layers, { layerType: "dense", options: "" }]
-    });
-  };
-
-  loadStarterNetwork = (layers, starterNetworkName) => {
-    this.setState({
-      layers: layers
-    });
-    this.props.updateLayers(layers, starterNetworkName);
-  };
   render() {
+    // const { onChangeLayer, onClickDelete, layer, indexOfItem } = this.props;
+    // const { layers } = this.props;
+    // const layer = layers[1];
+    // const { layerType, options } = layer;
+
+    const { layerType } = this.state;
+
+    let inputItems = [];
+    console.log(d[layerType], "d[layerType]", layerType);
+    if (layerType !== "") {
+      inputItems = d[layerType].inputs.map(input => {
+        console.log(input, "INPUT");
+        const { optionName, type, options } = input;
+        if (type === "Number") {
+          return (
+            <Input key={optionName} label={optionName} fluid onChange={(e, { value }) => {}} />
+          );
+        } else if (type === "Dropdown") {
+          const dropdownOptions = options.map(o => ({ key: o, value: o, text: o }));
+          return (
+            <Dropdown
+              key={optionName}
+              placeholder={optionName}
+              fluid
+              search
+              selection
+              label={optionName}
+              options={dropdownOptions}
+              onChange={(e, { value }) => {
+                console.log(value);
+              }}
+            />
+          );
+        }
+      });
+    }
+
     return (
       <div>
-        <div
-          id="layerNav"
-          style={{
-            height: this.props.openLayerNav ? "50%" : "0%",
-            width: "100%",
-            background: "blue"
-          }}
+        <Modal
+          trigger={
+            <Button size="small" color="blue" onClick={() => this.setState({ isModalOpen: true })}>
+              Add Layer
+            </Button>
+          }
+          style={{ width: "40%" }}
+          dimmer="inverted"
+          closeOnDimmerClick="false"
+          open={this.state.isModalOpen}
         >
-          hi
-        </div>
-        {/* <div>
-          <h5>Add layers of your own:</h5>
-          <Button
-            color="blue"
-            size="small"
-            onClick={() => {
-              this.props.updateLayers(this.state.layers, null);
-            }}
-          >
-            Update
-          </Button>
-          <Button color="blue" size="small" onClick={this.onClickAdd} style={{ float: "right" }}>
-            Add New Layer
-          </Button>
-          <div style={{ height: "8px" }} />
-          <SortableContainer onSortEnd={this.onSortEnd} useDragHandle distance={1}>
-            {this.state.layers.map((layer, index) => (
-              <SortableItem
-                key={`item-${index}`}
-                index={index}
-                layer={layer}
-                indexOfItem={index}
-                onChangeLayer={this.onChangeLayer.bind(this)}
-                onClickDelete={this.onClickDelete}
-              />
-            ))}
-          </SortableContainer>
-        </div>
-        <br />
-        <div>
-          <h5>Or choose From Defaults:</h5>
-          <AddStarterNetworks loadStarterNetwork={this.loadStarterNetwork} />
-        </div> */}
+          <Modal.Header>Create Layer</Modal.Header>
+          <Modal.Content>
+            <div>
+              <div style={{ display: "inline-block", width: "30%" }}>
+                <Dropdown
+                  placeholder="Layer Type"
+                  fluid
+                  search
+                  selection
+                  options={layerTypes}
+                  value={layerType}
+                  onChange={(e, { value }) => {
+                    console.log(value);
+                    this.setState({ layerType: value });
+                  }}
+                />
+              </div>
+              <div style={{ display: "inline-block", width: "5%" }} />
+              {inputItems}
+              {layerType && <p>{d[layerType].message}</p>}
+
+              <Button
+                size="small"
+                color="blue"
+                onClick={() => this.setState({ isModalOpen: false })}
+              >
+                Add Layer
+              </Button>
+
+              <Button size="mini" onClick={() => this.setState({ isModalOpen: false })}>
+                Cancel
+              </Button>
+            </div>
+          </Modal.Content>
+        </Modal>
       </div>
     );
   }
