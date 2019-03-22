@@ -15,7 +15,7 @@ import AnalyzeNeuron from "./components/analyze/AnalyzeNeuron";
 
 import CircularLoading from "./components/common/CircularLoading";
 
-import { Input, Button, Icon } from "semantic-ui-react";
+import { Input, Button, Icon, Message } from "semantic-ui-react";
 
 import "./components/NavLeft.css";
 
@@ -266,6 +266,11 @@ class App extends Component {
             </div>
 
             <div>
+              {/* <Message
+                style={{ marginTop: "5px", marginRight: "20px" }}
+                header="Welcome!"
+                content="Using this 'Artificial Neuropsychologist' tool, you can build neural networks with ease, and tinker with them in the browser!"
+              /> */}
               <h1 style={{ marginTop: "3px" }}>
                 Step 1: Load Dataset{" "}
                 {this.state.stepsCompleted >= 1 ? <Icon name="check" color="green" /> : ""}

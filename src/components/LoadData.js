@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 
 import { MnistData, FacesOrNotData } from "../utils/data";
-import { Button, Icon, Dropdown } from "semantic-ui-react";
+import { Button, Icon, Dropdown, Popup } from "semantic-ui-react";
 
 class LoadData extends Component {
   constructor(props) {
@@ -36,6 +36,16 @@ class LoadData extends Component {
           selectOnNavigation={false}
           selectOnBlur={false}
         />
+        <Popup
+          trigger={<Button icon="info" />}
+          content=<p>
+            First, choose a dataset that we will work with. MNIST is a dataset consisting of 60000
+            handwritten digits. "FacesOrNot" is a custom dataset that contains both objects and
+            human faces{" "}
+          </p>
+          basic
+        />
+
         <br />
         {/* {datasetInfo.name && (
           <span>

@@ -34,7 +34,6 @@ class ModifyWeights extends Component {
 
     const weightsAndBiases = inLayer.getWeights();
     if (weightsAndBiases.length != 2) {
-      console.log("Shouldnt be able to zero pooling layer");
       return; // actually shouldnt ever get to here, this is for testing
     }
 
@@ -42,6 +41,8 @@ class ModifyWeights extends Component {
     const biasesTensor = weightsAndBiases[1];
     let weightsData = [];
     if (weightsTensor.shape.length === 4) {
+      // means inLayer is a layer with squares
+
       weightsData = reshape4DTensorToArray(weightsTensor.dataSync(), ...weightsTensor.shape);
 
       if (groupTargetIndex === -1) {
@@ -65,9 +66,9 @@ class ModifyWeights extends Component {
 
       this.props.alertChangedWeights();
     } else if (weightsTensor.shape.length === 2) {
+      // means selected neuron is in a dense layer
       weightsData = reshape2DTensorToArray(weightsTensor.dataSync(), ...weightsTensor.shape);
       let newBiasesData = biasesTensor.dataSync();
-
       if (groupTargetIndex === -1) {
         weightsData.forEach((_, g) => {
           weightsData[g][colIndex] = 0;
