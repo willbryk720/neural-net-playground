@@ -112,23 +112,16 @@ class App extends Component {
   };
 
   onLoadedDataset = datasetInfo => {
-    // this.setState({
-    //   datasetInfo,
-    //   requestedDatasetLoading: null,
-    //   stepsCompleted: this.state.stepsCompleted === 0 ? 1 : this.state.stepsCompleted
-    // });
     this.setState({
       datasetInfo,
       requestedDatasetLoading: null,
       stepsCompleted: 1,
       layers: [],
-      starterNetworkName: null
-
-      // layers: [],
-      // layerOutputs: [],
-      // drawing: [],
-      // trainedModel: {},
-      // analyzeInfo: {}
+      starterNetworkName: null,
+      analyzeInfo: {},
+      drawing: [],
+      trainedModel: {},
+      layerOutputs: []
     });
   };
 

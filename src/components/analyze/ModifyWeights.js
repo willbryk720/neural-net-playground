@@ -15,6 +15,8 @@ import {
 import NeuronAnalyzeCanvas from "./NeuronAnalyzeCanvas";
 import DenseAnalyze from "./DenseAnalyze";
 
+import "./ModifyWeights.css";
+
 class ModifyWeights extends Component {
   constructor(props) {
     super(props);
@@ -134,18 +136,34 @@ class ModifyWeights extends Component {
           </div>
         );
       } else if (inLayerMetadata.isSquare) {
-        canvases = oneLayerOutputColors.map((colorSquare, i) => (
+        const numSquares = oneLayerOutputColors.length;
+        const canvasSquares = oneLayerOutputColors.map((colorSquare, i) => (
           <React.Fragment key={"" + i + neuron.id}>
             <div style={{ display: "inline-block" }}>
               <NeuronAnalyzeCanvas canvasWidth={100} canvasHeight={100} colorSquare={colorSquare} />
+              <span>{i + 1 + "/" + numSquares}</span>
               <button type="button" onClick={() => this.onChangeWeightsToZero(i)}>
                 Set to 0
               </button>
-              <div style={{ height: "7px" }} />
             </div>
+            {/* <div style={{ height: "7px" }} /> */}
+
             <div style={{ width: "5px", display: "inline-block" }} />
           </React.Fragment>
         ));
+        canvases = (
+          <div
+            style={{
+              height: "150px",
+              width: "100%",
+              overflowX: "scroll",
+              overflowY: "hidden",
+              whiteSpace: "nowrap"
+            }}
+          >
+            {canvasSquares}
+          </div>
+        );
       } else {
         canvases = (
           <DenseAnalyze
