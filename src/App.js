@@ -281,12 +281,12 @@ class App extends Component {
 
             <div>
               <Message
-                style={{ marginTop: "5px", marginRight: "20px" }}
+                style={{ marginTop: "8px", marginRight: "20px" }}
                 header="Greetings Artificial Neuropsychologists!"
                 content="With this tool, you can build neural networks with ease (no code required), and
                   then examine and poke them to see how they work. Make sure to wear gloves!"
               />
-              <h1 style={{ marginTop: "3px", display: "inline-block", width: "95%" }}>
+              <h1 style={{ marginTop: "0px", display: "inline-block", width: "95%" }}>
                 Step 1: Load Dataset
                 {this.state.stepsCompleted >= 1 ? <Icon name="check" color="green" /> : ""}
               </h1>
