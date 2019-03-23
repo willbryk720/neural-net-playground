@@ -332,7 +332,7 @@ class App extends Component {
               </React.Fragment>
             )}
 
-            <ShowLoading loading={this.state.networkLoading} />
+            {/* <ShowLoading loading={this.state.networkLoading} /> */}
             {this.state.networkLoading && <CircularLoading />}
           </div>
         </div>
@@ -345,20 +345,34 @@ class App extends Component {
             marginLeft: this.state.navLeftOpen ? "30%" : "0%"
           }}
         >
-          <NetworkScene
-            windowHeightRatio={this.state.navBottomOpen ? 0.5 : 1.0}
-            windowWidthRatio={this.state.navLeftOpen ? 0.7 : 1.0}
-            layers={this.state.layers}
-            drawing={this.state.drawing}
-            layerOutputs={this.state.layerOutputs}
-            trainedModel={this.state.trainedModel}
-            onBeginUpdateNetwork={this.onBeginUpdateNetwork}
-            onEndUpdateNetwork={this.onEndUpdateNetwork}
-            onDblClickNeuron={this.onDblClickNeuron}
-            datasetInfo={this.state.datasetInfo}
-            selectedNeuron={this.state.analyzeInfo.neuron}
-            networkLoading={this.state.networkLoading}
-          />
+          {/* <div
+            style={{
+              position: "fixed",
+              display: "inline-block",
+              top: "100px",
+              left: "30%",
+              width: "20%",
+              zIndex: "600000"
+            }}
+          >
+            <input type="text" name="fname" />
+          </div> */}
+          <div style={{ zIndex: "-1" }}>
+            <NetworkScene
+              windowHeightRatio={this.state.navBottomOpen ? 0.5 : 1.0}
+              windowWidthRatio={this.state.navLeftOpen ? 0.7 : 1.0}
+              layers={this.state.layers}
+              drawing={this.state.drawing}
+              layerOutputs={this.state.layerOutputs}
+              trainedModel={this.state.trainedModel}
+              onBeginUpdateNetwork={this.onBeginUpdateNetwork}
+              onEndUpdateNetwork={this.onEndUpdateNetwork}
+              onDblClickNeuron={this.onDblClickNeuron}
+              datasetInfo={this.state.datasetInfo}
+              selectedNeuron={this.state.analyzeInfo.neuron}
+              networkLoading={this.state.networkLoading}
+            />
+          </div>
 
           <div
             id="sidenavBottom"

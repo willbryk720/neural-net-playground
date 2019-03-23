@@ -44,36 +44,33 @@ class CreateEditLayer extends Component {
 
     let inputItems = [];
     if (layerTypeExists) {
-      inputItems = d[layerType].inputs.map(input => {
+      inputItems = d[layerType].inputs.map((input, z) => {
         const { optionName, type, options, initialVal } = input;
 
         if (type === "Number") {
           return (
-            <div key={optionName}>
-              <label>
-                <b>{optionName}</b>
-              </label>
-              <Input
-                key={optionName}
-                type={"Number"}
-                value={this.state.inputs[optionName] ? this.state.inputs[optionName] : initialVal}
-                onChange={(e, { value }) => {
-                  this.updateInputs(optionName, Number(value));
-                }}
-              />
-            </div>
+            <Form.Input
+              key={optionName}
+              type={"Number"}
+              label={optionName}
+              value={this.state.inputs[optionName] ? this.state.inputs[optionName] : initialVal}
+              onChange={(e, { value }) => {
+                console.log(value);
+                this.updateInputs(optionName, Number(value));
+              }}
+            />
           );
         } else if (type === "Dropdown") {
           const dropdownOptions = options.map(o => ({ key: o, value: o, text: o }));
           return (
-            <div key={optionName}>
+            <Form.Field key={optionName} style={{ width: "30%" }}>
               <label>
                 <b>{optionName}</b>
               </label>
               <Dropdown
-                key={optionName}
                 placeholder={optionName}
                 search
+                fluid
                 selection
                 options={dropdownOptions}
                 value={this.state.inputs[optionName] ? this.state.inputs[optionName] : initialVal}
@@ -81,15 +78,28 @@ class CreateEditLayer extends Component {
                   this.updateInputs(optionName, value);
                 }}
               />
-            </div>
+            </Form.Field>
           );
         }
       });
     }
 
+    // let formGroups = [];
+    // let formGroup = [];
+    // for (let i = 0; i < inputItems.length; i++) {
+    //   formGroup.push(inputItems[i]);
+    //   if (i % 2 === 1) {
+    //     formGroups.push(<div>{formGroup}</div>);
+    //     formGroup = [];
+    //   } else if (i === inputItems.length - 1) {
+    //     formGroups.push(<div>{formGroup}</div>);
+    //   }
+    // }
+
     return (
       <div>
         <Modal
+          style={{ zIndex: "10000", width: "40%", marginLeft: "0%", centered: false }}
           trigger={
             isCreatingLayer ? (
               <Icon
@@ -108,7 +118,6 @@ class CreateEditLayer extends Component {
               />
             )
           }
-          style={{ width: "40%" }}
           dimmer="inverted"
           closeOnDimmerClick={false}
           open={this.state.isModalOpen}
@@ -116,28 +125,35 @@ class CreateEditLayer extends Component {
           <Modal.Header>{isCreatingLayer ? "Create Layer" : "Editing Layer"}</Modal.Header>
           <Modal.Content>
             <div>
-              <div style={{ display: "inline-block", width: "30%" }}>
-                {isCreatingLayer ? (
-                  <Dropdown
-                    placeholder="Layer Type"
-                    fluid
-                    search
-                    selection
-                    options={layerTypes}
-                    value={layerType}
-                    onChange={(e, { value }) => {
-                      this.setRequiredInputs(value);
-                    }}
-                  />
-                ) : (
-                  <h4>{capitalize(layerType)}</h4>
-                )}
-              </div>
               <Form>
+                <Form.Field style={{ display: "inline-block", width: "30%" }}>
+                  {isCreatingLayer ? (
+                    <React.Fragment>
+                      <label>
+                        <b>Layer Type</b>
+                      </label>
+                      <Dropdown
+                        placeholder="Layer Type"
+                        fluid
+                        search
+                        selection
+                        options={layerTypes}
+                        value={layerType}
+                        onChange={(e, { value }) => {
+                          this.setRequiredInputs(value);
+                        }}
+                      />
+                    </React.Fragment>
+                  ) : (
+                    <h4>{capitalize(layerType) + " Layer"}</h4>
+                  )}
+                </Form.Field>
+                <br />
                 <Form.Group>{inputItems}</Form.Group>
               </Form>
-
-              {layerTypeExists && <p>{d[layerType].message}</p>}
+              {/* {inputItems} */}
+              <hr />
+              {layerTypeExists && d[layerType].message}
 
               {layerTypeExists && (
                 <Button

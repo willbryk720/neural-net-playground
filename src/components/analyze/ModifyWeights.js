@@ -15,8 +15,6 @@ import {
 import NeuronAnalyzeCanvas from "./NeuronAnalyzeCanvas";
 import DenseAnalyze from "./DenseAnalyze";
 
-import "./ModifyWeights.css";
-
 class ModifyWeights extends Component {
   constructor(props) {
     super(props);

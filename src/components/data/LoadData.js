@@ -23,7 +23,7 @@ class LoadData extends Component {
         <Dropdown
           disabled={isLoadingDataset}
           loading={isLoadingDataset}
-          placeholder="Layer Type"
+          placeholder="Choose Dataset"
           search
           selection
           options={[
