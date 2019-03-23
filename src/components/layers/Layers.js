@@ -90,6 +90,7 @@ class Layers extends Component {
                     indexOfLayer={index}
                     onClickDelete={this.onClickDelete}
                     onEditLayer={this.onEditLayer}
+                    onChangedCreateLayerModal={this.props.onChangedCreateLayerModal}
                   />
                 </div>
               );
@@ -102,6 +103,7 @@ class Layers extends Component {
                     indexOfLayer={index}
                     onClickDelete={this.onClickDelete}
                     onEditLayer={this.onEditLayer}
+                    onChangedCreateLayerModal={this.props.onChangedCreateLayerModal}
                   />
 
                   <Divider horizontal style={{ marginTop: "5px", marginBottom: "5px" }}>
@@ -109,6 +111,7 @@ class Layers extends Component {
                       indexOfBeforeLayer={index}
                       onCreateLayer={this.onCreateLayer}
                       isCreatingLayer={true}
+                      onChangedCreateLayerModal={this.props.onChangedCreateLayerModal}
                     />
                   </Divider>
                 </div>

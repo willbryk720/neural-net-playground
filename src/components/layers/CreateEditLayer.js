@@ -36,6 +36,15 @@ class CreateEditLayer extends Component {
     this.setState({ inputs: layerInputs });
   };
 
+  openModal = () => {
+    this.props.onChangedCreateLayerModal(true);
+    this.setState({ isModalOpen: true });
+  };
+  closeModal = () => {
+    this.props.onChangedCreateLayerModal(false);
+    this.setState({ isModalOpen: false });
+  };
+
   render() {
     const { isCreatingLayer } = this.props;
 
@@ -88,6 +97,8 @@ class CreateEditLayer extends Component {
       });
     }
 
+    // // Trying to automatically create groups for when there are many input fields
+    // // so that the fields dont go out of the modal
     // let formGroups = [];
     // let formGroup = [];
     // for (let i = 0; i < inputItems.length; i++) {
@@ -110,14 +121,14 @@ class CreateEditLayer extends Component {
                 name="add"
                 color="blue"
                 style={{ cursor: "pointer" }}
-                onClick={() => this.setState({ isModalOpen: true })}
+                onClick={this.openModal}
               />
             ) : (
               <Icon
                 name="edit"
                 onClick={() => {
                   this.setEditInputs();
-                  this.setState({ isModalOpen: true });
+                  this.openModal();
                 }}
               />
             )
@@ -173,7 +184,7 @@ class CreateEditLayer extends Component {
                     } else {
                       this.props.onEditLayer(this.props.indexOfLayer, layerType, this.state.inputs);
                     }
-                    this.setState({ isModalOpen: false });
+                    this.closeModal();
                   }}
                 >
                   {isCreatingLayer ? "Add Layer" : "Edit Layer"}
@@ -184,7 +195,7 @@ class CreateEditLayer extends Component {
                 size="mini"
                 onClick={() => {
                   this.resetInputs();
-                  this.setState({ isModalOpen: false });
+                  this.closeModal();
                 }}
               >
                 Cancel

@@ -35,6 +35,7 @@ class Layer extends Component {
         isCreatingLayer={false}
         layerType={layerType}
         layerInputs={JSON.parse(options)}
+        onChangedCreateLayerModal={this.props.onChangedCreateLayerModal}
       />
     );
     let icons;

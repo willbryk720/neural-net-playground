@@ -57,6 +57,7 @@ class NetworkScene extends Component {
       window.innerWidth * this.props.windowWidthRatio,
       window.innerHeight * this.props.windowHeightRatio
     );
+
     this.mount.appendChild(this.renderer.domElement);
 
     this.camera = new THREE.PerspectiveCamera(
@@ -154,19 +155,6 @@ class NetworkScene extends Component {
 
     const layersMetadata = getLayersMetadataFromLayers(layers);
     this.layersMetadata = layersMetadata;
-    // console.log(
-    //   "IMPORTANT:",
-    //   "drawing:",
-    //   drawing,
-    //   "layers:",
-    //   layers,
-    //   "layerOutputs:",
-    //   layerOutputs,
-    //   "layerOutputDataSync:",
-    //   layerOutputs.map(lO => lO.dataSync()),
-    //   "layersMetadata:",
-    //   layersMetadata
-    // );
 
     const layerVerticalSpacing = datasetInfo.inputLength
       ? datasetInfo.inputLength * LAYER_SPACING_TO_LENGTH_RATIO

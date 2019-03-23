@@ -17,7 +17,7 @@ import CircularLoading from "./components/common/CircularLoading";
 
 import { Input, Button, Icon, Message } from "semantic-ui-react";
 
-import "./components/NavLeft.css";
+import "./components/AppLayout.css";
 
 const preTrainedModelOptions = [
   { name: "Dense-1epoch" },
@@ -45,7 +45,8 @@ class App extends Component {
       navLeftOpen: true,
       navBottomOpen: true,
       networkLoading: false,
-      stepsCompleted: 0
+      stepsCompleted: 0,
+      createLayerModalOpen: false
     };
     this.dataRef = React.createRef();
   }
@@ -142,6 +143,10 @@ class App extends Component {
     this.setState({ networkLoading: false });
   };
 
+  onChangedCreateLayerModal = shouldOpen => {
+    this.setState({ createLayerModalOpen: shouldOpen });
+  };
+
   render() {
     const storeDataComponent = (
       <StoreData
@@ -153,6 +158,26 @@ class App extends Component {
 
     const thickSeparator = (
       <hr style={{ border: "black solid 1px", marginTop: "40px", marginBottom: "30px" }} />
+    );
+
+    const networkScene = (
+      <div id="network-scene" style={{ top: this.state.createLayerModalOpen ? "-50%" : "0%" }}>
+        <NetworkScene
+          windowHeightRatio={this.state.navBottomOpen ? 0.5 : 1.0}
+          windowWidthRatio={this.state.navLeftOpen ? 0.7 : 1.0}
+          layers={this.state.layers}
+          drawing={this.state.drawing}
+          layerOutputs={this.state.layerOutputs}
+          trainedModel={this.state.trainedModel}
+          onBeginUpdateNetwork={this.onBeginUpdateNetwork}
+          onEndUpdateNetwork={this.onEndUpdateNetwork}
+          onDblClickNeuron={this.onDblClickNeuron}
+          datasetInfo={this.state.datasetInfo}
+          selectedNeuron={this.state.analyzeInfo.neuron}
+          networkLoading={this.state.networkLoading}
+        />
+        {this.state.createLayerModalOpen && <div id="fake-scene" />}
+      </div>
     );
 
     let wholeApp = (
@@ -279,6 +304,7 @@ class App extends Component {
                   layers={this.state.layers}
                   datasetInfo={this.state.datasetInfo}
                   starterNetworkName={this.state.starterNetworkName}
+                  onChangedCreateLayerModal={this.onChangedCreateLayerModal}
                 />
               </div>
             )}
@@ -332,12 +358,12 @@ class App extends Component {
               </React.Fragment>
             )}
 
-            {/* <ShowLoading loading={this.state.networkLoading} /> */}
             {this.state.networkLoading && <CircularLoading />}
           </div>
         </div>
 
         <div
+          id="right-container"
           style={{
             display: "inline-block",
             width: this.state.navLeftOpen ? "70%" : "100%",
@@ -345,34 +371,7 @@ class App extends Component {
             marginLeft: this.state.navLeftOpen ? "30%" : "0%"
           }}
         >
-          {/* <div
-            style={{
-              position: "fixed",
-              display: "inline-block",
-              top: "100px",
-              left: "30%",
-              width: "20%",
-              zIndex: "600000"
-            }}
-          >
-            <input type="text" name="fname" />
-          </div> */}
-          <div style={{ zIndex: "-1" }}>
-            <NetworkScene
-              windowHeightRatio={this.state.navBottomOpen ? 0.5 : 1.0}
-              windowWidthRatio={this.state.navLeftOpen ? 0.7 : 1.0}
-              layers={this.state.layers}
-              drawing={this.state.drawing}
-              layerOutputs={this.state.layerOutputs}
-              trainedModel={this.state.trainedModel}
-              onBeginUpdateNetwork={this.onBeginUpdateNetwork}
-              onEndUpdateNetwork={this.onEndUpdateNetwork}
-              onDblClickNeuron={this.onDblClickNeuron}
-              datasetInfo={this.state.datasetInfo}
-              selectedNeuron={this.state.analyzeInfo.neuron}
-              networkLoading={this.state.networkLoading}
-            />
-          </div>
+          {networkScene}
 
           <div
             id="sidenavBottom"

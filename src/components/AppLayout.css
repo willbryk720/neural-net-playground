@@ -1,0 +1,78 @@
+#right-container {
+  /* position: relative; */
+}
+#fake-scene {
+  position: fixed;
+  top: 0%;
+  height: 50%;
+  width: 100%;
+  background: grey;
+}
+#input-test {
+  position: fixed;
+  top: 100px;
+  left: 30%;
+  width: 20%;
+  z-index: 6000000;
+}
+
+#network-scene {
+  z-index: 10;
+  position: absolute;
+
+  height: 50%;
+  width: 100%;
+}
+
+#sidenavBottom {
+  position: fixed;
+  z-index: 6;
+  transition: 0.5s;
+
+  top: 50%;
+}
+
+#sidenavBottom .closebtn {
+  position: absolute;
+  top: 5px;
+  right: 25px;
+  font-size: 28px;
+}
+
+#openbtn-bottom {
+  position: fixed;
+  z-index: 20;
+  bottom: 0;
+  right: 5%;
+  font-size: 28px;
+}
+
+#sidenavLeft {
+  height: 100%;
+  width: 0%;
+  position: fixed;
+  z-index: 20;
+  top: 0;
+  left: 0;
+  overflow-x: hidden;
+  transition: 0.5s;
+}
+
+#sidenavLeft a:hover {
+  color: #f1f1f1;
+}
+
+#sidenavLeft .closebtn {
+  position: absolute;
+  top: 0;
+  right: 3px;
+  font-size: 28px;
+}
+
+#openbtn-left {
+  position: fixed;
+  z-index: 20;
+  top: 0;
+  left: 0;
+  font-size: 28px;
+}
