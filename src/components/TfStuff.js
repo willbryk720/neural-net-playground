@@ -7,6 +7,8 @@ import { Button, Input } from "semantic-ui-react";
 
 import LineChart from "react-linechart";
 
+import ShowHelp from "./ShowHelp";
+
 import "../../node_modules/react-linechart/dist/styles.css";
 
 const CHART_COLORS = ["steelblue", "green", "red", "orange", "black"];
@@ -253,6 +255,8 @@ class TfStuff extends Component {
             yMax={1}
           />
         )}
+
+        <ShowHelp sectionName="step3" />
       </div>
     );
   }

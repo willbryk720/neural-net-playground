@@ -176,7 +176,9 @@ class App extends Component {
           selectedNeuron={this.state.analyzeInfo.neuron}
           networkLoading={this.state.networkLoading}
         />
-        {this.state.createLayerModalOpen && <div id="fake-scene" />}
+        {this.state.createLayerModalOpen && (
+          <div id="fake-scene" style={{ height: this.state.navBottomOpen ? "50%" : "100%" }} />
+        )}
       </div>
     );
 

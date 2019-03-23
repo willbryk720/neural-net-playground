@@ -7,6 +7,8 @@ import AddStarterNetworks from "../addFromExisting/AddStarterNetworks";
 
 import CreateEditLayer from "./CreateEditLayer";
 
+import ShowHelp from "../ShowHelp";
+
 class Layers extends Component {
   state = {
     layers: this.props.layers
@@ -119,6 +121,7 @@ class Layers extends Component {
             }
           })}
         </div>
+        <ShowHelp sectionName="step2" />
       </div>
     );
   }

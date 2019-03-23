@@ -3,6 +3,8 @@ import React, { Component } from "react";
 import { MnistData, FacesOrNotData } from "../../utils/data";
 import { Button, Icon, Dropdown, Popup } from "semantic-ui-react";
 
+import ShowHelp from "../ShowHelp";
+
 class LoadData extends Component {
   constructor(props) {
     super(props);
@@ -36,23 +38,8 @@ class LoadData extends Component {
           selectOnNavigation={false}
           selectOnBlur={false}
         />
-        <Popup
-          trigger={<Button icon="info" />}
-          content=<p>
-            First, choose a dataset that we will work with. MNIST is a dataset consisting of 60000
-            handwritten digits. "FacesOrNot" is a custom dataset that contains both objects and
-            human faces{" "}
-          </p>
-          basic
-        />
 
-        <br />
-        {/* {datasetInfo.name && (
-          <span>
-            <b>Successfully Loaded {datasetInfo.name}</b>
-            <Icon name="check" color="green" />
-          </span>
-        )} */}
+        <ShowHelp sectionName="step1" />
       </div>
     );
   }

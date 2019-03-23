@@ -42,7 +42,7 @@ class Layer extends Component {
     if (!isLastLayer && !(indexOfLayer === 0)) {
       icons = (
         <div style={{ float: "right", cursor: "pointer" }}>
-          <Icon name="delete" onClick={() => onClickDelete(indexOfLayer)} />
+          <Icon name="delete" color="blue" onClick={() => onClickDelete(indexOfLayer)} />
           <div>{editLayerItem}</div>
         </div>
       );

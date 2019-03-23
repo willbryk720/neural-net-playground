@@ -1,13 +1,15 @@
 import React, { Component } from "react";
 import { Button, Icon, Input, Dropdown, Modal, Header, Form } from "semantic-ui-react";
 
-import { layerTypes, d } from "../../utils/constants";
+import { d, layerTypes } from "../../utils/layerInfo";
+import { explanations } from "../../utils/explanations";
+
 import { capitalize } from "../../utils/general";
 
 class CreateEditLayer extends Component {
   constructor(props) {
     super(props);
-    this.state = { layerType: "", isModalOpen: false, inputs: {} };
+    this.state = { layerType: "", isModalOpen: false, inputs: {}, showExplanation: false };
   }
 
   updateInputs = (optionName, newValue) => {
@@ -42,7 +44,7 @@ class CreateEditLayer extends Component {
   };
   closeModal = () => {
     this.props.onChangedCreateLayerModal(false);
-    this.setState({ isModalOpen: false });
+    this.setState({ isModalOpen: false, showExplanation: false });
   };
 
   render() {
@@ -126,6 +128,7 @@ class CreateEditLayer extends Component {
             ) : (
               <Icon
                 name="edit"
+                color="blue"
                 onClick={() => {
                   this.setEditInputs();
                   this.openModal();
@@ -141,65 +144,87 @@ class CreateEditLayer extends Component {
           <Modal.Content>
             <div>
               <Form>
-                <Form.Field style={{ display: "inline-block", width: "30%" }}>
-                  {isCreatingLayer ? (
-                    <React.Fragment>
-                      <label>
-                        <b>Layer Type</b>
-                      </label>
-                      <Dropdown
-                        placeholder="Layer Type"
-                        fluid
-                        search
-                        selection
-                        options={layerTypes}
-                        value={layerType}
-                        onChange={(e, { value }) => {
-                          this.setRequiredInputs(value);
-                        }}
-                      />
-                    </React.Fragment>
-                  ) : (
-                    <h4>{capitalize(layerType) + " Layer"}</h4>
-                  )}
-                </Form.Field>
+                {isCreatingLayer ? (
+                  <Form.Field style={{ display: "inline-block", width: "30%" }}>
+                    <label>
+                      <b>Layer Type</b>
+                    </label>
+                    <Dropdown
+                      placeholder="Layer Type"
+                      fluid
+                      search
+                      selection
+                      options={layerTypes}
+                      value={layerType}
+                      onChange={(e, { value }) => {
+                        this.setRequiredInputs(value);
+                      }}
+                    />
+                  </Form.Field>
+                ) : (
+                  <h3>
+                    This is a <u>{capitalize(layerType)}</u> Layer
+                  </h3>
+                )}
+
                 <br />
                 <Form.Group>{inputItems}</Form.Group>
               </Form>
-              {/* {inputItems} */}
-              <hr />
-              {layerTypeExists && d[layerType].message}
-              <br />
-              {layerTypeExists && (
+              {layerTypeExists && !this.state.showExplanation && (
                 <Button
+                  style={{ float: "right" }}
                   size="small"
-                  color="blue"
+                  onClick={() => this.setState({ showExplanation: true })}
+                >
+                  Explain
+                </Button>
+              )}
+              <br />
+              <br />
+              <div>
+                {layerTypeExists && (
+                  <Button
+                    size="small"
+                    color="blue"
+                    onClick={() => {
+                      if (isCreatingLayer) {
+                        this.props.onCreateLayer(
+                          this.props.indexOfBeforeLayer,
+                          layerType,
+                          this.state.inputs
+                        );
+                      } else {
+                        this.props.onEditLayer(
+                          this.props.indexOfLayer,
+                          layerType,
+                          this.state.inputs
+                        );
+                      }
+                      this.closeModal();
+                    }}
+                  >
+                    {isCreatingLayer ? "Add Layer" : "Edit Layer"}
+                  </Button>
+                )}
+
+                <Button
+                  size="mini"
                   onClick={() => {
-                    if (isCreatingLayer) {
-                      this.props.onCreateLayer(
-                        this.props.indexOfBeforeLayer,
-                        layerType,
-                        this.state.inputs
-                      );
-                    } else {
-                      this.props.onEditLayer(this.props.indexOfLayer, layerType, this.state.inputs);
-                    }
+                    this.resetInputs();
                     this.closeModal();
                   }}
                 >
-                  {isCreatingLayer ? "Add Layer" : "Edit Layer"}
+                  Cancel
                 </Button>
-              )}
+              </div>
 
-              <Button
-                size="mini"
-                onClick={() => {
-                  this.resetInputs();
-                  this.closeModal();
-                }}
-              >
-                Cancel
-              </Button>
+              {layerTypeExists && this.state.showExplanation && (
+                <div>
+                  <hr />
+                  <br />
+                  {explanations[layerType]}
+                </div>
+              )}
             </div>
           </Modal.Content>
         </Modal>
