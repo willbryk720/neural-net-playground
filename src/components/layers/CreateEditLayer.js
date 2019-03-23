@@ -49,16 +49,20 @@ class CreateEditLayer extends Component {
 
         if (type === "Number") {
           return (
-            <Form.Input
-              key={optionName}
-              type={"Number"}
-              label={optionName}
-              value={this.state.inputs[optionName] ? this.state.inputs[optionName] : initialVal}
-              onChange={(e, { value }) => {
-                console.log(value);
-                this.updateInputs(optionName, Number(value));
-              }}
-            />
+            <Form.Field key={optionName} style={{ width: "30%" }}>
+              <label>
+                <b>{optionName}</b>
+              </label>
+              <Input
+                key={optionName}
+                type={"Number"}
+                value={this.state.inputs[optionName] ? this.state.inputs[optionName] : initialVal}
+                onChange={(e, { value }) => {
+                  console.log(value);
+                  this.updateInputs(optionName, Number(value));
+                }}
+              />
+            </Form.Field>
           );
         } else if (type === "Dropdown") {
           const dropdownOptions = options.map(o => ({ key: o, value: o, text: o }));
@@ -154,7 +158,7 @@ class CreateEditLayer extends Component {
               {/* {inputItems} */}
               <hr />
               {layerTypeExists && d[layerType].message}
-
+              <br />
               {layerTypeExists && (
                 <Button
                   size="small"
