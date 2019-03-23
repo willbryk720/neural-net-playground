@@ -17,6 +17,7 @@ import CircularLoading from "./components/common/CircularLoading";
 
 import { Input, Button, Icon, Message } from "semantic-ui-react";
 
+import ShowHelp from "./components/ShowHelp";
 import "./components/AppLayout.css";
 
 const preTrainedModelOptions = [
@@ -279,15 +280,17 @@ class App extends Component {
             </div>
 
             <div>
-              {/* <Message
+              <Message
                 style={{ marginTop: "5px", marginRight: "20px" }}
-                header="Welcome!"
-                content="Using this 'Artificial Neuropsychologist' tool, you can build neural networks with ease, and tinker with them in the browser!"
-              /> */}
-              <h1 style={{ marginTop: "3px" }}>
-                Step 1: Load Dataset{" "}
+                header="Greetings Artificial Neuropsychologists!"
+                content="With this tool, you can build neural networks with ease (no code required), and
+                  then examine and poke them to see how they work. Make sure to wear gloves!"
+              />
+              <h1 style={{ marginTop: "3px", display: "inline-block", width: "95%" }}>
+                Step 1: Load Dataset
                 {this.state.stepsCompleted >= 1 ? <Icon name="check" color="green" /> : ""}
               </h1>
+              <ShowHelp sectionName="step1" />
               <LoadData
                 onClickedLoadDataset={this.onClickedLoadDataset}
                 datasetInfo={this.state.datasetInfo}
@@ -297,10 +300,11 @@ class App extends Component {
             {this.state.stepsCompleted >= 1 && (
               <div>
                 {thickSeparator}
-                <h1>
+                <h1 style={{ marginTop: "0px", display: "inline-block", width: "95%" }}>
                   Step 2: Create Layers{" "}
                   {this.state.stepsCompleted >= 2 ? <Icon name="check" color="green" /> : ""}
                 </h1>
+                <ShowHelp sectionName="step2" />
                 <Layers
                   updateLayers={this.updateLayers}
                   layers={this.state.layers}
@@ -313,10 +317,11 @@ class App extends Component {
             {this.state.stepsCompleted >= 2 && (
               <React.Fragment>
                 {thickSeparator}
-                <h1>
+                <h1 style={{ marginTop: "0px", display: "inline-block", width: "95%" }}>
                   Step 3: Create Weights{" "}
                   {this.state.stepsCompleted >= 3 ? <Icon name="check" color="green" /> : ""}
                 </h1>
+                <ShowHelp sectionName="step3" />
                 <AddPreTrainedModel
                   onLoadPreTrainedModel={this.onLoadPreTrainedModel}
                   starterNetworkName={this.state.starterNetworkName}
@@ -346,7 +351,10 @@ class App extends Component {
             {this.state.stepsCompleted >= 3 && (
               <React.Fragment>
                 {thickSeparator}
-                <h1>Step 4: Predict Images</h1>
+                <h1 style={{ marginTop: "0px", display: "inline-block", width: "95%" }}>
+                  Step 4: Predict Images
+                </h1>
+                <ShowHelp sectionName="step4" />
                 <Predict
                   drawing={this.state.drawing}
                   onMakePrediction={this.onMakePrediction}

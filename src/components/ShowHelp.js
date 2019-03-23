@@ -23,20 +23,33 @@ const helpMessages = {
         it if you want.
       </p>
       <p>
-        Create layer by clicking add icon between layers. Edit layer by clicking edit icon on the
-        right of any layer. Delete a layer by clicking the x icon.
+        <ul>
+          <li>
+            Create layer by clicking the <Icon name="add" color="blue" /> icon between layers.{" "}
+          </li>
+          <li>
+            Edit a layer by clicking the <Icon name="edit" color="blue" /> icon to the right of any
+            layer.{" "}
+          </li>
+          <li>
+            Delete a layer by clicking the <Icon name="delete" color="blue" /> icon to the right of
+            any layer.
+          </li>
+        </ul>
       </p>
       <p>The network will automatically update with your changes</p>
     </div>
   ),
   step3: (
     <div>
-      <p>The network now needs weights! There are two options:</p>
-      <p>You can load pre-prepaired weights from this same network that was trained before</p>
+      <p>The network now needs weights! You have two options:</p>
       <p>
-        But if you are using a different network than one of the prepared ones, you can train your
-        network in the browser. Just choose the number of epochs, and click train. If your network
-        is large, it might take many minutes
+        a) You can load pre-prepaired weights, if we have pre-trained weights for your specific
+        network architecture{" "}
+      </p>
+      <p>
+        b) Or you can train your network in the browser. Just choose the number of epochs, and click
+        train. (If your network is large, it might take several minutes)
       </p>
     </div>
   ),
@@ -61,8 +74,7 @@ class ShowHelp extends Component {
     const content = helpMessages[this.props.sectionName];
 
     return (
-      <div>
-        <br />
+      <React.Fragment>
         {this.state.showHelp ? (
           <div>
             <Icon
@@ -72,15 +84,18 @@ class ShowHelp extends Component {
             />
             <br />
             {content}
+            <br />
           </div>
         ) : (
-          <Icon
-            name="question"
-            onClick={() => this.setState({ showHelp: true })}
-            style={{ float: "right", cursor: "pointer" }}
-          />
+          <div style={{ display: "inline-block", width: "5%", textAlign: "right" }}>
+            <Icon
+              name="question"
+              onClick={() => this.setState({ showHelp: true })}
+              style={{ cursor: "pointer" }}
+            />
+          </div>
         )}
-      </div>
+      </React.Fragment>
     );
   }
 }

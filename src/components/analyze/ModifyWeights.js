@@ -144,9 +144,7 @@ class ModifyWeights extends Component {
                 Set to 0
               </button>
             </div>
-            {/* <div style={{ height: "7px" }} /> */}
-
-            <div style={{ width: "5px", display: "inline-block" }} />
+            <div style={{ width: "8px", display: "inline-block" }} />
           </React.Fragment>
         ));
         canvases = (
@@ -184,6 +182,8 @@ class ModifyWeights extends Component {
             </div>
           )}
         </div>
+        <br />
+        <br />
         {canvases}
       </div>
     );

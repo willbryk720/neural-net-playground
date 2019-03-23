@@ -7,8 +7,6 @@ import * as tf from "@tensorflow/tfjs";
 import { reshape2DTensorToArray } from "../../utils/reshaping";
 import { getLayerOutputs, getGradient } from "../../utils/prediction";
 
-import ShowHelp from "../ShowHelp";
-
 const CANVAS_WIDTH = 300;
 const CANVAS_HEIGHT = 300;
 
@@ -164,7 +162,6 @@ class Predict extends Component {
             Predict Modified Image
           </Button>
         </div>
-        <ShowHelp sectionName="step4" />
       </div>
     );
   }

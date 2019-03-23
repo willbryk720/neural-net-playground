@@ -3,8 +3,6 @@ import React, { Component } from "react";
 import { MnistData, FacesOrNotData } from "../../utils/data";
 import { Button, Icon, Dropdown, Popup } from "semantic-ui-react";
 
-import ShowHelp from "../ShowHelp";
-
 class LoadData extends Component {
   constructor(props) {
     super(props);
@@ -25,7 +23,7 @@ class LoadData extends Component {
         <Dropdown
           disabled={isLoadingDataset}
           loading={isLoadingDataset}
-          placeholder="Choose Dataset"
+          placeholder="Load Dataset"
           search
           selection
           options={[
@@ -38,8 +36,6 @@ class LoadData extends Component {
           selectOnNavigation={false}
           selectOnBlur={false}
         />
-
-        <ShowHelp sectionName="step1" />
       </div>
     );
   }

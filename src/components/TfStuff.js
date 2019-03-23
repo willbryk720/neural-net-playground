@@ -7,8 +7,6 @@ import { Button, Input } from "semantic-ui-react";
 
 import LineChart from "react-linechart";
 
-import ShowHelp from "./ShowHelp";
-
 import "../../node_modules/react-linechart/dist/styles.css";
 
 const CHART_COLORS = ["steelblue", "green", "red", "orange", "black"];
@@ -214,7 +212,7 @@ class TfStuff extends Component {
       points: this.state.trainingAccuracyValues[i]
     }));
     return (
-      <div className="tfjs-example-container">
+      <div>
         <div>
           <label># Training Epochs:</label>
           <Input
@@ -240,23 +238,23 @@ class TfStuff extends Component {
           >
             Train
           </Button>
+
+          {this.state.showChart && (
+            <div>
+              <p>{this.state.status} </p>
+              <LineChart
+                width={300}
+                height={250}
+                data={data}
+                xLabel={"Batch"}
+                yLabel={"Accuracy"}
+                pointRadius={2}
+                yMax={1}
+              />
+            </div>
+          )}
         </div>
         <br />
-
-        <p>{this.state.status} </p>
-        {this.state.showChart && (
-          <LineChart
-            width={300}
-            height={250}
-            data={data}
-            xLabel={"Batch"}
-            yLabel={"Accuracy"}
-            pointRadius={2}
-            yMax={1}
-          />
-        )}
-
-        <ShowHelp sectionName="step3" />
       </div>
     );
   }
