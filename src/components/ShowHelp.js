@@ -25,7 +25,7 @@ const helpMessages = {
       <p>
         <ul>
           <li>
-            Create layer by clicking the <Icon name="add" color="blue" /> icon between layers.{" "}
+            Create a new layer by clicking the <Icon name="add" color="blue" /> icon between layers.{" "}
           </li>
           <li>
             Edit a layer by clicking the <Icon name="edit" color="blue" /> icon to the right of any
