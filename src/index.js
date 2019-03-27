@@ -42,13 +42,11 @@ const middleware = [thunk];
 //             window.__REDUX_DEVTOOLS_EXTENSION__()
 //         )
 //       );
-const store = createStore(
-  persistedReducer,
-  initialState,
-  compose(applyMiddleware(...middleware))
-);
+const store = createStore(persistedReducer, initialState, compose(applyMiddleware(...middleware)));
 
 let persistor = persistStore(store);
+
+console.log("PUBLIC URL: ", process.env.PUBLIC_URL);
 
 ReactDOM.render(
   <Provider store={store}>
