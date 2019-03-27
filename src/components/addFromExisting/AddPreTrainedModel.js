@@ -2,7 +2,6 @@ import React, { Component } from "react";
 import { Button, Icon, Dropdown } from "semantic-ui-react";
 
 import * as tf from "@tensorflow/tfjs";
-import logo from "./Conv-1epoch"; // Tell Webpack this JS file uses this image
 
 class AddPreTrainedModel extends Component {
   constructor(props) {
@@ -26,9 +25,8 @@ class AddPreTrainedModel extends Component {
     // console.log("URLSTR:", urlStr);
 
     // using relative path instead
-    urlStr = `${modelName}.json`;
+    urlStr = process.env.PUBLIC_URL + `${modelName}.json`;
 
-    console.log("HELLO", urlStr, logo);
     const preTrainedModel = await tf.loadModel(urlStr);
     preTrainedModel.preTrainedModelName = modelName;
     this.props.onLoadPreTrainedModel(preTrainedModel);
