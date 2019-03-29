@@ -137,7 +137,7 @@ export async function getFilterGradient(inputTensor, trainedModel, analyzeInfo) 
     const posLoss = output.slice([0, 0, 0, indexInfo.group], filterShape).mean();
     const negLoss = output.mean();
 
-    const loss = tf.sub(tf.mul(posLoss, tf.scalar(5)), negLoss);
+    const loss = tf.sub(tf.mul(posLoss, tf.scalar(2)), negLoss);
 
     console.log("LOSS", loss.dataSync());
     return loss;
