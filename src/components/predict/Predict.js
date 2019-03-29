@@ -29,7 +29,6 @@ class Predict extends Component {
 
   makeDrawingPrediction = async () => {
     const { datasetInfo } = this.props;
-    // const drawing = this.getDrawing();
     const drawing = this.myRef.current.state.points;
     const imageTensor = tf
       .tensor(drawing)
@@ -48,7 +47,6 @@ class Predict extends Component {
       datasetInfo.inputLength,
       datasetInfo.inputLength
     );
-    console.log(image);
     const layerOutputs = await getLayerOutputs(imageTensor, this.props.trainedModel);
     this.props.onMakePrediction(layerOutputs, image);
   };

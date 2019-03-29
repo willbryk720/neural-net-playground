@@ -5,6 +5,7 @@ import * as tf from "@tensorflow/tfjs";
 
 import { reshape2DTensorToArray } from "../../utils/reshaping";
 import { getLayerOutputs, getGradient, getFilterGradient } from "../../utils/prediction";
+import { getArrayMax, getArrayMin } from "../../utils/general";
 
 class FilterViz extends Component {
   constructor(props) {
@@ -32,20 +33,18 @@ class FilterViz extends Component {
       datasetInfo.inputLength,
       datasetInfo.inputLength
     );
+
+    const maxValue = getArrayMax(imageVector);
+    const minValue = getArrayMin(imageVector);
     image.forEach((row, r) => {
       row.forEach((col, c) => {
-        if (image[r][c] < 0) {
-          image[r][c] = 0;
-        } else if (image[r][c] > 1) {
-          image[r][c] = 1;
-        }
+        image[r][c] = (image[r][c] - minValue) / (maxValue - minValue);
       });
     });
 
     const layerOutputs = await getLayerOutputs(imageTensor, trainedModel);
     this.props.onMakePrediction(layerOutputs, image);
 
-    console.log("SETTING FALSE");
     this.setState({ loadingOneStep: false, loadingMultSteps: false });
   };
 

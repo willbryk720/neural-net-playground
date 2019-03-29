@@ -22,3 +22,7 @@ export function diffPropBetweenObjects(a, b) {
 export function capitalize(s) {
   return s.charAt(0).toUpperCase() + s.slice(1);
 }
+
+export const getArrayMax = array => array.reduce((a, b) => Math.max(a, b));
+export const getArrayMin = array => array.reduce((a, b) => Math.min(a, b));
+export const getArrayMax2d = array2d => getArrayMax(array2d.map(getArrayMax));

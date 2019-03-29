@@ -378,7 +378,7 @@ class NetworkScene extends Component {
             new THREE.Line(
               axisGeometry,
               new THREE.LineBasicMaterial({
-                color: 0x00ff00
+                color: 0x0000ff
               })
             )
           );

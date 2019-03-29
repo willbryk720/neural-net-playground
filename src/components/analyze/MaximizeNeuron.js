@@ -5,6 +5,7 @@ import * as tf from "@tensorflow/tfjs";
 
 import { reshape2DTensorToArray } from "../../utils/reshaping";
 import { getLayerOutputs, getGradient } from "../../utils/prediction";
+import { getArrayMax, getArrayMin } from "../../utils/general";
 
 class MaximizeNeuron extends Component {
   constructor(props) {
@@ -32,13 +33,11 @@ class MaximizeNeuron extends Component {
       datasetInfo.inputLength,
       datasetInfo.inputLength
     );
+    const maxValue = getArrayMax(imageVector);
+    const minValue = getArrayMin(imageVector);
     image.forEach((row, r) => {
       row.forEach((col, c) => {
-        if (image[r][c] < 0) {
-          image[r][c] = 0;
-        } else if (image[r][c] > 1) {
-          image[r][c] = 1;
-        }
+        image[r][c] = (image[r][c] - minValue) / (maxValue - minValue);
       });
     });
 

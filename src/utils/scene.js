@@ -12,10 +12,9 @@ import {
   reshape4DTensorToArray
 } from "./reshaping";
 
-const WHITE_COLOR = 65793;
+import { getArrayMax, getArrayMax2d } from "./general";
 
-const getArrayMax = array => array.reduce((a, b) => Math.max(a, b));
-const getArrayMax2d = array2d => getArrayMax(array2d.map(getArrayMax));
+const WHITE_COLOR = 65793;
 
 // Returns 1d array of positions of neurons spaced evenly with the line center at [0,0,height]
 export const getPositionsOfLineOfItems = (itemSpacing, itemWidth, numItems, height) => {
