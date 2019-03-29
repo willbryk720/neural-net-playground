@@ -1,9 +1,9 @@
-import { fracToHex, valueToHex } from "./scene";
+import { valueToHex } from "./scene";
 
 export const DENSE_NEURON_WIDTH = 20;
 
-export function getColorStyle(color, maxValue) {
-  color = valueToHex(color, maxValue);
+export function getColorStyle(color, maxValue, minValue) {
+  color = valueToHex(color, maxValue, minValue);
   let s =
     "" +
     Math.round(color)

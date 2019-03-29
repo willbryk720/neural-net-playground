@@ -26,7 +26,8 @@ const preTrainedModelOptions = [
   { name: "Conv-1epoch" },
   { name: "Conv-3epochs" },
   { name: "FacesOrNot-1epoch" },
-  { name: "FacesOrNot-3epochs" }
+  { name: "FacesOrNot-3epochs" },
+  { name: "ConvSmall-2epochs" }
 ];
 
 class App extends Component {

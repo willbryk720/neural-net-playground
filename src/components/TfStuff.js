@@ -194,9 +194,8 @@ class TfStuff extends Component {
 
     this.props.onFinishedTrainingModel(model);
 
-    // await model.save("downloads:///dense-testweights");
+    // await model.save("downloads:///Convsmall-2epochs");
 
-    console.log("PRINT WEIGHTS AFTER TRAINING");
     this.printStuff(model);
 
     this.setState({

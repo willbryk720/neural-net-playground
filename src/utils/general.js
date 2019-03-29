@@ -26,3 +26,4 @@ export function capitalize(s) {
 export const getArrayMax = array => array.reduce((a, b) => Math.max(a, b));
 export const getArrayMin = array => array.reduce((a, b) => Math.min(a, b));
 export const getArrayMax2d = array2d => getArrayMax(array2d.map(getArrayMax));
+export const getArrayMin2d = array2d => getArrayMin(array2d.map(getArrayMin));

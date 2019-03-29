@@ -18,7 +18,7 @@ class NeuronAnalyzeCanvas extends React.Component {
 
     colorSquare.forEach((row, r) => {
       row.forEach((col, c) => {
-        const colorStyle = getColorStyle(colorSquare[r][c].colorHex, 0xffffff);
+        const colorStyle = getColorStyle(colorSquare[r][c].colorHex, 0xffffff, 0x000000);
         ctx.fillStyle = colorStyle;
 
         ctx.fillRect(c * squareWidth, r * squareWidth, squareWidth, squareWidth);

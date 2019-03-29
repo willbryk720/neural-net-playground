@@ -45,7 +45,7 @@ class PredictCanvas extends React.Component {
     const squareWidth = this.props.canvasWidth / this.props.datasetInfo.inputLength;
     points.forEach((row, r) => {
       row.forEach((col, c) => {
-        const colorStyle = getColorStyle(points[r][c], 1);
+        const colorStyle = getColorStyle(points[r][c], 1, 0);
         ctx.fillStyle = colorStyle;
         ctx.fillRect(c * squareWidth, r * squareWidth, squareWidth, squareWidth);
       });

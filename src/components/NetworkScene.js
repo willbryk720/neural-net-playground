@@ -35,7 +35,9 @@ const GREEN_COLOR = 256;
 
 // very green if near maxWeight, very red if near minWeight, near black otherwise
 function getEdgeColor(edgeValue, maxWeight, minWeight) {
-  if (edgeValue <= 0) {
+  if (maxWeight === 0 && minWeight === 0) {
+    return 0;
+  } else if (edgeValue <= 0) {
     const frac = edgeValue / minWeight;
     return Math.round(frac * 255) * RED_COLOR;
   } else {
@@ -223,7 +225,7 @@ class NetworkScene extends Component {
             row.forEach((pos, c) => {
               const colorObj = hasLayerOutputs
                 ? layerOutputColors[layerIndex][g][r][c]
-                : { colorHex: 0x000000, maxVal: 0, val: 0 };
+                : { colorHex: 0x000000, maxVal: 0, minVal: 0, val: 0 };
               const indexInfo = { group: g, row: r, col: c, layerIndex };
               const neuronObj = this.drawNeuron(pos, colorObj, layerType, indexInfo, isSquare);
               rowOfObjects.push(neuronObj);
@@ -236,7 +238,7 @@ class NetworkScene extends Component {
           neuronGrouping.forEach((pos, i) => {
             const colorObj = hasLayerOutputs
               ? layerOutputColors[layerIndex][i]
-              : { colorHex: 0x000000, maxVal: 0, val: 0 };
+              : { colorHex: 0x000000, maxVal: 0, minVal: 0, val: 0 };
             const indexInfo = { col: i, layerIndex };
             const neuronObj = this.drawNeuron(pos, colorObj, layerType, indexInfo, isSquare);
             rowOfObjects.push(neuronObj);

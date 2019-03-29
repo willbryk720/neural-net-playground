@@ -12,7 +12,7 @@ import {
   reshape4DTensorToArray
 } from "./reshaping";
 
-import { getArrayMax, getArrayMax2d } from "./general";
+import { getArrayMax, getArrayMax2d, getArrayMin, getArrayMin2d } from "./general";
 
 const WHITE_COLOR = 65793;
 
@@ -272,10 +272,18 @@ export function getOutputColors(layerOutputs, layersMetadata, input2DArray) {
 
   // change input colors to hex
   const maxValue = getArrayMax2d(input2DArray);
+  const minValue = getArrayMin2d(input2DArray);
   let input2DArrayColors = [];
   input2DArray.forEach(r => {
     let rArr = [];
-    r.forEach(c => rArr.push({ colorHex: valueToHex(c, maxValue), maxVal: maxValue, val: c }));
+    r.forEach(c =>
+      rArr.push({
+        colorHex: valueToHex(c, maxValue, minValue),
+        maxVal: maxValue,
+        minVal: minValue,
+        val: c
+      })
+    );
     input2DArrayColors.push(rArr);
   });
   layerOutputColors.push([input2DArrayColors]); // push input as 3d array
@@ -306,11 +314,13 @@ export function getOutputColors(layerOutputs, layersMetadata, input2DArray) {
 export function getOneLayerOutputColors(layerOutput, isSquare, dimensions) {
   const values = layerOutput.dataSync();
   const maxValue = getArrayMax(values);
+  const minValue = getArrayMin(values);
 
   const colorArray = Array.prototype.slice.call(values);
   const colorObjs = colorArray.map(v => ({
-    colorHex: valueToHex(v, maxValue),
+    colorHex: valueToHex(v, maxValue, minValue),
     maxVal: maxValue,
+    minVal: minValue,
     val: v
   }));
   if (isSquare) {
@@ -324,15 +334,19 @@ export function fracToHex(value) {
   return Math.round(value * 255) * WHITE_COLOR;
 }
 
-export function valueToHex(value, maxValue) {
-  if (value <= 0) {
-    return 0;
-  } else if (maxValue <= 1) {
-    return fracToHex(value);
-  } else {
-    const frac = value / maxValue;
-    return fracToHex(frac);
-  }
+export function valueToHex(value, maxValue, minValue) {
+  // if (value <= 0) {
+  //   return 0;
+  // } else if (maxValue <= 1) {
+  //   return fracToHex(value);
+  // } else {
+  //   const frac = value / maxValue;
+  //   return fracToHex(frac);
+  // }
+  if (maxValue === 0 && minValue === 0) return 0;
+
+  const frac = (value - minValue) / (maxValue - minValue);
+  return fracToHex(frac);
 }
 
 export const getAllNeuronEdgesData = trainedModel => {
